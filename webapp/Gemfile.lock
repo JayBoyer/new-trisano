@@ -31,6 +31,7 @@ GEM
     capistrano-ext (1.2.1)
       capistrano (>= 1.0.0)
     cgi_multipart_eof_fix (2.5.0)
+    chronic (0.6.7)
     ci_reporter (1.6.2)
       builder (>= 2.1.2)
     columnize (0.3.6)
@@ -162,6 +163,9 @@ GEM
       nokogiri (>= 1.2.0)
       rack (>= 1.0)
       rack-test (>= 0.5.3)
+    whenever (0.7.3)
+      activesupport (>= 2.3.4)
+      chronic (~> 0.6.3)
 
 PLATFORMS
   java
@@ -206,3 +210,4 @@ DEPENDENCIES
   validates_timeliness (= 2.3.1)
   watchr (= 0.7)
   webrat (= 0.7.2.pre)
+  whenever
