@@ -125,11 +125,13 @@ end
 
 Factory.define :interested_party do |ip|
   ip.association :person_entity
+  ip.secondary_entity { Factory.create(:place_entity) }
   ip.association :risk_factor, :factory => :participations_risk_factor
 end
 
 Factory.define :interested_place do |ip|
   ip.association :place_entity
+  ip.secondary_entity { Factory.create(:place_entity) }
 end
 
 Factory.define :participations_risk_factor do |rf|
@@ -146,6 +148,7 @@ end
 
 Factory.define :jurisdiction do |j|
   j.place_entity { create_jurisdiction_entity }
+  j.secondary_entity { create_jurisdiction_entity }
 end
 
 Factory.define :associated_jurisdiction do |aj|
