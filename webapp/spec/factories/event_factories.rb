@@ -148,7 +148,9 @@ end
 
 Factory.define :jurisdiction do |j|
   j.place_entity { create_jurisdiction_entity }
-  j.secondary_entity { create_jurisdiction_entity }
+  j.after_build do |jurisdiction|
+    jurisdiction.secondary_entity_id  = jurisdiction.place_entity.id
+  end
 end
 
 Factory.define :associated_jurisdiction do |aj|
