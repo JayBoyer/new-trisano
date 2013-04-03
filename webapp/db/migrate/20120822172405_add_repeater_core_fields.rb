@@ -16,6 +16,9 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 class AddRepeaterCoreFields < ActiveRecord::Migration
   def self.up
+## TODO Jay
+    add_column :core_fields, :repeater, :boolean, :default => false
+## TODO Jay
     puts "Loading core fields from db/defaults/core_fields.yml"
     core_fields = YAML::load_file("#{RAILS_ROOT}/db/defaults/core_fields.yml")
     CoreField.load!(core_fields)

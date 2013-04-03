@@ -34,6 +34,9 @@ gem 'exception_notification', :git => "git://github.com/rails/exception_notifica
 # on its own like this.
 gem "sparrowhawk", "0.9.5"
 
+## TODO Jay
+gem "net-ldap", "0.0.5"
+
 group :development do
   gem "mechanize", "1.0.0"
   gem "rest-open-uri", "1.0.0"
