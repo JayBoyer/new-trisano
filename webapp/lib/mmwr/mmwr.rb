@@ -76,6 +76,24 @@ class Mmwr
     mmwr_week_range.mmwr_year.to_i
   end
 
+  def mwr_year(epidate)
+	@epidate = epidate
+	
+	last_day_of_pre_year = DateTime.new(@epidate.year - 1, 12, 31)
+    first_day_of_next_year = DateTime.new(@epidate.year + 1, 1, 1)
+
+	if first_day_of_next_year - @epidate <= 3 and first_day_of_next_year.wday <= 3 and @epidate.wday < 3 
+		mwr_yr = @epidate.year + 1
+	elsif @epidate - last_day_of_pre_year <= 3 and last_day_of_pre_year.wday >= 3 and @epidate.wday > 3  
+		mwr_yr = @epidate.year - 1           
+	else mwr_yr = @epidate.year
+	end
+	
+	mwr_yr
+    #lei comments
+    #logger.info "mwr_yr = #{mwr_yr}"
+  end	
+
   def epi_dates
     @epi_dates ||= {}
   end
@@ -125,8 +143,10 @@ class Mmwr
   def mmwr_weeks(year)
 
     first_mmwr_week = year_first_mmwr_week(year)
-    first_day_of_year = year.beginning_of_year
-    sunday = nil
+    #first_day_of_year = year.beginning_of_year
+    first_day_of_year = Date.new(mwr_year(@epi_date),1,1)
+    
+	sunday = nil
     saturday = nil
     count = 0
 
@@ -169,7 +189,9 @@ class Mmwr
   def date_ranges
     date_ranges = Hash.new()
 
-    first_day_of_year = @epi_date.beginning_of_year
+    #first_day_of_year = @epi_date.beginning_of_year
+	first_day_of_year = DateTime.new(mwr_year(@epi_date), 1, 1)
+	
     first_mmwr_week = year_first_mmwr_week(first_day_of_year)
     sunday = nil
     saturday = nil
