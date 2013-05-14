@@ -14,7 +14,7 @@ set :rvm_type, :user
 
 
 ## site config settings
-set :bi_server_url               , "http://pentaho-dev.cchd.org:8080/pentaho/Login"
+set :bi_server_url               , "http://pentaho.cchd.org:8080/pentaho/Login"
 set :help_url                    , "https://wiki.csinitiative.com/display/tri35/Help"
 set :mailer                      , "smtp"
 ## TODO Jay
@@ -35,7 +35,7 @@ set :recv_facility, "SNHD Trisano ProductionTest"
 set :processing_id, "P^"
 
 ## User auth configurations
-set :auth_login_timeout, 30
+set :auth_login_timeout, 90
 set :password_reset_timeout, 60 * 24 * 3
 set :default_admin_uid, 'trisano_admin'
 #TODO Jay
