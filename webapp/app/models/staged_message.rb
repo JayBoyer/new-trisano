@@ -326,6 +326,67 @@ class StagedMessage < ActiveRecord::Base
   rescue
   end
 
+  MASK_OOE = 0x01
+  MASK_STD = 0x02
+  MASK_TB  = 0x04
+
+  # get the jurisdiction bit mask
+  def self.get_mask_jurisdiction
+    mask_jurisdiction = 0;
+    mask_from_jurisdiction = { 'SNHDOOE' => MASK_OOE, 'SNHDSTD' => MASK_STD, 'SNHDTB' => MASK_TB }
+
+    # get the list of jurisdictions for the current user
+    User.current_user.role_memberships.each do |membership|
+      if ((mask_add = mask_from_jurisdiction[membership.jurisdiction.name]) != nil)
+         mask_jurisdiction |= mask_add
+      end 
+    end
+    return mask_jurisdiction
+  end
+
+  # build an SQL string to filter by disease group
+  def self.build_filter_condition
+    conditions = [
+      "((hl7_message NOT LIKE '%SNHDSTD%') AND (hl7_message NOT LIKE '%SNHDTB%'))",
+      "(hl7_message LIKE '%SNHDSTD%')",
+      "(hl7_message LIKE '%SNHDTB%')" ]
+    add_or = false
+    condition = ""
+    mask_jurisdiction = get_mask_jurisdiction()
+    (0..2).each do |i|
+      mask = MASK_OOE << i
+      if ((mask_jurisdiction & mask) != 0)
+        condition += add_or ? ' OR ' : ''
+        add_or = true
+        condition += conditions[i]
+      end
+    end 
+    return condition
+  end
+
+
+  #TODO Jay we are filtering by the group specified in a text field
+  # in the HL7 message, when disease groups are implemented we should
+  # filter by disease groups
+  def self.filter_by_user_and_disease_group(staged_messages)
+    staged_messages_ret = Array.new()
+    mask = get_mask_jurisdiction()
+
+    # build the list of filtered messages
+    staged_messages.each do |message|
+       hl7 = message.hl7.to_s
+       if hl7.include?('SNHDSTD') && ((mask & MASK_STD)!=0)
+          staged_messages_ret.push(message)
+       elsif hl7.include?('SNHDTB') && ((mask & MASK_TB)!= 0)
+          staged_messages_ret.push(message)
+       # all messages not designated for STD or TB go to OOE
+       elsif !hl7.include?('SNHDSTD') && !hl7.include?('SNHDTB') && ((mask & MASK_OOE)!= 0)
+         staged_messages_ret.push(message)
+       end
+    end
+    return staged_messages_ret
+  end
+
   class << self
     def recv_facility
       @recv_facility ||= hl7_config[:recv_facility] ||

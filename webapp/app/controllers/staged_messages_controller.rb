@@ -25,7 +25,7 @@ class StagedMessagesController < ApplicationController
 
   def index
     @selected = StagedMessage.states.has_value?(params[:message_state]) ? @selected = params[:message_state] : @selected = StagedMessage.states[:pending]
-    @staged_messages = StagedMessage.paginate_by_state(@selected, :order => "created_at DESC", :page => params[:page], :per_page => 10)
+    @staged_messages = StagedMessage.paginate_by_state(@selected, :conditions => StagedMessage.build_filter_condition(), :order => "created_at DESC", :page => params[:page], :per_page => 10)
   end
 
   def show
@@ -159,7 +159,7 @@ class StagedMessagesController < ApplicationController
   def search
     if params.delete(:do) == "Search"
       begin
-        @staged_messages = StagedMessage.find_by_search params
+        @staged_messages = StagedMessage.filter_by_user_and_disease_group(StagedMessage.find_by_search(params))
       rescue
         flash.now[:error] = t("staged_message_search_failed")
       end
