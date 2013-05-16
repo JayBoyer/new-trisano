@@ -108,6 +108,14 @@ class StagedMessagesController < ApplicationController
 
   def discard
     @staged_message = StagedMessage.find(params[:id])
+    
+    # put the user back on the same page, when a message is discarded, or
+    # on the prior page if the last page is now empty
+    current_page = params[:current_page].to_i()
+    total_entries = params[:total_entries].to_i() - 1
+    if (((current_page-1) * 10) >= total_entries && current_page >= 2)
+      current_page = [1, ((total_entries-1)/10)+1].min
+    end
     begin
       @staged_message.discard
     rescue
@@ -115,7 +123,7 @@ class StagedMessagesController < ApplicationController
       redirect_to(staged_message_path(@staged_message))
     else
       flash[:notice] = t("staged_message_discarded")
-      redirect_to(staged_messages_url)
+      redirect_to(staged_messages_path(:page=>current_page))
     end
   end
 

@@ -58,6 +58,8 @@
             = " | "
             - form_tag(discard_staged_message_path(staged_message), :style => "display: inline", :id => "discard_#{staged_message.id}") do
               = hidden_field_tag('staged_message_id', staged_message.id)
+              = hidden_field_tag('total_entries', @staged_messages.total_entries)
+              = hidden_field_tag('current_page', @staged_messages.current_page)
               = link_to_function(t("discard"), "this.parentNode.submit()", :class => 'staged-message-discard-link staged-message-link')
           %p
             = ct('state')
