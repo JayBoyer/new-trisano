@@ -20,7 +20,9 @@ class Mmwr
 
   def self.week(week, opts={})
     opts[:for_year] ||= DateTime.now.year
-    ranges = Mmwr.new(DateTime.new(opts[:for_year], 1, 1)).send(:date_ranges)
+    # 'Jan, 1' is not guaranteed to be the first mmwr week
+    # so choose a date that guaranteed to be in the mmwr year such as July 1 or Jan 10. 
+    ranges = Mmwr.new(DateTime.new(opts[:for_year], 1, 10)).send(:date_ranges)
     Mmwr.new(ranges[week].start_date)
   end
 
