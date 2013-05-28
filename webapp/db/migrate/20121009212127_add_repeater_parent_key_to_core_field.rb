@@ -18,7 +18,7 @@ class AddRepeaterParentKeyToCoreField < ActiveRecord::Migration
   def self.up
     CoreField.transaction do
 ## TODO Jay
-#      add_column :core_fields, :repeater_parent_key, :string
+      add_column :core_fields, :repeater_parent_key, :string
       CoreField.reset_column_information
       core_fields = {
         "morbidity_event[hospitalization_facilities][hospitals_participation][admission_date]" =>

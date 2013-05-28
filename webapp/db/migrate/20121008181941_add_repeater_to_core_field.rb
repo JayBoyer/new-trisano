@@ -17,7 +17,8 @@
 class AddRepeaterToCoreField < ActiveRecord::Migration
   def self.up
     CoreField.transaction do
-      add_column :core_fields, :repeater, :boolean, :default => false
+# TODO Jay
+#      add_column :core_fields, :repeater, :boolean, :default => false
       CoreField.reset_column_information
       core_fields = %w(
         morbidity_event[hospitalization_facilities][hospitals_participation][admission_date]
