@@ -335,6 +335,11 @@ class StagedMessage < ActiveRecord::Base
     mask_jurisdiction = 0;
     mask_from_jurisdiction = { 'SNHDOOE' => MASK_OOE, 'SNHDSTD' => MASK_STD, 'SNHDTB' => MASK_TB }
 
+    # if a super-user, they can see everything
+    if User.current_user.is_admin?
+      return MASK_OOE | MASK_STD | MASK_HIV
+    end
+
     # get the list of jurisdictions for the current user
     User.current_user.role_memberships.each do |membership|
       if ((mask_add = mask_from_jurisdiction[membership.jurisdiction.name]) != nil)
@@ -352,13 +357,17 @@ class StagedMessage < ActiveRecord::Base
       "(hl7_message LIKE '%SNHDTB%')" ]
     add_or = false
     condition = ""
-    mask_jurisdiction = get_mask_jurisdiction()
-    (0..2).each do |i|
-      mask = MASK_OOE << i
-      if ((mask_jurisdiction & mask) != 0)
-        condition += add_or ? ' OR ' : ''
-        add_or = true
-        condition += conditions[i]
+
+    # if a super-user, they can see everything
+    if(!User.current_user.is_admin?)
+      mask_jurisdiction = get_mask_jurisdiction()
+      (0..2).each do |i|
+        mask = MASK_OOE << i
+        if ((mask_jurisdiction & mask) != 0)
+          condition += add_or ? ' OR ' : ''
+          add_or = true
+          condition += conditions[i]
+        end
       end
     end 
     return condition
@@ -369,6 +378,9 @@ class StagedMessage < ActiveRecord::Base
   # in the HL7 message, when disease groups are implemented we should
   # filter by disease groups
   def self.filter_by_user_and_disease_group(staged_messages)
+    if(User.current_user.is_admin?)
+      return staged_messages
+    end
     staged_messages_ret = Array.new()
     mask = get_mask_jurisdiction()
 
