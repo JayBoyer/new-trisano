@@ -10,8 +10,8 @@ Feature: Exporting reportable diseases for the CDC
       And a morbidity event exists with the disease Brucellosis
       And the morbidity event state case status is "Confirmed"
     When I go to the CDC export for the current week
-    Then I should see "V491002000001"
-     And I should see "M 49(.*)10020"
+    Then I should see "V\d+1002000001"
+     And I should see "M \d+(.*)10020"
 
   @pending
   Scenario: Exporting a deleted record that's already been sent to the CDC
