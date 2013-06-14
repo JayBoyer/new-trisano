@@ -93,6 +93,15 @@ class MorbidityEventsController < EventsController
         format.xml  { render :xml => @event.errors, :status => :unprocessable_entity }
       end
     end
+##TODO Jay
+    ## if a cmr was successfully created
+	event_id = @event.id
+	if (event_id != nil)
+	  if (response.body == nil)
+        response.body = ""
+	  end	  
+      response.body += "<?xml version=\"1.0\" encoding=\"UTF-8\"?><cmr>" + event_id.to_s + "</cmr>"
+	end
   end
 
   def update
