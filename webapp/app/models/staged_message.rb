@@ -352,7 +352,7 @@ class StagedMessage < ActiveRecord::Base
   # build an SQL string to filter by disease group
   def self.build_filter_condition
     conditions = [
-      "((hl7_message NOT LIKE '%SNHDSTD%') AND (hl7_message NOT LIKE '%SNHDTB%'))",
+      "(hl7_message LIKE '%SNHDOOE%' OR ((hl7_message NOT LIKE '%SNHDSTD%') AND (hl7_message NOT LIKE '%SNHDTB%')))",
       "(hl7_message LIKE '%SNHDSTD%')",
       "(hl7_message LIKE '%SNHDTB%')" ]
     add_or = false
@@ -391,7 +391,9 @@ class StagedMessage < ActiveRecord::Base
           staged_messages_ret.push(message)
        elsif hl7.include?('SNHDTB') && ((mask & MASK_TB)!= 0)
           staged_messages_ret.push(message)
-       # all messages not designated for STD or TB go to OOE
+       elsif hl7.include?('SNHDOOE') && ((mask & MASK_OOE)!= 0)
+          staged_messages_ret.push(message)
+       # all messages not designated for STD or TB go to OOE (this displays messages with no designitation to OOE)
        elsif !hl7.include?('SNHDSTD') && !hl7.include?('SNHDTB') && ((mask & MASK_OOE)!= 0)
          staged_messages_ret.push(message)
        end
