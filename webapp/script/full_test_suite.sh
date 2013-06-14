@@ -7,6 +7,9 @@ read -r -p "Are you sure you are ready to run all tests? [Y/n] " response
 case $response in
   [Y]) 
 
+    rm log/test.log
+    rm log/feature.log
+
     echo ">>>>>>>>>>Stopping enhanced environment"
     ./script/enhanced_support_stop.sh
 
