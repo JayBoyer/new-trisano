@@ -100,7 +100,7 @@ class MorbidityEventsController < EventsController
       if (response.body == nil)
         response.body = ""
       end	  
-      response.body += "<?xml version=\"1.0\" encoding=\"UTF-8\"?><cmr>" + event_id.to_s + "</cmr>"
+      response.body += "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><cmr>" + event_id.to_s + "</cmr></response>"
     end
   end
 
