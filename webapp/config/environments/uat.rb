@@ -38,9 +38,34 @@ config.action_controller.allow_forgery_protection    = false
 config.action_mailer.delivery_method = :test
 
 require 'logging'
-Logging.init :debug, :info, :warn, :error, :fatal
-DEFAULT_LOGGER = Logging::Logger['server']
 
+# Logging.init is required to avoid 
+#   unknown level was given 'info' (ArgumentError)
+# or
+#   uninitialized constant Logging::MAX_LEVEL_LENGTH (NameError)
+# when an Appender or Layout is created BEFORE any Logger is instantiated:
+Logging.init :debug, :info, :warn, :error, :fatal
+
+# see https://github.com/TwP/logging/blob/master/lib/logging/layouts/pattern.rb
+# for pattern formatting reference
+layout = Logging::Layouts::Pattern.new :pattern => "[%p] [%d] [%-5l] %m\n"
+
+# Default logfile, history kept for 10 days
+TRISANO_LOG_LOCATION = ENV['TRISANO_LOG_LOCATION'] ||= '/var/log/trisano/'
+if TRISANO_LOG_LOCATION.split('').last != '/'
+  TRISANO_LOG_LOCATION = TRISANO_LOG_LOCATION + '/'
+end
+default_appender = Logging::Appenders::RollingFile.new 'default', :filename => TRISANO_LOG_LOCATION + 'trisano.log', :age => 'daily', :keep => 10, :safe => true, :layout => layout
+
+DEFAULT_LOGGER = Logging::Logger['server']
+DEFAULT_LOGGER.add_appenders default_appender
+if ENV['TRISANO_LOG_LEVEL'] != nil
+  DEFAULT_LOGGER.level = ENV['TRISANO_LOG_LEVEL'].intern
+else
+  DEFAULT_LOGGER.level = :info
+end
+
+config.logger = DEFAULT_LOGGER
 
 #make translation fail loud
 #require 'trisano/i18n/fail_fast'
