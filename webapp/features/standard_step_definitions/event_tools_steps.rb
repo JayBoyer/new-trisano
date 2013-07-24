@@ -25,4 +25,5 @@ Then /^I should see the full set of tools in the right place$/ do
   response.should have_xpath("//div[@id='title_area']//a[contains(text(), 'Create a new event from this one')]")
   response.should have_xpath("//div[@id='title_area']//a[contains(text(), 'Events')]")
   response.should have_xpath("//div[@id='title_area']//a[contains(text(), 'Route to Local Health Depts.')]")
+
 end

@@ -40,6 +40,11 @@ module HumanEventsHelper
       controls << link_to_function(t("print"), nil) do |page|
         page["printing_controls_#{event.id}"].visual_effect :appear, :duration => 0.0
       end
+    if !event.nil? && event.disease_name != "" && event.disease_name != nil
+      if event.disease_name.downcase.include? 'tuberculosis'
+        controls << " | " << link_to(t('generate_rvct'), pdf_print_pdfs_path(:evnt_id => event.id), :method => :get)
+      end
+    end
     end
     if event.deleted_at.nil? && can_update
       controls << " | " unless controls.blank?

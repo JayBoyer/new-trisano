@@ -738,6 +738,7 @@ en:
   show_contacts_map: "Show Contacts Map"
 
   #morbidity_events
+  generate_rvct:  "Generate RVCT"
   create_new_event_from_this_one: "Create a new event from this one"
   export_to_csv: "Export to CSV"
   add_attachment: "Add Attachment"
