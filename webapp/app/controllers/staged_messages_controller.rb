@@ -114,7 +114,7 @@ class StagedMessagesController < ApplicationController
     current_page = params[:current_page].to_i()
     total_entries = params[:total_entries].to_i() - 1
     if (((current_page-1) * 10) >= total_entries && current_page >= 2)
-      current_page = [1, ((total_entries-1)/10)+1].min
+      current_page = [1, ((total_entries-1)/10)+1].max
     end
     begin
       @staged_message.discard
