@@ -12,13 +12,14 @@ Feature: Creating new contact events
     And I press "Search" and wait to see "Create a new contact"
     Then I should see "No results"
     And I should see "Create a new contact"
-
     When I follow "Create a new contact"
     And I fill in "Last name" with "Contacto"
     And I fill in "Street number" with "679"
     And I fill in "Street name" with "Friday Lane"
     And I fill in "City" with "Salt Lake City"
     And I select "Utah" from "State"
+	
+    When I navigate to the Notes tab
     And I fill in "New note" with "This is some contact."
     And I save and continue
     Then I should see "Contact event was successfully created."

@@ -125,10 +125,10 @@ def add_value_sets
 end
 
 def reorder_elements
-  @browser.get_eval("nodes = window.document.getElementById(\"#{@reorderable_section_id}\").getElementsByTagName('li'); firstItem =nodes[0].id.toString().substring(9); secondItem =nodes[1].id.toString().substring(9); firstItem > secondItem").should == "false"
+  @driver.execute_script("return nodes = window.document.getElementById(\"#{@reorderable_section_id}\").getElementsByTagName('li'); firstItem =nodes[0].id.toString().substring(9); secondItem =nodes[1].id.toString().substring(9); firstItem > secondItem").should == "false"
   @browser.dragdrop "//ul[@id='#{@reorderable_section_id}']/li[2]", "0,-40"
   @browser.wait_for_ajax
-  @browser.get_eval("nodes = window.document.getElementById(\"#{@reorderable_section_id}\").getElementsByTagName('li'); firstItem =nodes[0].id.toString().substring(9); secondItem =nodes[1].id.toString().substring(9); firstItem > secondItem").should == "true"
+  @driver.execute_script("return nodes = window.document.getElementById(\"#{@reorderable_section_id}\").getElementsByTagName('li'); firstItem =nodes[0].id.toString().substring(9); secondItem =nodes[1].id.toString().substring(9); firstItem > secondItem").should == "true"
 end
 
 def edit_value_sets

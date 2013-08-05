@@ -56,7 +56,8 @@ end
 
 When(/^I click the "(.+)" link and wait to see "(.+)"$/) do |link, text|
   @browser.click "link=#{link}"
-  @browser.wait_for_element "//*[contains(text(),'#{text}')]", :timeout_in_seconds => 3
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  wait.until { @driver.page_source().include?(text) }
 end
 
 When(/^I click the "(.+)" button$/) do |button|
@@ -70,18 +71,18 @@ end
 
 When(/^I click and confirm the "(.+)" button$/) do |button|
   @browser.click("//input[contains(@value, '#{button}')]")
-  @browser.get_confirmation()
+  get_confirmation()
   @browser.wait_for_page_to_load($load_time)
 end
 
 When(/^I click and confirm the "(.+)" button and don't wait$/) do |button|
   @browser.click("//input[contains(@value, '#{button}')]")
-  @browser.get_confirmation()
+  get_confirmation()
 end
 
 When(/^I click and confirm the "(.+)" link$/) do |text|
   @browser.click("//a[contains(text(), '#{text}')]")
-  @browser.get_confirmation()
+  get_confirmation()
   @browser.wait_for_page_to_load($load_time)
 end
 
@@ -99,13 +100,14 @@ When /^I fill in "([^\"]*)" with "([^\"]*)"$/ do |field, text|
   rescue
     field_id = field
   end
-
+  
   @last_id = field_id
   @browser.type field_id, text
 end
 
 When /^I wait to see "([^\"]*)"$/ do |text|
-  @browser.wait_for_element "//*[contains(text(),'#{text}')]", :timeout_in_seconds => 3
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  element = wait.until { @driver.find_element(:xpath, "//*[contains(text(),'#{text}')]") }
 end
 
 When /^I check "([^\"]*)"$/ do |field|
@@ -113,15 +115,17 @@ When /^I check "([^\"]*)"$/ do |field|
   @browser.check field_id
 end
 
+
 When /^I press "([^\"]*)"$/ do |button|
   @browser.click "//input[@value='#{button}']"
 end
 
 When /^I press "([^\"]*)" and wait to see "([^\"]*)"$/ do |button, text|
   @browser.click "//input[@value='#{button}']"
-  @browser.wait_for_element "//*[contains(text(),'#{text}')]", :timeout_in_seconds => 3
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  element = wait.until { @driver.find_element(:xpath, "//*[contains(text(),'#{text}')]") }
+#  @browser.wait_for_element "//*[contains(text(),'#{text}')]", :timeout_in_seconds => 3
 end
-
 
 When /^the following values are selected from "([^\"]*)":$/ do |select, values|
   values.raw.each do |value|
@@ -139,17 +143,17 @@ end
 
 Then /^I should see "([^\"]*)"$/ do |text|
   escaped_text = Regexp.escape(text)
-  @browser.get_html_source.should =~ /#{escaped_text}/i
+  @driver.page_source().should =~ /#{escaped_text}/i
 end
 
 Then(/^I should see the following in order:$/) do |values|
   escaped_text = values.raw.join(".*")
-  @browser.get_html_source.should =~ /#{escaped_text}/im
+  @driver.page_source().should =~ /#{escaped_text}/im
 end
 
 Then /^I should not see "([^\"]*)"$/ do |text|
   escaped_text = Regexp.escape(text)
-  @browser.get_body_text.should_not =~ /#{escaped_text}/i
+  @browser.get_body_text().should_not =~ /#{escaped_text}/i
 end
 
 Then /^I wait for ajax$/ do

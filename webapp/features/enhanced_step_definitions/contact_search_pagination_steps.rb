@@ -31,7 +31,7 @@ When /^I follow the next pagination navigation link$/ do
 end
 
 When /^I follow the last pagination navigation link$/ do
-  page_number = @browser.get_eval("selenium.browserbot.getCurrentWindow().$$('#contact_search_results a').last().previous().innerHTML")
+  page_number = @driver.execute_script("return $j(this).$$('#contact_search_results a').last().previous().innerHTML")
   @browser.click("link=#{page_number}")
   sleep 5 # Wait for Ajax wasn't doing it here
 end

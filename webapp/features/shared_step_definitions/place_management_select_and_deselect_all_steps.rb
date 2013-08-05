@@ -43,9 +43,9 @@ When(/^I click the select-none option$/) do
 end
 
 Then(/^all merge check boxes should be selected$/) do
-  @browser.get_eval("assertion = true; selenium.browserbot.getCurrentWindow().$$('#merge_form input.merge_check_box').each(function(box){ if (box.checked==false) {assertion = false}}); assertion;").should be_true
+  @driver.execute_script("assertion = true; $j(this).$$('#merge_form input.merge_check_box').each(function(box){ if (box.checked==false) {assertion = false}}); return assertion;").should be_true
 end
 
 Then(/^all merge check boxes should not be selected$/) do
-  @browser.get_eval("assertion = true; selenium.browserbot.getCurrentWindow().$$('#merge_form input.merge_check_box').each(function(box){ if (box.checked==true) {assertion = false}}); assertion;").should be_true
+  @bdriver.execute_script("assertion = true; $j(this).$$('#merge_form input.merge_check_box').each(function(box){ if (box.checked==true) {assertion = false}}); return assertion;").should be_true
 end

@@ -13,6 +13,7 @@ Feature: Filtering the CMR list view
         | AIDS          |
     When I am on the events index page
     Then events list should show 3 events
+	And I follow "Change View"
     When I select "AIDS" from "Diseases"
       And I click the "Change View" button
       And I wait for the page to load
@@ -28,6 +29,7 @@ Feature: Filtering the CMR list view
         | Brucellosis   |
     When I am on the events index page
     Then events list should show 3 events
+	And I follow "Change View"
     When the following values are selected from "Diseases":
       | Anthrax |
       | AIDS    |

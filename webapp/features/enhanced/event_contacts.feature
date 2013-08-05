@@ -18,6 +18,7 @@ Feature: Managing contacts on events
     Then I should see all added contacts
 
     When I navigate to the assessment event edit page
+	When I navigate to the Contacts tab
     And I check a contact to remove
     And I save and exit
     Then the removed contact should be struckthrough
@@ -52,6 +53,7 @@ Feature: Managing contacts on events
     Then I should see all added contacts
 
     When I navigate to the morbidity event edit page
+	When I navigate to the Contacts tab
     And I check a contact to remove
     And I save and exit
     Then the removed contact should be struckthrough

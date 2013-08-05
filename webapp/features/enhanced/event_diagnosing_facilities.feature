@@ -17,6 +17,7 @@ Feature: Managing diagnosing facilities on events
     Then I should see all added diagnosing facilities
 
     When I navigate to the morbidity event edit page
+	When I navigate to the Clinical tab
     And I remove all of the diagnostic facilities
     Then I should not see the removed diagnostic facility
 
@@ -46,6 +47,7 @@ Feature: Managing diagnosing facilities on events
     And I save and continue
     Then I should see all added diagnosing facilities
     When I am on the contact event edit page
+	When I navigate to the Clinical tab
     And I remove all of the diagnostic facilities
     Then I should not see the removed diagnostic facility
 

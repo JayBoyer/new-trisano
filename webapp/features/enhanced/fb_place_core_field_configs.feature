@@ -12,6 +12,7 @@ Feature: Place event form core field configs
     And there is a place on the event named The Shack
 
     When I am on the place event edit page
+
     Then I should see all of the core field config questions
 
     When I answer all core field config questions

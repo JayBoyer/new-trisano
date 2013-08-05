@@ -16,21 +16,26 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
 Given /^I don\'t see any of the core follow up questions$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = core_field.key
+	p "key =" + key
     key.gsub!("morbidity_and_assessment_event", @event.type.underscore)
     raise "Should not not find #{key}" if html_source.include?("#{key} follow up?") == true
   end
 end
 
 When(/^I answer all of the core follow ups with a matching condition$/) do
+  click_core_tab(@browser, "Investigation")
+  @browser.wait_for_page_to_load("30000")
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = railsify_core_field_key(core_field.key)
     key.gsub!("morbidity_and_assessment_event", @event.type.underscore)
-
+p "write key = " + key
+    wait = Selenium::WebDriver::Wait.new(:timeout => 2)
+    wait.until { @driver.page_source().include?(key) }
     if core_field.code_name
       # For now, all core condition follow ups are drop downs. Later, we might have to
       # look at the core field's field type to know how to tell Selenium how to fill
@@ -48,7 +53,6 @@ When(/^I answer all of the core follow ups with a matching condition$/) do
         @browser.type(key, "1")
       end
 
-      puts "answering core follow up #{key} with matching condition"
       sleep 1  #to many questions answered at the same time, must wait for AJAX calls
     end
   end
@@ -57,7 +61,7 @@ end
 Then /^I should see all of the core follow up questions$/ do
   @browser.wait_for_ajax
   sleep 3 # Wait a sec or three for all of the core follow ups to show up
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     next if skip_core_field?(core_field, html_source)
@@ -68,21 +72,20 @@ Then /^I should see all of the core follow up questions$/ do
 end
 
 When /^I answer all core follow up questions$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     next if skip_core_field?(core_field, html_source)
     key = core_field.key
     key.gsub!("morbidity_and_assessment_event", @event.type.underscore)
     answer_investigator_question(@browser, "#{key} follow up?", "#{key} answer", html_source)
-    puts "answering core follow up question #{key}"
   end
 end
 
 Then /^I should see all follow up answers$/ do
   @browser.wait_for_ajax
   sleep 3 # Wait a sec or three for all of the core follow ups to show up
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     next if skip_core_field?(core_field, html_source)
@@ -120,7 +123,6 @@ When /^I answer all of the core follow ups with a non\-matching condition$/ do
 
     end
 
-    puts "answering core follow up #{key} with NON-matching condition"
     sleep 1  #to many questions answered at the same time, must wait for AJAX calls
   end
 end
@@ -132,7 +134,7 @@ end
 Then /^I should not see any of the core follow up questions$/ do
   @browser.wait_for_ajax
   sleep 3 # Wait a sec or three for all of the core follow ups to show up
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = core_field.key
@@ -144,7 +146,7 @@ end
 Then /^I should not see any follow up answers$/ do
   @browser.wait_for_ajax
   sleep 3 # Wait a sec or three for all of the core follow ups to show up
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = core_field.key
@@ -187,7 +189,7 @@ When /^I answer all of the form field follow ups with a matching condition$/ do
 end
 
 Then /^I should see all of the form field follow up questions$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = core_field.key
@@ -214,7 +216,7 @@ When /^I answer all form field follow up questions$/ do
 end
 
 Then /^I should see all form field follow up answers$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = core_field.key
@@ -240,7 +242,7 @@ When /^I answer all of the form field follow ups with a non\-matching condition$
 end
 
 Then /^I should not see any of the form field follow up questions$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = core_field.key

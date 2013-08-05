@@ -16,6 +16,9 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
 When(/^I click the back to top link$/) do
-  link = "//a[contains(text(), 'Return to top')]"
-  @browser.click(link)
+#  script = %Q{ $j("div#demographic_tab a:contains('Return to top')").click(); }
+#  script = "scrollToTop();"
+#  @driver.execute_script(script);
+  element = @driver.find_element(:xpath, "//div[@id='demographic_tab']/a[contains(., 'Return to top')]")
+  element.click()
 end

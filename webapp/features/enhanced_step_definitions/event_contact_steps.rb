@@ -29,7 +29,7 @@ When(/^I add an existing contact$/) do
 end
 
 When(/^I click remove for that contact$/) do
-  @browser.click("link=Remove")
+  @driver.find_element(:link_text, "Remove").click();
   wait_for_element_not_present("//div[@id='contact_child_events']/div[@class='contact_from_search']")
 end
 

@@ -33,9 +33,16 @@ module TrisanoContactsHelper
 
   def add_contact(browser, contact_attributes, index = 1)
     click_core_tab(browser, CONTACTS)
-    browser.click "link=Add a contact"
-    sleep(1)
-    browser.type("//li[@class='contact'][#{index}]//input[contains(@id, 'last_name')]", contact_attributes[:last_name])
+	# we sleep here because we may have just added a contact and contact search results are refreshing
+	# the first "Add a contact" link may be stale
+	sleep(2)
+	wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+    element = wait.until { @driver.find_element(:link_text, "Add a contact") }
+	element.click();
+	wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+	xpath = "//li[@class='contact'][#{index}]//input[contains(@id, 'last_name')]"
+    wait.until { @driver.find_element(:xpath, xpath) }
+    browser.type(xpath, contact_attributes[:last_name])
     browser.type("//li[@class='contact'][#{index}]//input[contains(@id, 'first_name')]", contact_attributes[:first_name])
     browser.select("//li[@class='contact'][#{index}]//select[contains(@id, 'disposition')]", "label=#{contact_attributes[:disposition]}")
     
@@ -60,7 +67,9 @@ module TrisanoContactsHelper
   end
 
   def remove_contact(browser, index=1)
-    browser.click("//div[@id='contact_child_events']//li[@class='contact'][#{index}]//input[contains(@id, '_destroy')]")
+  	wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+    element = wait.until { @driver.find_element(:xpath, "//div[@id='contact_child_events']//li[@class='contact'][#{index}]//input[contains(@id, '_destroy')]") }
+	element.click();
   end
   
 end

@@ -16,7 +16,7 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
 Then /^I should see all of the core field config questions$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ?', @form.event_type, true, false])
   @core_fields.each do |core_field|
     check_core_fields(core_field.key, html_source)
@@ -27,7 +27,7 @@ When /^I answer all core field config questions$/ do
   # Also fill in one address field so the address will show up in show mode
   @browser.type("#{@form.event_type}[address_attributes][street_number]", "12") if ["morbidity_event", "contact_event", "place_event"].include? @form.event_type
 
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ?', @form.event_type, true, false])
   @core_fields.each do |core_field|
     answer_investigator_question(@browser, "#{core_field.key} before?", "#{core_field.key} before answer", html_source).should be_true
@@ -36,7 +36,7 @@ When /^I answer all core field config questions$/ do
 end
 
 Then /^I should see all core field config answers$/ do
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ?', @form.event_type, true, false])
   @core_fields.each do |core_field|
     raise "Could not find before answer for #{core_field.key}" if html_source.include?("#{core_field.key} before answer") == false

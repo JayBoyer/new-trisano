@@ -19,6 +19,7 @@ Feature: Managing place exposures on events
     Then I should see all added place exposures
 
     When I navigate to the morbidity event edit page
+	When I navigate to the Epidemiological tab
     And I check a place exposure to remove
     And I save and exit
     Then I should see the removed place exposure as deleted
@@ -79,6 +80,7 @@ Feature: Managing place exposures on events
     Then I should see all added place exposures
 
     When I navigate to the assessment event edit page
+	When I navigate to the Epidemiological tab
     And I check a place exposure to remove
     And I save and exit
     Then I should see the removed place exposure as deleted

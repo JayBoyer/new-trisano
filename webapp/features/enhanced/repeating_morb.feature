@@ -85,6 +85,7 @@ Feature: Form fields for repeating core sections.
     And     a published form with repeating core fields for a morbidity event with matching disease
 
     When    I navigate to the morbidity event edit page
+	When    I navigate to the Investigation tab
     Then    I should see 0 instances of the repeater core field config questions
 
     When    I click the "Add/Remove forms for this event" link
@@ -123,6 +124,7 @@ Feature: Form fields for repeating core sections.
     And     I should see 2 instances of the repeater core field config questions
     And     I should see 2 instances of answers to the repeating core field config questions
 
+	When    I navigate to the Investigation tab
     When    I click the "Add/Remove forms for this event" link
     And     I check the form for removal
     And     I click and confirm the "Remove Forms" button
@@ -140,9 +142,6 @@ Feature: Form fields for repeating core sections.
 
     When    I change the disease to match the published form
     And     I save and continue
-    Then    I should see "successfully updated"
-
-    When    I click and confirm the "Cancel" button
     Then    I should see "successfully updated"
     And     I should see 1 instances of the repeater core field config questions
 

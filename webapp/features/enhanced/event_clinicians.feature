@@ -18,6 +18,7 @@ Feature: Managing clinicians on events
     Then I should see all added clinicians
 
     When I navigate to the morbidity event edit page
+	When I navigate to the Clinical tab
     And I check a clinician to remove
     And I save and continue
     Then I should not see the removed clinician
@@ -57,6 +58,7 @@ Feature: Managing clinicians on events
     Then I should see all added clinicians
 
     When I navigate to the assessment event edit page
+	When I navigate to the Clinical tab
     And I check a clinician to remove
     And I save and continue
     Then I should not see the removed clinician

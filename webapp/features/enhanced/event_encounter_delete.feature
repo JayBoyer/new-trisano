@@ -10,6 +10,7 @@ Feature: Removing existing encounter strikes them through
     And the event has an encounter
     And the encounter investigator is "joe" 
     When I navigate to the morbidity event show page
+	When I navigate to the Encounters tab
     When I click the "Show Encounter" link
     And I click the "Delete" link and accept the confirmation
     Then I should see "The event was successfully marked as deleted."
@@ -21,6 +22,7 @@ Feature: Removing existing encounter strikes them through
     And the event has an encounter
     And the encounter investigator is "joe" 
     When I navigate to the assessment event show page
+	When I navigate to the Encounters tab
     When I click the "Show Encounter" link
     And I click the "Delete" link and accept the confirmation
     Then I should see "The event was successfully marked as deleted."

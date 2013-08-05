@@ -104,7 +104,7 @@ describe 'Adding a task to a CMR' do
   it 'should display the task notes as a clinical note' do
     @browser.click("clinical-notes")
     sleep(2)
-    @browser.get_eval("selenium.browserbot.getCurrentWindow().$$('div[id^=note_]').findAll(function(n) { return n.innerHTML.indexOf('#{@task_with_notes_notes}') > 0; }).length").to_i.should eql(1)
+    @driver.execute_script("return $j(this).$$('div[id^=note_]').findAll(function(n) { return n.innerHTML.indexOf('#{@task_with_notes_notes}') > 0; }).length").to_i.should eql(1)
   end
 
   # Debt: Weak test of task assignment. Maybe bust out into a separate task assignment spec when the dashboard is functional

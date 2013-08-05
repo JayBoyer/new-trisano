@@ -60,6 +60,7 @@ module TrisanoHelper
     ENCOUNTERS => "encounters_tab",
     EPI => "epi_tab",
     REPORTING => "reporting_tab",
+	INVESTIGATION => "investigation_tab",
     NOTES => 'notes_tab',
     ADMIN => "administrative_tab",
     PLACE => "place_tab",
@@ -191,7 +192,7 @@ module TrisanoHelper
 
   def click_nav_cmrs(browser)
     browser.click 'link=EVENTS'
-    browser.wait_for_page_to_load($load_time)
+    browser._for_page_to_load($load_time)
     return (browser.is_text_present("List Morbidity Events") and
         browser.is_element_present("link=EVENTS"))
   end
@@ -270,7 +271,7 @@ module TrisanoHelper
 
     wait_for_element_present("//div[contains(@id, 'printing_controls')]")
     browser.click "print_all"
-    browser.get_eval("selenium.browserbot.findElement(\"//form[contains(@action, 'print')]\").target='doit';")
+    @driver.execute_script("$j(\"//form[contains(@action, 'print')]\").target='doit';")
     browser.open_window("", "doit");
     browser.click "print_btn"
     browser.wait_for_pop_up("doit", $load_time)
@@ -376,7 +377,7 @@ module TrisanoHelper
   end
 
   def watch_for_spinner(css_selector, browser=@browser, &proc)
-    script = "selenium.browserbot.getCurrentWindow().$$('#{css_selector}').first().visible()"
+    script = "return $j(this).$$('#{css_selector}').first().visible()"
     proc.call unless proc.nil?
     browser.wait_for_condition("#{script} == true", 3000).should == "OK"
     browser.wait_for_condition("#{script} == false", 3000).should == "OK"
@@ -564,9 +565,9 @@ module TrisanoHelper
 
   def note_count(browser, note_type="All")
     if note_type == "All"
-      return browser.get_eval(%Q{selenium.browserbot.getCurrentWindow().$$('span.note-type').length}).to_i
+      return @driver.execute_script(%Q{ return $j(this).$$('span.note-type').length}).to_i
     else
-      browser.get_eval("selenium.browserbot.getCurrentWindow().$$('span.note-type').findAll(function(n) { return n.innerHTML.indexOf('#{note_type}') > 0; }).length").to_i
+      @driver.execute_script("return $j(this).$$('span.note-type').findAll(function(n) { return n.innerHTML.indexOf('#{note_type}') > 0; }).length").to_i
     end
   end
 
@@ -617,7 +618,7 @@ module TrisanoHelper
   end
 
   def is_text_present_in(browser, html_id, text)
-    result = browser.get_eval("selenium.browserbot.getCurrentWindow().$('#{html_id}').innerHTML.indexOf('#{text}') > 0")
+    result = @driver.execute_script("return $j(this).$('#{html_id}').innerHTML.indexOf('#{text}') > 0")
     (result == "false") ? false : true
   end
 
@@ -759,7 +760,13 @@ module TrisanoHelper
     browser.click("link=Add a new lab result to this lab") unless result_index == 1
     sleep(1)
     browser.select("//div[@id='labs']//div[@class='lab'][#{lab_index}]//select[contains(@id, '_secondary_entity_id')]", "label=#{attributes[:lab_name]}") if attributes[:lab_name]
-    browser.select("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//select[contains(@id, '_test_type_id')]", "label=#{attributes[:test_type]}") if attributes[:test_type]
+	if attributes[:test_type]
+	  if(!browser.is_element_present("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//select[contains(@id, '_test_type_id')]//option[.=\'#{attributes[:test_type]}\']"))
+        browser.select("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//select[contains(@id, '_test_type_id')]", "More choices...") 
+        sleep(1)
+	  end
+	  browser.select("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//select[contains(@id, '_test_type_id')]", attributes[:test_type])
+    end	  
     browser.type("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//input[contains(@id, '_lab_result_text')]", attributes[:lab_result_text]) if attributes[:lab_result_text]
     browser.select("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//select[contains(@id, '_interpretation_id')]", "label=#{attributes[:lab_interpretation]}") if attributes[:lab_interpretation]
     browser.select("//div[@id='labs']//div[@class='lab'][#{lab_index}]//li[@class='lab_result'][#{result_index}]//select[contains(@id, '_specimen_source_id')]", "label=#{attributes[:lab_specimen_source]}") if attributes[:lab_specimen_source]
@@ -836,7 +843,7 @@ module TrisanoHelper
 
   def assert_contains(browser, container_element, element)
     begin
-      result = browser.get_eval("window.document.getElementById(\"#{element}\").descendantOf(\"#{container_element}\")")
+      result = @driver.execute_script("return window.document.getElementById(\"#{element}\").descendantOf(\"#{container_element}\")")
     rescue
       result = false
     end
@@ -1075,5 +1082,13 @@ module TrisanoHelper
     # When the EE Outbreak plugin is installed the outbreak name field is hidden and does not allow use of 
     # traditional follow ups. Skip this core field in this case.
     @ee_outbreak_plugin_installed ||= core_field.key.include?("outbreak_name") and html_source.include?("href=\"/trisano/outbreak_events\"")
+  end
+  
+  def get_confirmation()
+    begin
+      alert = @driver.switch_to().alert()
+      alert.accept()
+    rescue
+	end
   end
 end

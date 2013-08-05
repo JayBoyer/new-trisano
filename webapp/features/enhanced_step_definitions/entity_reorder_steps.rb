@@ -24,16 +24,15 @@ Then /^the (.+) should be ordered (.+)$/ do |entity_plural, names|
 end
 
 Given /^I click the arrows on an empty lab result$/ do
-  browser_eval_script %Q{ $j("span:contains('Test type')").closest('li').find('span.top').click(); }
+  @driver.execute_script( %Q{ $j("span:contains('Test type')").closest('li').find('span.top').click(); } )
 end
 
 def move_entity(entity, name, movement)
   movement = movement.split(' ').last
-
   if (entity == 'treatment' || entity == 'lab result')
-    browser_eval_script %Q{ $j("option:contains('#{name}'):selected").closest('li').find('span.#{movement}').click(); }
+    @driver.execute_script(%Q{ $j("option:contains('#{name}'):selected").closest('li').find('span.#{movement}').click(); })
   elsif (entity == 'contact' || entity == 'place')
-    browser_eval_script %Q{ $j("span:contains('#{name}')").closest('li').find('span.#{movement}').click(); }
+    @driver.execute_script(%Q{ $j("span:contains('#{name}')").closest('li').find('span.#{movement}').click(); })
   else
     raise
   end
@@ -51,9 +50,9 @@ end
 
 def li_index(entity_plural, names, index)
   if (entity_plural == 'treatments' || entity_plural == 'lab results')
-    return browser_eval_script %Q{ $j("option:contains('#{names[index]}'):selected").closest('li').index(); }
+    return @driver.execute_script( %Q{ return $j("option:contains('#{names[index]}'):selected").closest('li').index(); } )
   elsif (entity_plural == 'contacts' || entity_plural == 'places')
-    return browser_eval_script %Q{ $j("span:contains('#{names[index]}')").closest('li').index(); }
+    return @driver.execute_script( %Q{ return $j("span:contains('#{names[index]}')").closest('li').index(); } )
   else
     raise
   end

@@ -238,7 +238,7 @@ module TrisanoFormsHelper
     wait_for_element_present("new-follow-up-form", browser)
     browser.type "model_auto_completer_tf", condition
     browser.select "follow_up_element_core_path", "label=Patient birth gender"
-    browser.get_eval("element = window.document.getElementById(\"follow_up_element_core_path\").options[1]; element.value = '#{invalid_core_path}'; element.selected = true")
+    @driver.execute_script("return element = window.document.getElementById(\"follow_up_element_core_path\").options[1]; element.value = '#{invalid_core_path}'; element.selected = true")
     browser.click "//input[contains(@id, 'create_follow_up_submit')]"
     wait_for_element_not_present("new-follow-up-form", browser)
   end
@@ -396,7 +396,7 @@ module TrisanoFormsHelper
   def delete_view(browser, name)
     element_id = get_form_element_id(browser, name, VIEW_ID_PREFIX)
     browser.click("delete-view-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-view-#{element_id}"))
   end
 
@@ -404,7 +404,7 @@ module TrisanoFormsHelper
   def delete_section(browser, name)
     element_id = get_form_element_id(browser, name, SECTION_ID_PREFIX)
     browser.click("delete-section-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-section-#{element_id}"))
   end
 
@@ -412,7 +412,7 @@ module TrisanoFormsHelper
   def delete_group(browser, name)
     element_id = get_form_element_id(browser, name, GROUP_ID_PREFIX)
     browser.click("delete-group-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-group-#{element_id}"))
   end
 
@@ -420,14 +420,14 @@ module TrisanoFormsHelper
   def delete_question(browser, name)
     element_id = get_form_element_id(browser, name, QUESTION_ID_PREFIX)
     browser.click("delete-question-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-question-#{element_id}"))
   end
 
   def delete_question_from_library(browser, name)
     element_id = get_library_element_id(browser, name, QUESTION_ID_PREFIX)
     browser.click("delete-question-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-question-#{element_id}"))
   end
 
@@ -435,7 +435,7 @@ module TrisanoFormsHelper
   def delete_value_set(browser, name)
     element_id = get_form_element_id(browser, name, VALUE_SET_ID_PREFIX)
     browser.click("delete-value-set-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-value-set-#{element_id}"))
   end
 
@@ -443,7 +443,7 @@ module TrisanoFormsHelper
   def delete_core_field_config(browser, name)
     element_id = get_form_element_id(browser, name, CORE_FIELD_ID_PREFIX)
     browser.click("delete-core-field-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     return(!browser.is_text_present("delete-core-field-#{element_id}"))
   end
 
@@ -451,7 +451,7 @@ module TrisanoFormsHelper
   def delete_follow_up(browser, name)
     element_id = get_form_element_id(browser, name, FOLLOW_UP_ID_PREFIX)
     browser.click("delete-follow-up-#{element_id}")
-    browser.get_confirmation()
+    get_confirmation()
     sleep(2)
     return(!browser.is_text_present("delete-follow-up-#{element_id}"))
   end

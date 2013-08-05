@@ -15,6 +15,7 @@ case $response in
 
     echo ">>>>>>>>>>Reset DB, output to log/dbreset.log"
     time bundle exec rake db:reset 2>&1 | tee ./log/dbreset.log
+    time bundle exec rake db:reset RAILS_ENV="feature" 2>&1 | tee ./log/dbresetfeature.log
 
     echo ">>>>>>>>>>Running specs, output to log/spec.log"
     time bundle exec rake spec 2>&1 | tee ./log/spec.log

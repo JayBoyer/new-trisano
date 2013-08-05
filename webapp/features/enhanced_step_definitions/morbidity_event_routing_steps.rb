@@ -38,10 +38,10 @@ When /^I click the "Reopen" radio$/ do
 end
 
 When /^the event status is "([^\"]*)"$/ do |state_description|
-  @browser.get_html_source.should =~ /#{state_description}/
+  @driver.page_source().should =~ /#{state_description}/
 end
 
 Then /^the event state is "([^\"]*)"$/ do |state_description|
-  @browser.get_html_source.should =~ /#{state_description}/
+  @driver.page_source().should =~ /#{state_description}/
 end
 

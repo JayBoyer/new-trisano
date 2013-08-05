@@ -32,7 +32,7 @@ end
 
 When(/^I click and confirm the attachment "(.+)" link$/) do |text|
   @browser.click("//tr[@id='attachment_#{@attachment.id}']//a[contains(text(), 'Delete')]")
-  #@browser.get_confirmation()
+  get_confirmation()
 end
 
 When(/^I wait a few seconds$/) do
@@ -40,7 +40,7 @@ When(/^I wait a few seconds$/) do
 end
 
 Then /^I should not see "([^\"]*)" listed as an attachment$/ do |file_name|
-  @browser.get_html_source.should_not =~ /#{file_name}/
+  @driver.page_source().should_not =~ /#{file_name}/
 end
 
 

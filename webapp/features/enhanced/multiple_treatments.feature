@@ -13,6 +13,7 @@ Feature: Adding multiple treatments to a CMR
         | Eye of Newt    | true    |
      When I go to the new CMR page
       And I enter basic CMR data
+	  When I navigate to the Clinical tab
       And I select treatment "Whiskey"
       And I add treatment "Leeches"
       And I press "Save & Exit"
@@ -29,6 +30,7 @@ Feature: Adding multiple treatments to a CMR
         | Leeches        | true    |
         | Whiskey        | true    |
       And I am on the morbidity event edit page
+	  When I navigate to the Clinical tab
      When I remove treatment "Whiskey"
       And I press "Save & Exit"
       And I wait for the page to load

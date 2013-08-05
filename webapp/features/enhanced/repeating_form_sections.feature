@@ -11,19 +11,20 @@ Feature: Morbidity event form core view configs
     And     a morbidity event exists with a disease that matches the form
 
     When    I am on the morbidity event edit page
+	When    I navigate to the Investigation tab
     And     I create 1 new instances of all section repeaters
-    Then    I should see 2 instances of the repeater section questions
+    Then    I should see 2 instances of the repeater section questions in body text
 
     When    I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
     When    I save and exit
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I print the morbidity event
@@ -31,10 +32,11 @@ Feature: Morbidity event form core view configs
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I am on the morbidity event edit page
+	When    I navigate to the Investigation tab
     And     I mark all section repeaters for removal
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 1 instances of the repeater section questions
+    And     I should see 1 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
@@ -47,19 +49,20 @@ Feature: Morbidity event form core view configs
     And     a assessment event exists with a disease that matches the form
 
     When    I am on the assessment event edit page
+	When    I navigate to the Investigation tab
     And     I create 1 new instances of all section repeaters
-    Then    I should see 2 instances of the repeater section questions
+    Then    I should see 2 instances of the repeater section questions in body text
 
     When    I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
     When    I save and exit
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I print the assessment event
@@ -67,10 +70,11 @@ Feature: Morbidity event form core view configs
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I am on the assessment event edit page
+	When    I navigate to the Investigation tab
     And     I mark all section repeaters for removal
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 1 instances of the repeater section questions
+    And     I should see 1 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
@@ -83,19 +87,20 @@ Feature: Morbidity event form core view configs
     And     a contact event exists with a disease that matches the form
 
     When    I am on the contact event edit page
+	When    I navigate to the Investigation tab
     And     I create 1 new instances of all section repeaters
-    Then    I should see 2 instances of the repeater section questions
+    Then    I should see 2 instances of the repeater section questions in body text
 
     When    I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
     When    I save and exit
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I print the contact event
@@ -103,10 +108,11 @@ Feature: Morbidity event form core view configs
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I am on the contact event edit page
+	When    I navigate to the Investigation tab
     And     I mark all section repeaters for removal
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 1 instances of the repeater section questions
+    And     I should see 1 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
@@ -119,26 +125,31 @@ Feature: Morbidity event form core view configs
     And     a place event exists with a disease that matches the form
 
     When    I am on the place event edit page
+	When    I navigate to the Investigation tab
     And     I create 1 new instances of all section repeaters
-    Then    I should see 2 instances of the repeater section questions
+    Then    I should see 2 instances of the repeater section questions in body text
 
     When    I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+	When    I navigate to the Investigation tab
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
     When    I save and exit
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
+	When    I navigate to the Investigation tab
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I am on the place event edit page
+	When    I navigate to the Investigation tab
     And     I mark all section repeaters for removal
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 1 instances of the repeater section questions
+	When    I navigate to the Investigation tab
+    And     I should see 1 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
@@ -151,26 +162,28 @@ Feature: Morbidity event form core view configs
     And     a encounter event exists with a disease that matches the form
 
     When    I am on the encounter event edit page
+	When    I navigate to the Investigation tab
     And     I create 1 new instances of all section repeaters
-    Then    I should see 2 instances of the repeater section questions
+    Then    I should see 2 instances of the repeater section questions in body text
 
     When    I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
     When    I save and exit
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
 
     When    I am on the encounter event edit page
+	When    I navigate to the Investigation tab
     And     I mark all section repeaters for removal
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 1 instances of the repeater section questions
+    And     I should see 1 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
@@ -182,19 +195,21 @@ Feature: Morbidity event form core view configs
     And     that form is published
 
     When    I navigate to the assessment event edit page
-    Then    I should see 0 instances of the repeater section questions
+    Then    I should see 0 instances of the repeater section questions in body text
 
+	When    I navigate to the Investigation tab
     When    I click the "Add/Remove forms for this event" link
     And     I check the form for addition
     And     I click the "Add Forms" button
     And     I navigate to the assessment event edit page
-    Then    I should see 1 instances of the repeater section questions
+	When    I navigate to the Investigation tab
+    Then    I should see 1 instances of the repeater section questions in body text
 
     When    I create 1 new instances of all section repeaters
     And     I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
@@ -206,13 +221,14 @@ Feature: Morbidity event form core view configs
     And     a assessment event exists with a disease that matches the form
 
     When    I navigate to the assessment event edit page
-    Then    I should see 1 instances of the repeater section questions
+	When    I navigate to the Investigation tab
+    Then    I should see 1 instances of the repeater section questions in body text
 
     When    I create 1 new instances of all section repeaters
     And     I answer 2 instances of all repeater section questions
     And     I save and continue
     Then    I should see "successfully updated"
-    And     I should see 2 instances of the repeater section questions
+    And     I should see 2 instances of the repeater section questions in body text
     And     I should see 2 instances of answers to the repeating section questions
     And     the database should have 4 answers and investigator form questions for this event
 
@@ -220,7 +236,7 @@ Feature: Morbidity event form core view configs
     And     I check the form for removal
     And     I click and confirm the "Remove Forms" button
     And     I navigate to the assessment event edit page
-    Then    I should see 0 instances of the repeater section questions
+    Then    I should see 0 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
@@ -233,18 +249,19 @@ Feature: Morbidity event form core view configs
     And     a morbidity event exists with a disease that matches the form
 
     When    I am on the morbidity event edit page
-    Then    I should see 1 instances of the repeater section questions
+	When    I navigate to the Investigation tab
+    Then    I should see 1 instances of the repeater section questions in body text
     And     the database should have 0 answers and investigator form questions for this event
 
     When    I save and continue
     Then    I should see "successfully updated"
-    And     I should see 1 instances of the repeater section questions
+    And     I should see 1 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
     And     the database should have 0 answers and investigator form questions for this event
 
     When    I save and exit
     Then    I should see "successfully updated"
-    And     I should see 0 instances of the repeater section questions
+    And     I should see 0 instances of the repeater section questions in body text
     And     I should see 0 instances of answers to the repeating section questions
 
     When    I print the morbidity event

@@ -37,7 +37,7 @@ Given /^a common test type named "(.+)"$/ do |common_name|
 end
 
 Then /^I should see help text for all (.+) core fields in (.+) mode$/ do |event_type, mode|
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
 
   @core_fields ||= CoreField.all(:conditions => [<<-SQL, event_type.gsub(" ", "_"), false, %w(section tab event)])
     event_type = ? and disease_specific = ? and field_type NOT IN (?) and repeater = FALSE

@@ -38,11 +38,21 @@ DatabaseCleaner.strategy = :nothing
 Cucumber::Rails::World.use_transactional_fixtures = false
 
 require 'spec/expectations'
-require 'selenium'
+require 'selenium/webdriver'
+require 'selenium/client'
+require 'selenium/server'
 
 # "before all"
-browser = Selenium::SeleniumDriver.new("localhost", 4444, "*firefox #{RAILS_ROOT}/features/support/firefox-36/firefox-bin", "http://localhost:8080", 15000)
-
+  jar_name = "#{RAILS_ROOT}/features/support/selenium/selenium-server-standalone-2.33.0.jar"
+  server = Selenium::Server.new(jar_name, :background => true)
+  server.start
+  browser = Selenium::Client::Driver.new :host  => "localhost",
+                                         :port  => 4444,
+                                         :url   => "http://localhost:8080",
+                                         :browser => "*webdriver"
+  driver = Selenium::WebDriver.for :remote, :url => "http://localhost:4444/wd/hub/"
+  browser.start :driver => driver
+ 
 # Allow profiling of cucumber features
 if ENV['RUBY_PROF'].present?
   require 'ruby-prof'
@@ -51,7 +61,7 @@ if ENV['RUBY_PROF'].present?
   at_exit do
     results = RubyProf.stop
     puts ARGV.inspect
-    File.open "#{RAILS_ROOT}/tmp/cucumber_#{Time.now}", 'w' do |file|
+    File.open "tmp/cucumber_#{Time.now}", 'w' do |file|
       RubyProf::CallTreePrinter.new(results).print(file)
     end
   end 
@@ -59,20 +69,18 @@ if ENV['RUBY_PROF'].present?
 end
 Before do
   @browser = browser
-  @browser.start
-  @browser.open "/trisano/events"
+  @driver = driver
+  
+  @browser.open "http://localhost:8080/trisano/events"
 end
 
 After do
-  @browser.stop
 end
 
 # "after all"
 at_exit do
-  browser.close rescue nil
-end
 
-def browser_eval_script(script)
-  script = %Q{ selenium.browserbot.getCurrentWindow().#{script.strip} }
-  @browser.get_eval(script)
+# comment out the following 2 lines to leave the browser up at the end of the tests
+  browser.stop
+  server.stop
 end

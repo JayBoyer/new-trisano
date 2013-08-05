@@ -114,22 +114,31 @@ end
 
 When /^I select "([^\"]*)" from the sibling navigator and Save$/ do |option_text|
   @browser.select "css=.events_nav", option_text
-  @browser.wait_for_element_present "//button/span[contains(text(), 'Save')]"
-  @browser.click "//button/span[contains(text(), 'Save')]"
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  element = wait.until { @driver.find_element(:xpath, "//button/span[contains(text(), 'Save')]") }
+  element.click()
+#  @browser.wait_for_element_present "//button/span[contains(text(), 'Save')]"
+#  @browser.click "//button/span[contains(text(), 'Save')]"
   @browser.wait_for_page_to_load
 end
 
 When /^I select "([^\"]*)" from the sibling navigator and leave without saving$/ do |option_text|
   @browser.select "css=.events_nav", option_text
-  @browser.wait_for_element_present "//button/span[contains(text(), 'Leave')]"
-  @browser.click "//button/span[contains(text(), 'Leave')]"
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  element = wait.until { @driver.find_element(:xpath, "//button/span[contains(text(), 'Leave')]") }
+  element.click()
+#  @browser.wait_for_element_present "//button/span[contains(text(), 'Leave')]"
+#  @browser.click "//button/span[contains(text(), 'Leave')]"
   @browser.wait_for_page_to_load
 end
 
 When /^I select "([^\"]*)" from the sibling navigator but cancel the dialog$/ do |option_text|
   @browser.select "css=.events_nav", option_text
-  @browser.wait_for_element_present "//a/span[contains(text(), 'close')]"
-  @browser.click "//a/span[contains(text(), 'close')]"
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  element = wait.until { @driver.find_element(:xpath, "//a/span[contains(text(), 'close')]") }
+  element.click()
+#  @browser.wait_for_element_present "//a/span[contains(text(), 'close')]"
+#  @browser.click "//a/span[contains(text(), 'close')]"
 end
 
 Then /^I should be on the contact named "([^\"]*)"$/ do |last_name|
@@ -144,8 +153,8 @@ When /^I enter "([^\"]*)" as the contact\'s first name$/ do |text|
 end
 
 Then /^no value should be selected in the sibling navigator$/ do
-  script = "selenium.browserbot.getCurrentWindow().$j('.events_nav').val();"
-  @browser.get_eval(script).should == ""
+  script = "return $j('.events_nav').val();"
+  @driver.execute_script(script).should == ""
 end
 
 When(/^I am on the place event edit page$/) do
@@ -154,12 +163,14 @@ When(/^I am on the place event edit page$/) do
 end
 
 When /^I save and continue$/ do
-  @browser.click("//*[@id='save_and_continue_btn']")
+  element = @driver.find_element(:id, "save_and_continue_btn")
+  element.click()
   @browser.wait_for_page_to_load
 end
 
 When /^I save and exit$/ do
-  @browser.click("//*[@id='save_and_exit_btn']")
+  element = @driver.find_element(:id, "save_and_exit_btn")
+  element.click()
   @browser.wait_for_page_to_load
 end
 
@@ -184,13 +195,13 @@ After('@clean_events') do
 end
 
 When /^I scroll down a bit$/ do
-  script = "selenium.browserbot.getCurrentWindow().$j(window).scrollTop(300);"
-  @browser.get_eval(script).should == "[object Window]" # Just making sure the script ran
+  script =  "$j('html,body').animate({scrollTop: 300},'fast');"
+  @driver.execute_script(script)
 end
 
 Then /^I should have been scrolled back to the top of the page$/ do
-  script = "selenium.browserbot.getCurrentWindow().$j(window).scrollTop();"
-  @browser.get_eval(script).should == "0"
+  script = "return $j('html,body').scrollTop();"
+  @driver.execute_script(script).should == 0
 end
 
 Then /^I should have a note that says "([^\"]*)"$/ do |text|

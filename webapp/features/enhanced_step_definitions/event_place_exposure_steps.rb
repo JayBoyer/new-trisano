@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
-
 When(/^I add an existing place exposure$/) do
   click_core_tab(@browser, EPI)
   @browser.type('place_search_name', @place_entity.place.name)
@@ -50,11 +49,6 @@ When(/^I check a place exposure to remove$/) do
 end
 
 Then(/^I should see the removed place exposure as deleted$/) do
-  #  script = <<-SCRIPT
-  #  selenium.browserbot.getCurrentWindow().$("//td[contains(text(), '#{@place_entity.place.name}')]")[0].hasClassName('struck-through')
-  #SCRIPT
-  #  @browser.get_eval(script)
-
   # Could not get the above to work. This more generic test will do for now.
   @browser.is_element_present("//td[@class='struck-through']").should be_true
 end

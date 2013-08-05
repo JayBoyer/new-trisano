@@ -31,15 +31,15 @@ When /^I add an existing reporter$/ do
 end
 
 Then /^I should see the reporter on the page$/ do
-  script = "selenium.browserbot.getCurrentWindow().$j('#reporters').text();"
+  script = "return $j('#reporters').text();"
   wait_for_element_present("//div[@id='reporters']")
-  @browser.get_eval(script).should =~ /#{@reporter.last_comma_first}/
+  @driver.execute_script(script).should =~ /#{@reporter.last_comma_first}/
 end
 
 Then /^I should not see the reporter on the page$/ do
-  script = "selenium.browserbot.getCurrentWindow().$j('#reporters').text();"
+  script = "return $j('#reporters').text();"
   wait_for_element_present("//div[@id='reporters']")
-  @browser.get_eval(script).should_not =~ /#{@reporter.last_comma_first}/
+  @driver.execute_script(script).should_not =~ /#{@reporter.last_comma_first}/
 end
 
 Then /^I should see the reporter form$/ do

@@ -31,8 +31,8 @@ When(/^I click remove for that diagnosing facility$/) do
 end
 
 Then(/^I should not see the diagnosing facility$/) do
-  script = "selenium.browserbot.getCurrentWindow().$j('#diagnostic_facilities span').text();"
-  text = @browser.get_eval(script)
+  script = "return $j('#diagnostic_facilities span').text();"
+  text = @driver.execute_script(script)
   text.should =~ /Beaver Valley Hospital/m
 end
 
@@ -49,8 +49,10 @@ Then(/^I should see all added diagnosing facilities$/) do
 end
 
 When /^I remove all of the diagnostic facilities$/ do
-  script = %{selenium.browserbot.getCurrentWindow().$j('#diagnostic_facilities input[type="checkbox"]').click()}
-  @browser.get_eval(script)
+  elements = @driver.find_elements(:xpath, "//input[@type='checkbox'][contains(@name, 'diagnostic_facilities')]")
+  elements.each do |element|
+    element.click()
+  end
   When "I save and exit"
 end
 

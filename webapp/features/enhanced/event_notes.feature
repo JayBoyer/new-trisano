@@ -18,6 +18,7 @@ Feature: Notes can be added to an Event
     Given I am logged in as a super user
       And a simple morbidity event in jurisdiction Unassigned for last name Jones
     When I navigate to the morbidity event edit page
+	When I navigate to the Notes tab
       And I fill in "New note" with "My first clinical note"
       And I press "Save & Continue"
       And I wait for the page to load
@@ -28,6 +29,7 @@ Feature: Notes can be added to an Event
     Given I am logged in as a super user
       And a simple morbidity event in jurisdiction Unassigned for last name Jones
     When I navigate to the morbidity event edit page
+    When I navigate to the Notes tab
       And I fill in "New note" with "My first admin note"
       And I check "Is admin"
       And I press "Save & Continue"

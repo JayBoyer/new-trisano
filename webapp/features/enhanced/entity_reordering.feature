@@ -11,6 +11,7 @@ Feature: Reordering entities
       | Whiskey        | true    |
       | Cornbread      | true    |
     And I am on the morbidity event edit page
+	When I navigate to the Clinical tab
     When I move the treatment "Cornbread" to the top
     And I move the treatment "Whiskey" up
     And I save and continue
@@ -27,6 +28,7 @@ Feature: Reordering entities
       | TwoContact    |
       | ThreeContact    |
     And I am on the morbidity event edit page
+	When I navigate to the Contacts tab
     When I move the contact "ThreeContact" to the top
     And I move the contact "TwoContact" up
     And I save and continue
@@ -57,6 +59,7 @@ Feature: Reordering entities
         | TestTypeTwo |
         | TestTypeThree |
     And I am on the morbidity event edit page
+	When I navigate to the Laboratory tab
     When I move the lab result "TestTypeThree" to the top
     And I move the place "TestTypeTwo" up
     And I save and continue
@@ -68,6 +71,7 @@ Feature: Reordering entities
 
   Scenario: Ordering labs without filling in lab info should not cause a validation error
     Given I am on the morbidity event edit page
+	When I navigate to the Laboratory tab
     And I click the arrows on an empty lab result
     And I save and continue
     Then I should not see "There were problems with the following fields"

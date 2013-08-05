@@ -27,6 +27,6 @@ end
 
 When /^I click the "([^\"]*)" link and accept the confirmation$/ do |link|
   @browser.click("link=#{link}")
-  @browser.get_confirmation
+  get_confirmation()
   @browser.wait_for_page_to_load($load_time)
 end

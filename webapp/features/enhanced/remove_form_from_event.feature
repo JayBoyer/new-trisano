@@ -14,6 +14,7 @@ Feature: Removing forms from events
 
     When I navigate to the morbidity event edit page
     And I see the form and answers on the event
+	When I navigate to the Investigation tab
     And I click the "Add/Remove forms for this event" link
     And I check the form for removal
     And I click and confirm the "Remove Forms" button

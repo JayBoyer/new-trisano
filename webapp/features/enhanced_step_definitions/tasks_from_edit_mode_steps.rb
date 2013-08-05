@@ -33,15 +33,15 @@ end
 
 Then /^the flash should disappear$/ do
   sleep 3
-  @browser.get_eval("selenium.browserbot.getCurrentWindow().$('flash-message').visible()").should == "false"
+  @driver.execute_script("return $('flash-message').visible()").should == "false"
 end
 
 Then /^the task form should not be visible$/ do
-  @browser.get_html_source.include?("event-task-form").should be_true
-  @browser.get_html_source.include?("new-event-form").should be_false
+  @driver.page_source().include?("event-task-form").should be_true
+  @driver.page_source().include?("new-event-form").should be_false
 end
 
 Then /^I should see the task$/ do
-  @browser.get_html_source.include?("Do this please!").should be_true
+  @driver.page_source().include?("Do this please!").should be_true
 end
 

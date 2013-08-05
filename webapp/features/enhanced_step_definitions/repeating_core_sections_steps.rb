@@ -145,7 +145,7 @@ Then /^I should see (\d+) instances of the repeater core field config questions$
   # We want to use body_text here because the JavaScript links contain template code
   # which have the question text in them, which throws off the count...not that we want to 
   # count templates anyway.
-  html_source = @browser.get_body_text
+  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ? AND repeater = ?', @form.event_type, true, false, true])
   @core_fields.count.should_not be_equal(0), "Didn't find any lab core fields."
   @core_fields.each do |core_field|
@@ -154,16 +154,24 @@ Then /^I should see (\d+) instances of the repeater core field config questions$
     else
       key = core_field.key
     end
-    before_count = html_source.scan("#{key} before?").count
-    before_count.should be_equal(expected_count.to_i), "Expected #{expected_count} instances of before question for #{key}, got #{before_count}." 
+	
+	counts = Array.new(2, 0)
+	suffixes = [ "#{key} before?", "#{key} after?"]
+	(0..1).each do |i|
+	  text = suffixes[i]
+	  elements = @driver.find_elements(:xpath, "//label[contains(text(),'#{text}')]")	  
+	  counts[i] += elements.count
+	  elements = @driver.find_elements(:xpath, "//span[contains(text(),'#{text}')]")	  
+	  counts[i] += elements.count
+	end
 
-    after_count = html_source.scan("#{key} after?").count
-    after_count.should be_equal(expected_count.to_i), "Expected #{expected_count} instances of after question for #{key}, got #{after_count}." 
+    counts[0].should be_equal(expected_count.to_i), "Expected #{expected_count} instances of before question for #{key}, got #{counts[0]}." 
+    counts[1].should be_equal(expected_count.to_i), "Expected #{expected_count} instances of after question for #{key}, got #{counts[1]}." 
   end
 end
 
 Then /^I should see (\d+) instances of answers to the repeating core field config questions$/ do |expected_count|
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ? AND repeater = ?', @form.event_type, true, false, true])
   @core_fields.count.should_not be_equal(0), "Didn't find any core fields."
   @core_fields.each do |core_field|
@@ -184,9 +192,8 @@ end
 
 When /^I create (\d+) new instances of all (.+) event repeaters$/ do |count, event_type|
     count.to_i.times do
-      
-
-      unless event_type == "encounter"
+     
+     unless event_type == "encounter"
         click_core_tab(@browser, "Demographics")
         And  "I click the \"Add a Telephone\" link and don't wait"
         And  "I click the \"Add an Email Address\" link and don't wait"
@@ -206,7 +213,7 @@ When /^I create (\d+) new instances of all (.+) event repeaters$/ do |count, eve
 end
 
 When /^I answer (\d+) instances of all repeater questions$/ do |count|
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ? AND repeater = ?', @form.event_type, true, false, true])
   raise "No core fields found" if @core_fields.empty?
   @core_fields.each do |core_field|
@@ -223,7 +230,7 @@ When /^I answer (\d+) instances of all repeater questions$/ do |count|
 end
 
 When /^I answer (\d+) instances of all repeater section questions$/ do |count|
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   count.to_i.times do |i|
     answer_investigator_question(@browser, "#{@first_section_name} question?", "#{@first_section_name} answer #{i}", html_source, i)
     answer_investigator_question(@browser, "#{@second_section_name} question?", "#{@second_section_name} answer #{i}", html_source, i)
@@ -240,10 +247,20 @@ end
 Then /^I should see (\d+) instances of the repeater section questions$/ do |expected_count|
   @first_section_name.should_not be_nil, "First section name not defined."
   @second_section_name.should_not be_nil, "Second section name not defined."
+  html_source = @driver.page_source()
+  actual_count = html_source.scan("#{@first_section_name} question?").count
+  actual_count.should be_equal(expected_count.to_i), "Expected #{expected_count} instances of '#{@first_section_name} question?', got #{actual_count}." 
+  actual_count = html_source.scan("#{@second_section_name} question?").count
+  actual_count.should be_equal(expected_count.to_i), "Expected #{expected_count} instances of '#{@second_section_name} question?', got #{actual_count}." 
+end
+
+Then /^I should see (\d+) instances of the repeater section questions in body text$/ do |expected_count|
+  @first_section_name.should_not be_nil, "First section name not defined."
+  @second_section_name.should_not be_nil, "Second section name not defined."
   # We want to use body_text here because the JavaScript links contain template code
   # which have the question text in them, which throws off the count...not that we want to 
   # count templates anyway.
-  html_source = @browser.get_body_text
+  html_source = @browser.get_body_text()
   actual_count = html_source.scan("#{@first_section_name} question?").count
   actual_count.should be_equal(expected_count.to_i), "Expected #{expected_count} instances of '#{@first_section_name} question?', got #{actual_count}." 
   actual_count = html_source.scan("#{@second_section_name} question?").count
@@ -254,7 +271,7 @@ Then /^I should see (\d+) instances of answers to the repeating section question
   @first_section_name.should_not be_nil, "First section name not defined."
   @second_section_name.should_not be_nil, "Second section name not defined."
 
-  html_source = @browser.get_html_source
+  html_source = @driver.page_source()
   count.to_i.times do |i|
     actual_count = html_source.scan("#{@first_section_name} answer #{i}").count
     actual_count.should be_equal(1), "Expected 1 instances of '#{@first_section_name} answer #{i}', got #{actual_count}."
@@ -278,12 +295,14 @@ When /^I mark all core repeaters for removal$/ do
   event.interested_party.person_entity.email_addresses.count.times do |i|
     @browser.check "xpath=(//input[contains(@id, '_interested_party_attributes_person_entity_attributes_email_addresses_attributes_')][contains(@id, '__destroy')])[#{i+1}]"
   end
+  click_core_tab(@browser, CLINICAL)
   event.hospitalization_facilities.count.times do |i|
     @browser.check "xpath=(//input[contains(@id, '_hospitalization_facilities_attributes_')][contains(@id, '__destroy')])[#{i+1}]"
   end
   event.interested_party.treatments.count.times do |i|
     @browser.check "xpath=(//input[contains(@id, '_interested_party_attributes_treatments_attributes_')][contains(@id, '__destroy')])[#{i+1}]"
   end
+  click_core_tab(@browser, LABORATORY)
   event.lab_results.count.times do |i|
     @browser.check "xpath=(//input[contains(@id, '_lab_results_attributes_')][contains(@id, '__destroy')])[#{i+1}]"
   end

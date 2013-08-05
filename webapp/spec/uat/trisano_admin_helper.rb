@@ -83,7 +83,8 @@ module TrisanoAdminHelper
   
   def add_role(browser, role_attributes, index = 1)
     browser.click "link=Add Role"
-    browser.wait_for_element "user_role_membership_attributes__jurisdiction_id"
+	wait = Selenium::WebDriver::Wait.new(:timeout => 5)
+    element = wait.until { @driver.find_element(:id, "user_role_membership_attributes__jurisdiction_id") }
     browser.select "user_role_membership_attributes__role_id", "label=#{role_attributes[:role]}"
     browser.select "user_role_membership_attributes__jurisdiction_id", "label=#{role_attributes[:jurisdiction]}"
   end
