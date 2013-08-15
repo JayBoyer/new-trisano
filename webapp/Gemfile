@@ -36,6 +36,7 @@ gem "sparrowhawk", "0.9.5"
 
 gem "net-ldap", "0.0.5"
 gem "pdf-forms", "0.5.5"
+gem "newrelic_rpm", "3.6.6.147"
 
 group :development do
   gem "mechanize", "1.0.0"

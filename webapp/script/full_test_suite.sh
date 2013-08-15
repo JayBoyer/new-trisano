@@ -24,12 +24,10 @@ case $response in
     time bundle exec rake features 2>&1 | tee ./log/standard_features.log
 
     echo ">>>>>>>>>>Setting up enhanced support infrastructure"
-# comment out until enhanced_features tests can run successfully
-#    ./script/enhanced_support.sh
+    ./script/enhanced_support.sh
 
     echo ">>>>>>>>>>Running enhanced features, output to log/enhanced_features.log"
-# comment out until enhanced_features tests can run successfully
-#    time bundle exec rake enhanced_features 2>&1 | tee ./log/enhanced_features.log
+    time bundle exec rake enhanced_features 2>&1 | tee ./log/enhanced_features.log
 
 ;;
 esac
