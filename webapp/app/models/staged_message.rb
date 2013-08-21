@@ -124,7 +124,11 @@ class StagedMessage < ActiveRecord::Base
     @rejected = bad_message_type || bad_processing_id || bad_version_id
     return if @rejected
 
-    control_ids = StagedMessage.all.map {|m| m.id != self.id ? HL7::Message.new(m.hl7_message)[:MSH].message_control_id : nil }.compact
+    # check the last 500 staged messages for a duplicate control ID
+    # we do this only to reject duplicate messages sent in the recent past
+    # if we were to search ALL the staged messages, this could seriously degrade performance
+    last_500 = StagedMessage.all(:order => "id desc", :limit => 500)
+    control_ids = last_500.map {|m| m.id != self.id ? HL7::Message.new(m.hl7_message)[:MSH].message_control_id : nil }.compact
     if control_ids.include?(hl7[:MSH].message_control_id)
       add_hl7_error :duplicate_message_control_id, :msh, 1
     end
@@ -311,7 +315,7 @@ class StagedMessage < ActiveRecord::Base
   def discard
     raise(I18n.translate('staged_message_is_already_assigned')) if self.state == self.class.states[:assigned]
     self.state = self.class.states[:discarded]
-    self.save!
+    self.save(false)
   end
 
   # Build an HL7 ACK^R01^ACK message in response to the received
