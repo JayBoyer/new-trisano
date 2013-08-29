@@ -93,5 +93,6 @@
   %br
   - form_tag(event_staged_message_path(@staged_message), :id => "assign_to_new") do
     = link_to_function(t("create_cmr_from_message"), "this.parentNode.submit()")
-  - form_tag(event_staged_message_path(@staged_message), :id => "assign_to_new_ae", :type => "assessment_event") do
+  - form_tag(event_staged_message_path(@staged_message), :id => "assign_to_new_ae") do
+    = hidden_field_tag :type, "assessment_event"
     = link_to_function(t("create_ae_from_message"), "this.parentNode.submit()")
