@@ -441,14 +441,37 @@ class Event < ActiveRecord::Base
     end
 
     if event_components.include?("disease_specific")
-      self.form_references.each do |form|
-        new_event.form_references.build(:form_id => form.form_id, :template_id => form.template_id) # Can't use add_forms here since the new event isn't saved
-      end
+      new_event.save!
+      new_event.add_forms(self.forms)
 
       self.answers.each do |answer|
-        new_event.answers.build(:question_id => answer.question_id,
+        new_event.answers.create(:question_id => answer.question_id,
           :text_answer => answer.text_answer,
           :export_conversion_value_id => answer.export_conversion_value_id)
+      end
+
+      new_event.form_references.each do |reference|
+        # for answers in repeating sections, need to create corresponding investigator_form_sections
+        # and link them to the answers
+        repeater_section_elements = FormElement.find(:all, :conditions =>["form_id = ? and repeater = TRUE", reference.form_id])
+        repeater_section_elements.each do |element|
+
+          # find all of the form elements whose parent is the repeater_section_element
+          form_elements = FormElement.find(:all, :conditions =>["parent_id = ?", element.id])
+          form_elements.each do |form_element|
+            questions = Question.find(:all, :conditions =>["form_element_id = ?", form_element.id])
+            questions.each do |question|
+              new_event.answers.each do |answer|
+                if(answer.question_id == question.id)
+                  form_section = InvestigatorFormSection.new(:event_id => new_event.id, :section_element_id => element.id)
+                  form_section.save
+                  answer.repeater_form_object_id = form_section.id
+                  answer.repeater_form_object_type = form_section.class.base_class.name
+                end
+              end
+            end
+          end
+        end
       end
     end
 
