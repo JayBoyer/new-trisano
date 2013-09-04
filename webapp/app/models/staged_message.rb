@@ -372,13 +372,12 @@ class StagedMessage < ActiveRecord::Base
           add_or = true
           condition += conditions[i]
         end
-        
-        # if no condition has been set, the user doesn't have jurisdiction to see anything
-        if(condition.length == 0)
-          # set a filter condition that will filter out all messages
-          condition = "(hl7_message = '')"  
-        end        
-      end
+      end        
+      # if no condition has been set, the user doesn't have jurisdiction to see anything
+      if(condition.length == 0)
+        # set a filter condition that will filter out all messages
+        condition = "(hl7_message = '')"  
+      end        
     end 
     return condition
   end
