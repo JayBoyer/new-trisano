@@ -1,6 +1,6 @@
 class CreateTbPhinQaSingleViews < ActiveRecord::Migration
   def self.up
-  execute %{
+	execute %{
       CREATE OR REPLACE VIEW tb_phin_qa_single_views AS 
         SELECT tb_qa_views.event_id, tb_qa_views.form_short_name, tb_qa_views.question_short_name, tb_qa_views.question_id, tb_qa_views.question_text, tb_qa_views.question_data_type, tb_qa_views.answer_text, tb_qa_views.investigation_started_date, 
         CASE
@@ -39,7 +39,7 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'drug_use_history'::text THEN 'tb149a'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'excessive_alcohol_use'::text THEN 'tb150a'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'count_status'::text THEN 'tb153'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'drug_suscept_test'::text THEN 'tb156'::text
+            WHEN lower(tb_qa_views.question_short_name::text) = 'drug_suscept_test_init'::text THEN 'tb156'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_first_isolate_collect'::text THEN 'tb157'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_conversion'::text THEN 'tb173'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_first_neg_sputum'::text THEN 'tb175'::text
@@ -112,12 +112,12 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'comments'::text THEN 'pg5_comm_pg6_comm'::text
             ELSE NULL::text
         END AS phin_var, tb_qa_views.answer_code
-    FROM tb_qa_views tb_qa_views
-    WHERE tb_qa_views.s_repeater IS NOT TRUE AND tb_qa_views.form_short_name::text ~~ 'TB%'::text;
+		FROM tb_qa_views tb_qa_views
+		WHERE tb_qa_views.s_repeater IS NOT TRUE AND tb_qa_views.form_short_name::text ~~ 'TB%'::text;
     }
   end
 
   def self.down
-  execute "drop view tb_phin_qa_single_views;"
+	execute "drop view tb_phin_qa_single_views;"
   end
 end

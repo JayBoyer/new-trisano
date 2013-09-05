@@ -1804,15 +1804,15 @@ class PrintPdfsController < ApplicationController
 						@@repeat_id = @idrs_repeat_id
 					end
 							
-					if @idrs_question_short_name == 'other_drug_name'
+					if @idrs_question_short_name == 'other_drug_name_init'
 						@@other_drug = @idrs_answer_text
 					end
 					
-					if @idrs_question_short_name.downcase == 'tb_drug_test'
+					if @idrs_question_short_name.downcase == 'tb_drug_test_init'
 						@@tb_drug_test = @idrs_pdf_var
 					end
 					
-					if @idrs_question_short_name.downcase == 'tb_drug_test_result'
+					if @idrs_question_short_name.downcase == 'tb_drug_test_result_init'
 						@@tb_drug_test_result = @idrs_pdf_var
 					end
 					
@@ -1858,15 +1858,15 @@ class PrintPdfsController < ApplicationController
 						@@repeat_id = @fdrs_repeat_id
 					end
 							
-					if @fdrs_question_short_name == 'other_drug_name'
+					if @fdrs_question_short_name == 'other_drug_name_final'
 						@@other_drug = @fdrs_answer_text
 					end
 					
-					if @fdrs_question_short_name.downcase == 'tb_drug_test'
+					if @fdrs_question_short_name.downcase == 'tb_drug_test_final'
 						@@tb_drug_test = @fdrs_pdf_var
 					end
 					
-					if @fdrs_question_short_name.downcase == 'tb_drug_test_result'
+					if @fdrs_question_short_name.downcase == 'tb_drug_test_result_final'
 						@@tb_drug_test_result = @fdrs_pdf_var
 					end
 					
