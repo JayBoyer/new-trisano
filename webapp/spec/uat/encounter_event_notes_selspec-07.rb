@@ -53,7 +53,7 @@ describe 'Encounter event notes' do
 
   it 'should add an admin note and a clinical note to the encounter' do
     @browser.click("link=Edit Encounter")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Encounter Event")
 
     enter_note(@browser, @admin_note, { :is_admin => true })
     save_and_continue(@browser)
@@ -116,7 +116,7 @@ describe 'Encounter event notes' do
 
   it "should aggregate notes on the parent morbidity event's show mode" do
     @browser.click("link=#{@cmr_last_name}")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW ENCOUNTER EVENT")
     # With the two morb notes and four encounter notes, we should have six on the morb event
     note_count(@browser).should eql(9)
   end

@@ -16,13 +16,13 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 When /^I navigate to the loinc code "([^\"]*)" edit page$/ do |loinc_code|
   @browser.click "link=ADMIN"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "System Configuration")
   @browser.click "link=Manage LOINC Codes"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "LOINC Code")
   @browser.click "link=#{loinc_code}"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Show a LOINC Code")
   @browser.click "link=Edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Edit a LOINC Code")
 end
 
 Then /^the Organism field should be disabled$/ do

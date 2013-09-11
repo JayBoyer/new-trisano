@@ -23,14 +23,14 @@ When(/^I add an existing contact$/) do
   @browser.type("contact_search_name", @contact_event.interested_party.person_entity.person.last_name)
   @browser.click("contact_search")
 
-  wait_for_element_present("//div[@id='contact_search_results']/table")
+  wait_for_element_present(:xpath, "//div[@id='contact_search_results']/table")
   @browser.click "//div[@id='contact_search_results']//a[@id='add_contact_#{@contact_event.id}']"
-  wait_for_element_present("//div[@class='contact_from_search']")
+  wait_for_element_present(:xpath, "//div[@class='contact_from_search']")
 end
 
 When(/^I click remove for that contact$/) do
-  @driver.find_element(:link_text, "Remove").click();
-  wait_for_element_not_present("//div[@id='contact_child_events']/div[@class='contact_from_search']")
+  @driver.find_element(:link_text, "Remove").click()
+  wait_for_element_not_present(:xpath, "//div[@id='contact_child_events']/div[@class='contact_from_search']")
 end
 
 Then(/^I should not see the contact$/) do

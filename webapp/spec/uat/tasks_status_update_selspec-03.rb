@@ -72,7 +72,7 @@ describe 'Marking a task as completed or as not applicable' do
 
   it 'should mark the task as complete from the CMR edit page' do
     @browser.click("link=Edit CMR")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     update_task_status(@browser, "Complete")
     @browser.get_html_source.include?("task-complete").should be_true
   end
@@ -84,7 +84,7 @@ describe 'Marking a task as completed or as not applicable' do
 
   it 'should mark the task as complete from the CMR show page' do
     @browser.click("link=Show")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW MORBIDITY EVENT")
     update_task_status(@browser, "Complete")
     @browser.get_html_source.include?("task-complete").should be_true
   end

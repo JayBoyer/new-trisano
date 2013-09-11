@@ -42,7 +42,7 @@ describe 'Tab Toggling Functionality' do
 
   it 'should show Show Place Exposure tabs properly' do
     @browser.click "link=Show"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
     verify_tab_behavior(@browser)
   end
 
@@ -66,7 +66,7 @@ describe 'Tab Toggling Functionality' do
 
   it 'should show Show Contact Event tabs properly' do
     @browser.click "link=Show"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Contact Event")
     verify_tab_behavior(@browser)
   end
 end

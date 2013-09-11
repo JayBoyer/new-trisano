@@ -55,7 +55,9 @@ When /^I delete the group element$/ do
 end
 
 Then /^the text "(.+)" should disappear$/ do |text|
-  @browser.wait_for_no_element "//*[contains(text(),'#{text}')]", :timeout_in_seconds => 3
+  wait = Selenium::WebDriver::Wait.new(:timeout => 3)
+  wait.until { elements = @driver.find_elements(:xpath, "//*[contains(text(),'#{text}')]")
+               elements.size == 0 }
 end
 
 After('@clean_forms') do

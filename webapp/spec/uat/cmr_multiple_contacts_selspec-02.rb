@@ -85,7 +85,7 @@ describe 'Adding multiple contacts to a CMR' do
     click_core_tab(@browser, "Contacts")
     @browser.is_text_present('Laurel').should be_true
     @browser.click "//tr[3]//a[contains(text(), 'Edit')]"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Contact event")
     @browser.select "contact_event_participations_contact_attributes_disposition_id", "label=Infected, brought to treatment"
     @browser.select "contact_event_participations_contact_attributes_contact_type_id", "label=First Responder"
     click_core_tab(@browser, "Laboratory")

@@ -113,7 +113,6 @@ When /^I print the (.+) event$/ do |event_type|
       :only_path => true
     })
   @browser.open "/trisano" + event_path
-  @browser.wait_for_page_to_load
 end
 
 When /^I fill in "(.+)" with an invalid date$/ do |label|
@@ -145,7 +144,6 @@ Then /^I should see (\d+) instances of the repeater core field config questions$
   # We want to use body_text here because the JavaScript links contain template code
   # which have the question text in them, which throws off the count...not that we want to 
   # count templates anyway.
-  html_source = @driver.page_source()
   @core_fields ||= CoreField.all(:conditions => ['event_type = ? AND fb_accessible = ? AND disease_specific = ? AND repeater = ?', @form.event_type, true, false, true])
   @core_fields.count.should_not be_equal(0), "Didn't find any lab core fields."
   @core_fields.each do |core_field|
@@ -260,7 +258,8 @@ Then /^I should see (\d+) instances of the repeater section questions in body te
   # We want to use body_text here because the JavaScript links contain template code
   # which have the question text in them, which throws off the count...not that we want to 
   # count templates anyway.
-  html_source = @browser.get_body_text()
+#  html_source = @driver.page_source()
+  html_source = @driver.find_element(:tag_name, "body").text
   actual_count = html_source.scan("#{@first_section_name} question?").count
   actual_count.should be_equal(expected_count.to_i), "Expected #{expected_count} instances of '#{@first_section_name} question?', got #{actual_count}." 
   actual_count = html_source.scan("#{@second_section_name} question?").count

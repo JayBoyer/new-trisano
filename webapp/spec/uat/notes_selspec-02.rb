@@ -29,7 +29,7 @@ describe 'Associating notes with an event.' do
 
   it "It should show an appropriate message for new events." do
     @browser.open "/trisano/cmrs"
-    @browser.wait_for_page_to_load $load_time
+    sleep(3)
     click_nav_new_cmr(@browser).should be_true
     @browser.type('morbidity_event_interested_party_attributes_person_entity_attributes_person_attributes_last_name', "Smith")
     first_reported_to_ph_date @browser, Date.today
@@ -94,7 +94,7 @@ describe 'Associating notes with an event.' do
     add_place(@browser, { :name => "PS 207" })
     save_cmr(@browser)
     @browser.click "link=Edit Contact"
-    @browser.wait_for_page_to_load $load_time 
+    wait_for_element_present(:text, "Edit Contact event")
 
     @browser.get_html_source.include?("Contact event created.").should be_true
     enter_note(@browser, "My first clinical, contact note.")
@@ -131,9 +131,9 @@ describe 'Associating notes with an event.' do
     note_count(@browser, "Clinical").should eql(1)
 
     @browser.click("link=Smith")
-    @browser.wait_for_page_to_load $load_time 
+    wait_for_element_present(:text, "Edit morbidity event")
     @browser.click "link=Edit Place"
-    @browser.wait_for_page_to_load $load_time
+    wait_for_element_present(:text, "Edit Place Event")
 
     @browser.get_html_source.include?("Place event created.").should be_true
     enter_note(@browser, "My first clinical, place note.")

@@ -61,7 +61,7 @@ describe 'Form Builder CDC mapping functionality' do
   it 'should create basic Hep A cmr and open for edit' do
     create_basic_investigatable_cmr(@browser, get_random_word + 'HepA', "Hepatitis A", get_random_jurisdiction).should be_true
     @browser.click('link=Edit')
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Edit morbidity event")
     click_core_tab(@browser, INVESTIGATION)
     @browser.click("link=#{@form_name}")
   end

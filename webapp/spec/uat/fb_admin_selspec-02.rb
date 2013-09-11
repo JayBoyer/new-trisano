@@ -75,10 +75,10 @@ end
 
 def add_a_section
   @browser.click "link=Add section to tab"
-  wait_for_element_present("new-section-form")
+  wait_for_element_present(id:, "new-section-form")
   @browser.type "section_element_name", "Section 1"
   @browser.click "//input[contains(@id, 'create_section_submit')]"
-  wait_for_element_not_present("new-section-form")
+  wait_for_element_not_present(:id, "new-section-form")
   @browser.is_text_present("Section 1").should be_true
 
   @reorderable_section_id = "section_#{@browser.get_value("id=modified-element")}_children"
@@ -133,11 +133,11 @@ end
 
 def edit_value_sets
   @browser.click "link=Edit value set"
-  wait_for_element_present("edit-value-set-form")
+  wait_for_element_present(:id, "edit-value-set-form")
   @browser.is_element_present("edit-value-set-form").should be_true
   @browser.type "value_set_element_name", "Edited value set"
   @browser.click "//input[contains(@id, 'edit_value_set_submit')]"
-  wait_for_element_not_present("edit-value-set-form")
+  wait_for_element_not_present(:id, "edit-value-set-form")
 
   @browser.click "link=Inactivate"
   sleep(2)
@@ -148,18 +148,18 @@ end
 def add_and_populate_tab
 
   @browser.click("add-tab")
-  wait_for_element_present("new-view-form")
+  wait_for_element_present(:id, "new-view-form")
   @browser.type "view_element_name", @user_defined_tab_text
   @browser.click "//input[contains(@id, 'create_view_submit')]"
-  wait_for_element_not_present("new-view-form")
+  wait_for_element_not_present(:id, "new-view-form")
 
   @tab_element_id = @browser.get_value("id=modified-element")
 
   @browser.click "id=add-section-#{@tab_element_id}"
-  wait_for_element_present("new-section-form")
+  wait_for_element_present(:id, "new-section-form")
   @browser.type "section_element_name", @user_defined_tab_section_text
   @browser.click "//input[contains(@id, 'create_section_submit')]"
-  wait_for_element_not_present("new-section-form")
+  wait_for_element_not_present(:id, "new-section-form")
   @browser.is_text_present(@user_defined_tab_text).should be_true
 
   @tab_section_element_id = @browser.get_value("id=modified-element")
@@ -172,7 +172,7 @@ def to_and_from_library_no_group
 
   # Debt: This could be refactored to use the #add_question_to_library helper method
   @browser.click "link=Copy to library"
-  wait_for_element_present("new-group-form")
+  wait_for_element_present(:id, "new-group-form")
   @browser.click "link=No Group"
   sleep(2)
   # Commenting out until UI settles down on library -- library functionality is checked in other tests
@@ -180,7 +180,7 @@ def to_and_from_library_no_group
   @browser.click "link=Close"
 
   @browser.click "link=Add question to tab"
-  wait_for_element_present("new-question-form")
+  wait_for_element_present(:id, "new-question-form")
 
   @browser.click("link=Show all groups")
   # Debt: If this UI sticks, add something to key off of instead of using this sleep
@@ -199,7 +199,7 @@ def to_and_from_library_new_group
   num_times_text_appears(@browser, @question_to_add_to_library_text).should == 1
   group_name = get_unique_name(3)
   @browser.click "link=Copy to library"
-  wait_for_element_present("new-group-form")
+  wait_for_element_present(:id, "new-group-form")
   @browser.type "group_element_name", group_name
   @browser.click "group_element_submit"
   sleep(2)
@@ -232,16 +232,16 @@ def delete_edit_and_inactivate_questions
   delete_question(@browser, @question_to_delete_text)
   sleep(1)
   @browser.click "id=edit-question-#{@question_to_edit_id}"
-  wait_for_element_present("edit-question-form")
+  wait_for_element_present(:id, "edit-question-form")
   @browser.type "question_element_question_attributes_question_text", @question_to_edit_modified_text
   @browser.click "//input[contains(@id, 'edit_question_submit')]"
-  wait_for_element_not_present("edit-question-form")
+  wait_for_element_not_present(:id, "edit-question-form")
   @browser.is_text_present(@question_to_edit_text).should be_false
   @browser.is_text_present(@question_to_edit_modified_text).should be_true
 
   @browser.click "id=edit-question-#{@question_to_inactivate_id}"
-  wait_for_element_present("edit-question-form")
+  wait_for_element_present(:id, "edit-question-form")
   @browser.click "question_element_is_active_false"
   @browser.click "//input[contains(@id, 'edit_question_submit')]"
-  wait_for_element_not_present("edit-question-form")
+  wait_for_element_not_present(:id, "edit-question-form")
 end

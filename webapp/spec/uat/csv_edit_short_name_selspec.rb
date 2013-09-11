@@ -30,15 +30,15 @@ describe 'CSV configuration' do
   it 'should open csv config page' do
     click_nav_admin(@browser)
     @browser.click("//a[@id='admin_csv_config']")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "CSV Export Columns")
   end
 
   it 'should edit short names from csv records' do
     @browser.click("//table[@id='morbidity_event_fields']//td[contains(text(), 'patient_event_id')]/../td[2]/div/a")
-    wait_for_element_present("//form[contains(@id, '-inplaceeditor')]")
+    wait_for_element_present(:xpath, "//form[contains(@id, '-inplaceeditor')]")
     @browser.type("//input[@class='editor_field']", @unique_name)
     @browser.click("//input[@class='editor_ok_button']")
-    wait_for_element_not_present("//form[contains(@id, '-inplaceeditor')]")
+    wait_for_element_not_present(:xpath, "//form[contains(@id, '-inplaceeditor')]")
     # Needs some assertions
   end
 

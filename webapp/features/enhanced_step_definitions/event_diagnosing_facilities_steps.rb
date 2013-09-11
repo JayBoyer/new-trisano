@@ -27,7 +27,7 @@ end
 When(/^I click remove for that diagnosing facility$/) do
   # This may need to be more specific at some point
   @browser.click("link=Remove")
-  wait_for_element_not_present("//div[@id='live_search_diagnostics']/div[@class='existing_diagnostic']")
+  wait_for_element_not_present(:xpath, "//div[@id='live_search_diagnostics']/div[@class='existing_diagnostic']")
 end
 
 Then(/^I should not see the diagnosing facility$/) do

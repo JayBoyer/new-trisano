@@ -29,7 +29,7 @@ describe "cmr helper example" do
   
   it "should create a cmr from a hash of field names and values" do 
     @browser.open("/trisano/forms")
-    @browser.wait_for_page_to_load("30000")
+    wait_for_element_present(:text, "FORM INFORMATION")
     cmr_hash = get_full_cmr_hash()
     create_cmr_from_hash(@browser, cmr_hash)
   end

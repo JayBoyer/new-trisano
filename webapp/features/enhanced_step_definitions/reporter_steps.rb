@@ -25,20 +25,20 @@ When /^I add an existing reporter$/ do
   click_core_tab(@browser, "Reporting")
   @browser.type('reporter_search_name', @reporter_entity.person.last_name)
   @browser.click('reporter_search')
-  wait_for_element_present("//div[@id='reporter_search_results']/table")
+  wait_for_element_present(:xpath, "//div[@id='reporter_search_results']//a[@id='add_reporter_entity_#{@reporter_entity.id}']")
   @browser.click "//div[@id='reporter_search_results']//a[@id='add_reporter_entity_#{@reporter_entity.id}']"
-  wait_for_element_present("//div[@id='existing-reporter']")
+  wait_for_element_present(:xpath, "//div[@id='existing-reporter']")
 end
 
 Then /^I should see the reporter on the page$/ do
   script = "return $j('#reporters').text();"
-  wait_for_element_present("//div[@id='reporters']")
+  wait_for_element_present(:xpath, "//div[@id='reporters']")
   @driver.execute_script(script).should =~ /#{@reporter.last_comma_first}/
 end
 
 Then /^I should not see the reporter on the page$/ do
   script = "return $j('#reporters').text();"
-  wait_for_element_present("//div[@id='reporters']")
+  wait_for_element_present(:xpath, "//div[@id='reporters']")
   @driver.execute_script(script).should_not =~ /#{@reporter.last_comma_first}/
 end
 

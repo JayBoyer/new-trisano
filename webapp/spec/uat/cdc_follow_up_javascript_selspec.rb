@@ -29,38 +29,38 @@ describe 'CDC export follow ups' do
   it 'should add mumps form and core cdc follow up to cdc output' do
     click_nav_forms(@browser).should be_true
     @browser.click("//input[@value='Create New Form']")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Create Form")
     @browser.type("//input[@id='form_name']", "mumpy #{get_unique_name(1)}")
     @browser.type("//input[@id='form_short_name']", "mumpy #{get_unique_name(1)}")
     @browser.select("//select[@id='form_event_type']", "Morbidity Event")
     @browser.check("//input[@id='Mumps']")
     @browser.click("//input[@value='Create']")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Form Information")
     @browser.click("//a[text()='Builder']")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Form Builder")
     @browser.click("//a[@id='add-core-field']")
-    wait_for_element_present("//b[text()='Add Core Field']")
+    wait_for_element_present(:xpath, "//b[text()='Add Core Field']")
     @browser.select("//select[@id='core_field_element_core_path']", "Pregnant")
     @browser.click("//input[@value='Create']")
-    wait_for_element_present("//a[text()='Add follow up to after config']")
+    wait_for_element_present(:xpath, "//a[text()='Add follow up to after config']")
     @browser.click("//a[text()='Add follow up to after config']")
-    wait_for_element_present("//label[text()='Condition']")
+    wait_for_element_present(:xpath, "//label[text()='Condition']")
     @browser.type("//input[@name='follow_up_element[condition]']", "Code: Yes (yesno)")
     @browser.select("//select[@id='follow_up_element_core_path']", "Pregnant")
     @browser.click("//input[@value='Create']")
-    wait_for_element_present("//a[text()='Add question to follow up container']")
+    wait_for_element_present(:xpath, "//a[text()='Add question to follow up container']")
     @browser.click("//a[text()='Add question to follow up container']")
-    wait_for_element_present("//label[text()='Question text']")
+    wait_for_element_present(:xpath, "//label[text()='Question text']")
     @browser.type("//input[@id='question_element_question_attributes_question_text']", @field_name)
     @browser.type("//input[@id='question_element_question_attributes_short_name']", @field_name)
     @browser.select("//select[@id='question_element_export_column_id']", "Number of weeks gestation (or trimester) at onset")
     @browser.click("//input[@value='Create']")
-    wait_for_element_present("//i[text()='Blank']")
+    wait_for_element_present(:xpath, "//i[text()='Blank']")
     @browser.click("//input[@value='Publish']")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Form was successfully published")
 
     @browser.open "/trisano/cmrs/new"
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "New Morbidity Event")
 
     add_demographic_info(@browser, { :last_name => "#{get_unique_name(1)} mumpy cdc" })
     add_clinical_info(@browser, { :disease => "Mumps" })
@@ -68,13 +68,13 @@ describe 'CDC export follow ups' do
     add_admin_info(@browser, { :state_case_status => "Confirmed" })
     save_and_continue(@browser)
     add_clinical_info(@browser, { :pregnant => "Yes" })
-    wait_for_element_present("//label[text()='#{@field_name}']")
+    wait_for_element_present(:xpath, "//label[text()='#{@field_name}']")
     @browser.select("//label[text()='#{@field_name}']/../select", "Second trimester")
     save_cmr(@browser)
 
     # check the cdc output
     @browser.open "/trisano/cdc_events/current_week.txt"
-    @browser.wait_for_page_to_load($load_time)
+    sleep 1
     source = @browser.get_html_source.gsub(/<\/?[^>]*>/, "")
     records = source.split("\n")
     records[1][264,3].should == '2nd'

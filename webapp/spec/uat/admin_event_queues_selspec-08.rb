@@ -31,20 +31,20 @@ describe 'Managing event queues' do
     @browser.open "/trisano/admin"
     current_user = @browser.get_selected_label("user_id")
     if current_user != "default_user"
-      switch_user(@browser, "default_user")
+      switch_user(@driver, "default_user")
     end
 
     @browser.click "admin_queues"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queues")
     
     @browser.click "create_event_queue"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create event queue")
 
     @browser.type "event_queue_queue_name", @queue_name_1
     @browser.select "event_queue_jurisdiction_id", "label=Utah County Health Department"
 
     @browser.click "event_queue_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queue Detail")
 
     @browser.is_text_present('Event queue was successfully created.').should be_true
     @browser.is_text_present(@queue_name_1).should be_true
@@ -53,10 +53,10 @@ describe 'Managing event queues' do
 
   it "should allow editing an event queue" do
     @browser.click "link=Edit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queue Admin")
     @browser.type "event_queue_queue_name", @queue_name_2
     @browser.click "event_queue_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queue Detail")
    
     @browser.is_text_present('Event queue was successfully updated.').should be_true
     @browser.is_text_present(@queue_name_2).should be_true
@@ -64,14 +64,14 @@ describe 'Managing event queues' do
 
   it "should allow deleting an event queue" do
     @browser.click "link=Delete"
-    @browser.wait_for_page_to_load($load_time)
+    sleep 1
    
     @browser.is_text_present(@queue_name_2).should_not be_true
     @browser.is_text_present('Utah County Health Department').should_not be_true
   end
 
   it "should not be accessible to non-admins" do
-    switch_user(@browser, "lhd_manager").should be_true
+    switch_user(@driver, "lhd_manager").should be_true
     @browser.is_text_present('You do not have administrative rights').should be_true
   end
     

@@ -328,5 +328,5 @@ Given /^the event has a lab$/i do
 end
 
 When /^I navigate to the (.+) tab$/ do |tab_name|
-  @browser.click("//a[@href='##{TrisanoHelper::TAB_ELEMENT_IDS_BY_NAME[tab_name]}']")
+  @driver.find_element(:xpath, "//a[@href='##{TrisanoHelper::TAB_ELEMENT_IDS_BY_NAME[tab_name]}']").click()
 end

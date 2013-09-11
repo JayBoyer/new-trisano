@@ -29,14 +29,14 @@ describe "lab results helper" do
     }
     @browser.open("/trisano/cmrs")
     @browser.click("link=Edit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "EDIT MORBIDITY EVENT")
     @browser.click("link=New Lab Result")
     sleep 3
     set_fields(@browser, @lab_result_fields)
     @browser.click("save-button")
     sleep 3
     @browser.click('event_submit')
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW MORBIDITY EVENT")
   end
 end
 

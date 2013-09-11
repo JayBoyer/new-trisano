@@ -19,9 +19,9 @@ When(/^I add an existing place exposure$/) do
   click_core_tab(@browser, EPI)
   @browser.type('place_search_name', @place_entity.place.name)
   @browser.click('place_search')
-  wait_for_element_present("//div[@id='place_search_results']/table")
+  wait_for_element_present(:xpath, "//div[@id='place_search_results']/table")
   @browser.click "//div[@id='place_search_results']//a[@id='add_place_entity_#{@place_entity.id}']"
-  wait_for_element_present("//div[@id='place_child_events']")
+  wait_for_element_present(:xpath, "//div[@id='place_child_events']")
 end
 
 When(/^I click remove for the unsaved place exposure$/) do
@@ -68,7 +68,6 @@ end
 
 When(/^I navigate to the place event$/) do
   @browser.click "link=Edit Place"
-  @browser.wait_for_page_to_load
 end
 
 When(/^I edit the place event$/) do

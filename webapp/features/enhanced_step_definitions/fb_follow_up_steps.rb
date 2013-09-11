@@ -28,12 +28,11 @@ end
 
 When(/^I answer all of the core follow ups with a matching condition$/) do
   click_core_tab(@browser, "Investigation")
-  @browser.wait_for_page_to_load("30000")
+  wait_for_element_present(:text, "Investigative Information", 10)
   core_fields = CoreField.default_follow_up_core_fields_for(@form.event_type)
   core_fields.each do |core_field|
     key = railsify_core_field_key(core_field.key)
     key.gsub!("morbidity_and_assessment_event", @event.type.underscore)
-p "write key = " + key
     wait = Selenium::WebDriver::Wait.new(:timeout => 2)
     wait.until { @driver.page_source().include?(key) }
     if core_field.code_name

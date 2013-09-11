@@ -23,7 +23,7 @@ module TrisanoAdminHelper
     browser.open "/trisano/events"
     click_nav_admin(browser)
     browser.click("admin_cdc_config")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Export Columns")
     return(browser.is_text_present("Export Columns"))
   end
 
@@ -33,13 +33,13 @@ module TrisanoAdminHelper
     browser.open "/trisano/events"
     click_nav_admin(browser)
     browser.click("admin_diseases")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Diseases")
     return(browser.is_text_present("Diseases"))
   end
 
   def create_disease(browser, disease_attributes)
     modify_disease(browser, disease_attributes)
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Disease was successfully created.")
     return(browser.is_text_present("Disease was successfully created."))
   end
 
@@ -61,13 +61,13 @@ module TrisanoAdminHelper
   def click_edit_disease(browser, disease_name)
     disease_id = get_resource_id(browser, disease_name)
     browser.click("//a[contains(@href, 'diseases/#{disease_id}/edit')]")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit disease")
   end
 
   def edit_disease(browser, disease_name, disease_attributes)
     click_edit_disease(browser, disease_name)
     modify_disease(browser, disease_attributes)
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Disease was successfully updated.")
     return(browser.is_text_present("Disease was successfully updated."))
   end
 
@@ -77,7 +77,7 @@ module TrisanoAdminHelper
     browser.open "/trisano/events"
     click_nav_admin(browser)
     browser.click("link=Manage Users")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Users")
     return(browser.is_text_present("Users"))
   end
   
@@ -95,7 +95,7 @@ module TrisanoAdminHelper
     browser.open "/trisano/events"
     click_nav_admin(browser)
     browser.click("admin_places")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Place management")
     return(browser.is_text_present("Place Management"))
   end
 

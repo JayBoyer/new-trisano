@@ -17,7 +17,6 @@
 
 When(/^I navigate to the admin dashboard page$/) do
   @browser.open "/trisano/admin"
-  @browser.wait_for_page_to_load
 end
 
 When(/^I navigate to the place management tool$/) do
@@ -31,6 +30,5 @@ end
 When(/^I search for a place named (.+)/) do |name|
    @browser.type("name", name)
    @browser.click("submit_place_search")
-   @browser.wait_for_page_to_load($load_time)
 end
 

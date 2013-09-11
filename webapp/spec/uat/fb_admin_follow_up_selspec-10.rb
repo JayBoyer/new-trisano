@@ -55,7 +55,7 @@ describe 'Form Builder Admin Standard Follow-Up Functionality' do
     answer_investigator_question(@browser, @original_question_text, "Yes")
 
     @browser.click("link=#{@form_name}") # A bit of a kluge. Clicking this link essential generates the onChange needed to process the follow-up logic
-    wait_for_element_present("//label[texte()='#@follow_up_question_text']")
+    wait_for_element_present(:xpath, "//label[texte()='#@follow_up_question_text']")
     assert_tooltip_exists(@browser, @follow_up_help_text).should be_true
         
     # Enter an answer that does not meet the follow-up condition
@@ -67,7 +67,7 @@ describe 'Form Builder Admin Standard Follow-Up Functionality' do
     # Back to a match, enter follow up answer and submit
     answer_investigator_question(@browser, @original_question_text, "Yes")
     @browser.click("link=#{@form_name}")
-    wait_for_element_present("//label[texte()='#@follow_up_question_text']")
+    wait_for_element_present(:xpath, "//label[texte()='#@follow_up_question_text']")
     answer_investigator_question(@browser, @follow_up_question_text, @follow_up_answer)
 
     save_cmr(@browser)    

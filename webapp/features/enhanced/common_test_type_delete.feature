@@ -10,7 +10,7 @@ Feature: Deleting common test types
     When I navigate to show common test type
     Then I should see a link to "Delete"
 
-    When I click the "Delete" link
+    When I click and confirm the "Delete" link
     Then I should see "Common test type was successfully deleted"
     And I should not see "Culture"
 

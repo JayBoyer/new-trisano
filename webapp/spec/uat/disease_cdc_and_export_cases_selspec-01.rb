@@ -32,13 +32,13 @@ describe 'adding diseases' do
   it 'should create an inactive disease' do
     navigate_to_disease_admin(@browser).should be_true
     @browser.click("//input[@value='Create new disease']")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create Disease")
     create_disease(@browser, :disease_name => @disease_name).should be_true
   end
 
   it 'should have no cdc value' do
     @browser.click("link=Edit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit disease")
     @browser.get_value("id=disease_cdc_code").should == ""
   end
 
@@ -51,18 +51,18 @@ describe 'adding diseases' do
 
   it 'adding a cdc value should save the cdc export value' do
     modify_disease(@browser, :cdc_code => 11590)
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Disease Detail DETAIL")
     @browser.click("link=Edit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit disease")
     @browser.get_value("id=disease_cdc_code").should == '11590'
   end
 
   it 'selecting export states should store related export states' do
     checked_fields = {'Confirmed' => :check, 'Probable' => :check, 'Suspect' => :check}
     modify_disease(@browser, :external_codes => checked_fields)
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Disease Detail DETAIL")
     @browser.click("link=Edit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit disease")
     checked_fields.each { |id, msg| @browser.is_checked(id).should be_true }
   end
       
@@ -70,9 +70,9 @@ describe 'adding diseases' do
   it 'removing an export state should save preserve remaining export states' do
     unchecked_fields = {'Probable' => :uncheck}
     modify_disease(@browser, :external_codes => unchecked_fields)
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Disease Detail DETAIL")
     @browser.click("link=Edit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit disease")
     case_checkboxes(@browser).each do |id|
       @browser.is_checked(id).should == %w(Confirmed Suspect).include?(id)
     end

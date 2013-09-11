@@ -145,7 +145,7 @@ GEM
     rubyzip (0.9.4)
     rvm-capistrano (1.2.7)
       capistrano (>= 2.0.0)
-    selenium-webdriver (2.33.0)
+    selenium-webdriver (2.34.0)
       childprocess (>= 0.2.5)
       multi_json (~> 1.0)
       rubyzip
@@ -216,7 +216,7 @@ DEPENDENCIES
   ruby-prof (= 0.11.2)
   rubyzip (= 0.9.4)
   rvm-capistrano (= 1.2.7)
-  selenium-webdriver (= 2.33.0)
+  selenium-webdriver (= 2.34.0)
   sparrowhawk (= 0.9.5)
   unicorn (= 1.1.3)
   validates_timeliness (= 2.3.1)

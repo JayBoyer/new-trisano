@@ -27,11 +27,12 @@ end
 
 When /^I navigate to the add attachments page$/ do
   @browser.open "/trisano/events/#{(@event).id}/attachments/new"
-  @browser.wait_for_page_to_load
+  wait = Selenium::WebDriver::Wait.new(:timeout => 5)
+  wait.until { @driver.find_element(:id, "existing-attachments") }
 end
 
 When(/^I click and confirm the attachment "(.+)" link$/) do |text|
-  @browser.click("//tr[@id='attachment_#{@attachment.id}']//a[contains(text(), 'Delete')]")
+  @driver.find_element(:xpath, "//tr[@id='attachment_#{@attachment.id}']//a[contains(text(), 'Delete')]").click()
   get_confirmation()
 end
 

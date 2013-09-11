@@ -74,7 +74,7 @@ describe 'Updating a task' do
       }).should be_true
 
     @browser.click "link=Show CMR"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
 
     is_text_present_in(@browser, "tasks", @task_name).should be_false
     is_text_present_in(@browser, "tasks", @task_notes).should be_false

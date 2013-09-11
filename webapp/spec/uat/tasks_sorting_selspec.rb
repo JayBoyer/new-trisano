@@ -60,17 +60,17 @@ describe 'Sorting tasks on the Dashboard' do
     ].each do |task|
       add_task(@browser, task).should be_true
       @browser.click("link=Show CMR")
-      @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
     end
   end
 
   it 'should sort by columns' do
     @browser.click("//div[@id='head']//a/img")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:id, "look_back")
     @browser.type('look_ahead', 7)
     @browser.type('look_back',  7)
     @browser.click('update_tasks_filter')
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Event Tasks")
     ['Name', 'Description', 'Category', 'Priority'].each do |column|
       @browser.click("link=#{column}")
       sleep(3)

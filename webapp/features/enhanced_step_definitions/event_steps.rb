@@ -29,36 +29,36 @@ end
 
 When /^I go to the new CMR page$/ do
   @browser.open "/trisano/cmrs/new"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "New CMR", 10) 
 end
 
 When(/^I navigate to the morbidity event edit page$/) do
   @browser.click "link=EVENTS"
-  @browser.wait_for_page_to_load $load_time
+  wait_for_element_present(:text, "Change View", 10) 
   @browser.click "link=Edit"
-  @browser.wait_for_page_to_load $load_time
+  wait_for_element_present(:text, "Edit morbidity event", 10) 
 end
 
 When(/^I navigate to the assessment event edit page$/) do
   @browser.click "link=EVENTS"
-  @browser.wait_for_page_to_load $load_time
+  wait_for_element_present(:text, "Change View", 10)
   @browser.click "link=Edit"
-  @browser.wait_for_page_to_load $load_time
+  wait_for_element_present(:text, "Edit assessment event", 10)
 end
 
 When(/^I am on the assessment event edit page$/) do
   @browser.open "/trisano/aes/#{(@event).id}/edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:id, "disable_tabs", 5)
 end
 
 When(/^I am on the morbidity event edit page$/) do
   @browser.open "/trisano/cmrs/#{(@event).id}/edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:id, "disable_tabs", 5)
 end
 
 When(/^I am on the morbidity event show page$/) do
   @browser.open "/trisano/cmrs/#{(@event).id}"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:id, "disable_tabs", 5)
 end
 
 # Consider refactoring the name of this one -- it really isn't
@@ -66,50 +66,48 @@ end
 # imply a verification that you are already there?
 When(/^I navigate to the morbidity event show page$/) do
   @browser.open "/trisano/cmrs/#{(@event).id}"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:id, "disable_tabs", 5)
 end
 
 When(/^I navigate to the assessment event show page$/) do
   @browser.open "/trisano/aes/#{(@event).id}"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "View Assessment Event", 10)
 end
 
 When /^I am on the events index page$/ do
   @browser.open "/trisano/events"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Events", 10)
 end
-
 
 When(/^I am on the contact event edit page$/) do
   @browser.open "/trisano/contact_events/#{@contact_event.id}/edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Edit Contact event", 10)
 end
 
 When /^I navigate to the contact event edit page$/ do
   When "I am on the contact event edit page"
+  wait_for_element_present(:text, "Edit Contact event", 10)
 end
 
 When /^I navigate to the encounter event edit page$/ do
   @browser.open "/trisano/encounter_events/#{(@encounter_event).id}/edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Edit Encounter Event", 10)
 end
-
 
 When /^I am on the encounter event edit page$/ do
   When "I navigate to the encounter event edit page"
+  wait_for_element_present(:text, "Edit Encounter Event", 10)
 end
-
 
 When /^I navigate to the contact named "(.+)"$/ do |last_name|
   @contact_event = ContactEvent.first(:include => { :interested_party => { :person_entity => :person } },
                                       :conditions => ['people.last_name = ?', last_name])
   @browser.open "/trisano/contact_events/#{@contact_event.id}/edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Edit Contact event", 10)
 end
 
 When /^I select "([^\"]*)" from the sibling navigator$/ do |option_text|
   @browser.select "css=.events_nav", option_text
-  @browser.wait_for_page_to_load
 end
 
 When /^I select "([^\"]*)" from the sibling navigator and Save$/ do |option_text|
@@ -117,9 +115,6 @@ When /^I select "([^\"]*)" from the sibling navigator and Save$/ do |option_text
   wait = Selenium::WebDriver::Wait.new(:timeout => 3)
   element = wait.until { @driver.find_element(:xpath, "//button/span[contains(text(), 'Save')]") }
   element.click()
-#  @browser.wait_for_element_present "//button/span[contains(text(), 'Save')]"
-#  @browser.click "//button/span[contains(text(), 'Save')]"
-  @browser.wait_for_page_to_load
 end
 
 When /^I select "([^\"]*)" from the sibling navigator and leave without saving$/ do |option_text|
@@ -127,9 +122,6 @@ When /^I select "([^\"]*)" from the sibling navigator and leave without saving$/
   wait = Selenium::WebDriver::Wait.new(:timeout => 3)
   element = wait.until { @driver.find_element(:xpath, "//button/span[contains(text(), 'Leave')]") }
   element.click()
-#  @browser.wait_for_element_present "//button/span[contains(text(), 'Leave')]"
-#  @browser.click "//button/span[contains(text(), 'Leave')]"
-  @browser.wait_for_page_to_load
 end
 
 When /^I select "([^\"]*)" from the sibling navigator but cancel the dialog$/ do |option_text|
@@ -137,8 +129,6 @@ When /^I select "([^\"]*)" from the sibling navigator but cancel the dialog$/ do
   wait = Selenium::WebDriver::Wait.new(:timeout => 3)
   element = wait.until { @driver.find_element(:xpath, "//a/span[contains(text(), 'close')]") }
   element.click()
-#  @browser.wait_for_element_present "//a/span[contains(text(), 'close')]"
-#  @browser.click "//a/span[contains(text(), 'close')]"
 end
 
 Then /^I should be on the contact named "([^\"]*)"$/ do |last_name|
@@ -159,19 +149,19 @@ end
 
 When(/^I am on the place event edit page$/) do
   @browser.open "/trisano/place_events/#{(@place_event).id}/edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Edit Place", 10)
 end
 
 When /^I save and continue$/ do
   element = @driver.find_element(:id, "save_and_continue_btn")
   element.click()
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "was successfully")
 end
 
 When /^I save and exit$/ do
   element = @driver.find_element(:id, "save_and_exit_btn")
   element.click()
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "was successfully")
 end
 
 Then /^events list should show (\d+) events$/ do |expected_count|

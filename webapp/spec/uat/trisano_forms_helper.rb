@@ -21,7 +21,7 @@ module TrisanoFormsHelper
     id = get_resource_id(browser, name)
     if id > 0
       browser.click "//a[contains(@href, '/trisano/forms/builder/" + id.to_s + "')]"
-      browser.wait_for_page_to_load "30000"
+    wait_for_element_present(:text, "Form Information")
       return 0
     else
       return -1
@@ -30,7 +30,7 @@ module TrisanoFormsHelper
 
   def click_build_form_by_id(browser, id)
     browser.click "//a[contains(@href, '/trisano/forms/builder/" + id.to_s + "')]"
-    browser.wait_for_page_to_load "30000"
+    wait_for_element_present(:text, "Form Information")
   end
 
   def click_form_export(browser, name)
@@ -47,7 +47,7 @@ module TrisanoFormsHelper
     id = get_resource_id(browser, name)
     if id > 0
       browser.click "//a[contains(@href, '/trisano/forms/" + id.to_s + "/push')]"
-      browser.wait_for_page_to_load "30000"
+    wait_for_element_present(:text, "Form was successfully pushed")
       return true
     else
       return false
@@ -58,7 +58,7 @@ module TrisanoFormsHelper
     id = get_resource_id(browser, name)
     if id > 0
       browser.click "//a[contains(@href, '/trisano/forms/" + id.to_s + "/deactivate')]"
-      browser.wait_for_page_to_load "30000"
+    wait_for_element_present(:text, "Form was successfully deactivated")
       return true
     else
       return false
@@ -68,7 +68,7 @@ module TrisanoFormsHelper
   def create_new_form_and_go_to_builder(browser, form_name, disease_label, jurisdiction_label, type='Morbidity Event', short_name=nil)
     click_nav_forms(@browser).should be_true
     browser.click "//input[@value='Create New Form']"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create Form")
     browser.type "form_name", form_name
     browser.type "form_short_name", short_name || form_name
     browser.select "form_event_type", "label=#{type}"
@@ -79,13 +79,12 @@ module TrisanoFormsHelper
     end
     browser.select "form_jurisdiction_id", "label=#{jurisdiction_label}"
     browser.click "form_submit"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Form was successfully created.")
     if browser.is_text_present("Form was successfully created.") != true
       return(false)
     end
-    sleep 3
     browser.click "link=Builder"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Form:")
     return browser.is_text_present("Publish")
   end
 
@@ -104,13 +103,13 @@ module TrisanoFormsHelper
 
     browser.select "form_jurisdiction_id", "label=#{ form_attributes[:jurisdiction]}" unless form_attributes[:jurisdiction].nil?
     browser.click "form_submit"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Form was successfully updated.")
     if browser.is_text_present("Form was successfully updated.") != true
       return(false)
     end
     browser.click "link=Builder"
 
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Form:")
     return browser.is_element_present("publish_btn")
     #return browser.is_text_present("Form Builder")
   end
@@ -118,16 +117,16 @@ module TrisanoFormsHelper
   # Must be called from the builder view
   def open_form_builder_library_admin(browser)
     browser.click("open-library-admin")
-    wait_for_element_present("library-admin-container")
+    wait_for_element_present(:id, "library-admin-container")
     return(browser.is_text_present("Library Administration"))
   end
 
   def add_view(browser, name)
     browser.click("add-tab")
-    wait_for_element_present("new-view-form")
+    wait_for_element_present(:id, "new-view-form")
     browser.type("view_element_name", name)
     browser.click "//input[contains(@id, 'create_view_submit')]"
-    wait_for_element_not_present("new-view-form")
+    wait_for_element_not_present(:id, "new-view-form")
     if browser.is_text_present(name)
       return browser.get_value("id=modified-element")
     else
@@ -138,12 +137,12 @@ module TrisanoFormsHelper
   def add_section_to_view(browser, view_name, section_attributes = {})
     element_id = get_form_element_id(browser, view_name, VIEW_ID_PREFIX)
     browser.click("add-section-#{element_id}")
-    wait_for_element_present("new-section-form", browser)
+    wait_for_element_present(:id, "new-section-form")
     browser.type("section_element_name", section_attributes[:section_name])
     browser.type("section_element_description", section_attributes[:description]) unless section_attributes[:description].nil?
     browser.type("section_element_help_text", section_attributes[:help_text]) unless section_attributes[:help_text].nil?
     browser.click "//input[contains(@id, 'create_section_submit')]"
-    wait_for_element_not_present("new-section-form", browser)
+    wait_for_element_not_present(:id, "new-section-form")
     if browser.is_text_present(section_attributes[:section_name])
       return browser.get_value("id=modified-element")
     else
@@ -183,14 +182,14 @@ module TrisanoFormsHelper
 
     element_id = get_form_element_id(browser, element_name, VIEW_ID_PREFIX)
     browser.click("add-question-#{element_id}")
-    wait_for_element_present("new-question-form", browser)
+    wait_for_element_present(:id, "new-question-form")
     browser.click("link=Show all groups")
 
     # Debt: If this UI sticks, add something to key off of instead of using this sleep
     sleep(2)
 
     browser.click("link=Click to add all questions in group: #{group_name}")
-    wait_for_element_not_present("new-question-form", browser)
+    wait_for_element_not_present(:id, "new-question-form")
 
     if browser.is_text_present(group_name)
       return true
@@ -201,12 +200,12 @@ module TrisanoFormsHelper
 
   def edit_question_by_id(browser, question_element_id, question_attributes={}, expect_error=false)
     browser.click("edit-question-#{question_element_id}")
-    wait_for_element_present("edit-question-form", browser)
+    wait_for_element_present(:id, "edit-question-form")
     fill_in_question_attributes(browser, question_attributes, { :mode => :edit })
     browser.click "//input[contains(@id, 'edit_question_submit')]"
 
     unless expect_error
-      wait_for_element_not_present("edit-question-form", browser)
+      wait_for_element_not_present(:id, "edit-question-form")
     else
       sleep 1
     end
@@ -235,61 +234,61 @@ module TrisanoFormsHelper
   def add_invalid_core_follow_up_to_view(browser, element_name, condition, invalid_core_path)
     element_id = get_form_element_id(browser, element_name, VIEW_ID_PREFIX)
     browser.click("add-follow-up-#{element_id}")
-    wait_for_element_present("new-follow-up-form", browser)
+    wait_for_element_present(:id, "new-follow-up-form")
     browser.type "model_auto_completer_tf", condition
     browser.select "follow_up_element_core_path", "label=Patient birth gender"
     @driver.execute_script("return element = window.document.getElementById(\"follow_up_element_core_path\").options[1]; element.value = '#{invalid_core_path}'; element.selected = true")
     browser.click "//input[contains(@id, 'create_follow_up_submit')]"
-    wait_for_element_not_present("new-follow-up-form", browser)
+    wait_for_element_not_present(:id, "new-follow-up-form")
   end
 
 
   def edit_core_follow_up(browser, element_name, condition, core_label)
     element_id = get_form_element_id(browser, element_name, FOLLOW_UP_ID_PREFIX)
     browser.click("edit-follow-up-#{element_id}")
-    wait_for_element_present("edit-follow-up-form", browser)
+    wait_for_element_present(:id, "edit-follow-up-form")
     browser.type "model_auto_completer_tf", condition
     sleep 1 # Give the type ahead a second to breath, otherwise the edit doesn't stick
     browser.select "follow_up_element_core_path", "label=#{core_label}"
     browser.click "//input[contains(@id, 'edit_follow_up_submit')]"
-    wait_for_element_not_present("edit-follow-up-form", browser)
+    wait_for_element_not_present(:id, "edit-follow-up-form")
   end
 
   def edit_follow_up(browser, element_name, condition)
     element_id = get_form_element_id(browser, element_name, FOLLOW_UP_ID_PREFIX)
     browser.click("edit-follow-up-#{element_id}")
-    wait_for_element_present("edit-follow-up-form", browser)
+    wait_for_element_present(:id, "edit-follow-up-form")
     browser.type "follow_up_element_condition", condition
     browser.click "//input[contains(@id, 'edit_follow_up_submit')]"
-    wait_for_element_not_present("edit-follow-up-form", browser)
+    wait_for_element_not_present(:id, "edit-follow-up-form")
   end
 
   def edit_section(browser, element_name, section_text)
     element_id = get_form_element_id(browser, element_name, SECTION_ID_PREFIX)
     browser.click("edit-section-#{element_id}")
-    wait_for_element_present("section-element-edit-form", browser)
+    wait_for_element_present(:id, "section-element-edit-form")
     browser.type "section_element_name", section_text
     browser.click "//input[contains(@id, 'edit_section_submit')]"
-    wait_for_element_not_present("edit-section-form", browser)
+    wait_for_element_not_present(:id, "edit-section-form")
   end
 
   def add_value_set_to_question(browser, question_text, value_set_name, value_attributes=[])
     element_id = get_form_element_id(browser, question_text, QUESTION_ID_PREFIX)
     browser.click("add-value-set-#{element_id}")
-    wait_for_element_present("new-value-set-form", browser)
+    wait_for_element_present(:id, "new-value-set-form")
     browser.type "value_set_element_name", value_set_name
     browser.click "//input[contains(@id, 'create_value_set_submit')]"
-    wait_for_element_not_present("new-value-set-form")
+    wait_for_element_not_present(:id, "new-value-set-form")
     browser.is_text_present(value_set_name).should be_true
     value_set_id = browser.get_value("id=modified-element")
 
     value_attributes.each do |attributes|
       browser.click("add-value-#{value_set_id}")
-      wait_for_element_present("new-value-form", browser)
+      wait_for_element_present(:id, "new-value-form")
       browser.type "value_element_name", attributes[:name]
       browser.type "value_element_code", attributes[:code] if attributes[:code]
       browser.click "//input[contains(@id, 'create_value_submit')]"
-      wait_for_element_not_present("new-value-form")
+      wait_for_element_not_present(:id, "new-value-form")
     end
 
     if browser.is_text_present(value_set_name)
@@ -302,11 +301,11 @@ module TrisanoFormsHelper
   def add_value_set_from_library_to_question(browser, question_text, value_set_name)
     element_id = get_form_element_id(browser, question_text, QUESTION_ID_PREFIX)
     browser.click("add-value-set-#{element_id}")
-    wait_for_element_present("new-value-set-form", browser)
+    wait_for_element_present(:id, "new-value-set-form")
     browser.type "lib_filter", value_set_name
     sleep(2)
     browser.click "link=#{value_set_name}"
-    wait_for_element_not_present("new-value-set-form")
+    wait_for_element_not_present(:id, "new-value-set-form")
 
     # Debt: Not the best test since it could be on the form already
     if browser.is_text_present(value_set_name)
@@ -318,24 +317,24 @@ module TrisanoFormsHelper
 
   def add_core_tab_configuration(browser, core_view_name)
     browser.click("add-core-tab")
-    wait_for_element_present("new-core-view-form", browser)
+    wait_for_element_present(:id, "new-core-view-form")
     browser.select("core_view_element_name", "label=#{core_view_name}")
     browser.click "//input[contains(@id, 'create_core_view_submit')]"
-    wait_for_element_not_present("new-core-view-form", browser)
+    wait_for_element_not_present(:id, "new-core-view-form")
   end
 
   def add_core_field_config(browser, core_field_name)
     browser.click("add-core-field")
-    wait_for_element_present("new_core_field_element", browser)
+    wait_for_element_present(:id, "new_core_field_element")
     browser.select("core_field_element_core_path", "label=#{core_field_name}")
     browser.click "//input[contains(@id, 'create_core_field_submit')]"
-    wait_for_element_not_present("new_core_field_element", browser)
+    wait_for_element_not_present(:id, "new_core_field_element")
   end
 
   def add_question_to_library(browser, question_text, group_name=nil)
     element_id = get_form_element_id(browser, question_text, QUESTION_ID_PREFIX)
     browser.click("add-element-to-library-#{element_id}")
-    wait_for_element_present("new-group-form")
+    wait_for_element_present(:id, "new-group-form")
 
     if (group_name.nil?)
       browser.click "link=No Group"
@@ -359,7 +358,7 @@ module TrisanoFormsHelper
   def add_value_set_to_library(browser, value_set_name, group_name=nil)
     element_id = get_form_element_id(browser, value_set_name, VALUE_SET_ID_PREFIX)
     browser.click("add-element-to-library-#{element_id}")
-    wait_for_element_present("new-group-form")
+    wait_for_element_present(:id, "new-group-form")
 
     if (group_name.nil?)
       browser.click "link=No Group"
@@ -379,7 +378,7 @@ module TrisanoFormsHelper
 
   def add_question_from_library(browser, question_text)
     browser.click "link=Add question to tab"
-    wait_for_element_present("new-question-form")
+    wait_for_element_present(:id, "new-question-form")
     browser.click("link=Show all groups")
     sleep(2) # Debt: If this UI sticks, add something to key off of instead of using this sleep
     browser.click "link=#{question_text}"
@@ -458,7 +457,7 @@ module TrisanoFormsHelper
 
   def publish_form(browser)
     click_publish_button(browser)
-    browser.wait_for_page_to_load($publish_time)
+    wait_for_element_present(:text, "Form was successfully published.")
     return(browser.is_text_present("Form was successfully published"))
   end
 
@@ -476,7 +475,7 @@ module TrisanoFormsHelper
 
   def add_form_to_event(browser, form_name)
     browser.click("link=Add/Remove forms for this event")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Forms")
     html_source = browser.get_html_source
     name_position = html_source.index(form_name)
     id_start_position = html_source.index("forms_to_add_", name_position) + "forms_to_add_".size
@@ -484,7 +483,7 @@ module TrisanoFormsHelper
     id = html_source[id_start_position..id_end_position]
     browser.click("forms_to_add_#{id}")
     browser.click("add_forms")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "The list of forms in use was successfully updated.")
     return browser.is_text_present("The list of forms in use was successfully updated.")
   end
 

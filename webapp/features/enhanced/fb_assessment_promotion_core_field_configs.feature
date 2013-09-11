@@ -9,6 +9,7 @@ Feature: Forms remain attached when assessments are promoted to morbidity events
 
   Scenario: When an AE is promoted to a CMR, forms configs still apply
     Given I am logged in as a super user
+    And a common test type named "Common Test Type"
     And a assessment event form exists
     And that form has core field configs configured for all core fields
     And that form is published

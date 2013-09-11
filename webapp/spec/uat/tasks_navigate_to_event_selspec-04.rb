@@ -51,20 +51,20 @@ describe 'Navigating to an event from a task' do
 
   it 'should allow navigation to the event from the task form page' do
     @browser.click("link=Edit event")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     @browser.get_html_source.include?("Edit morbidity event:").should be_true
   end
 
   it 'should allow navigation to the event from the event edit page' do
     @browser.click("link=Edit event")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     @browser.get_html_source.include?("Edit morbidity event:").should be_true
   end
 
   it 'should allow navigation to the event from the event show page' do
     show_cmr(@browser)
     @browser.click("link=Edit event")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     @browser.get_html_source.include?("Edit morbidity event:").should be_true
   end
 
@@ -72,7 +72,7 @@ describe 'Navigating to an event from a task' do
     click_logo(@browser)
     change_task_filter(@browser, { :look_ahead => "" })
     @browser.click("link=Edit event")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     @browser.get_html_source.include?("Edit morbidity event:").should be_true
   end
 

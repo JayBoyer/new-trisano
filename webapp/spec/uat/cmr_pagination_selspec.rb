@@ -17,9 +17,6 @@
 
 require File.dirname(__FILE__) + '/spec_helper'
 
-#$dont_kill_browser = true
-
-
 describe 'CMR pagination' do
 
   def create_and_route_cmr
@@ -28,14 +25,14 @@ describe 'CMR pagination' do
     @browser.get_selected_label('jurisdiction_id').should == "Unassigned"
     @browser.select "jurisdiction_id", "label=Central Utah"
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.get_selected_label('jurisdiction_id').should == "Central Utah"
     @browser.click("accept_accept")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Accepted by Local Health Dept.")
     @browser.is_text_present("Accepted by Local Health Dept.").should be_true
     @browser.is_text_present('Route to').should be_true
     @browser.select "morbidity_event__event_queue_id", "label=#{@queue_name}-UtahCounty"
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Assign to investigator")
   end
 
   before :all do
@@ -47,20 +44,20 @@ describe 'CMR pagination' do
     @browser.open "/trisano/admin"
     current_user = @browser.get_selected_label("user_id")
     if current_user != "default_user"
-      switch_user(@browser, "default_user")
+      switch_user(@driver, "default_user")
     end
 
     @browser.click "admin_queues"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queues")
     
     @browser.click "create_event_queue"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create event queue")
 
     @browser.type "event_queue_queue_name", @queue_name
     @browser.select "event_queue_jurisdiction_id", "label=Utah County Health Department"
 
     @browser.click "event_queue_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event queue was successfully created.")
 
     @browser.is_text_present('Event queue was successfully created.').should be_true
     @browser.is_text_present(@queue_name).should be_true
@@ -73,11 +70,11 @@ describe 'CMR pagination' do
 
   it 'should change view to special queue' do
     @browser.click "link=EVENTS"
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Events")
     @browser.click "link=Change View"
     @browser.add_selection "//div[@id='change_view']//select[@id='queues_selector']", "label=#{@queue_name}-UtahCounty"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load
+    sleep(1)
   end
 
   it 'should not display pagination' do
@@ -90,22 +87,22 @@ describe 'CMR pagination' do
 
   it 'should display pagination' do
     @browser.click "link=EVENTS"
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Events")
     @browser.click "link=Change View"
     @browser.add_selection "//div[@id='change_view']//select[@id='queues_selector']", "label=#{@queue_name}-UtahCounty"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load
+    sleep(1)
     @browser.is_element_present("//a[@class='next_page']").should be_true
   end
 
   it 'should re-paginate to 50 per page' do
     @browser.click "link=EVENTS"
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Events")
     @browser.click "link=Change View"
     @browser.add_selection "//div[@id='change_view']//select[@id='queues_selector']", "label=#{@queue_name}-UtahCounty"
     @browser.select "//select[@id='per_page']", "label=50"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load
+    sleep(1)
     @browser.is_element_present("//a[@class='next_page']").should be_false
   end
 end

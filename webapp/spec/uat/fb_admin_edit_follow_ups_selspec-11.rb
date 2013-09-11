@@ -66,7 +66,7 @@ describe 'Form Builder Admin Edit Follow-Up Functionality' do
     # Enter the answer that meets the core follow-up condition after the edit
     click_core_tab(@browser, CLINICAL)
     add_clinical_info(@browser, { :died => "Yes" })
-    wait_for_element_present("//label[text()='#@core_follow_up_question_text']", @browser)
+    wait_for_element_present(:xpath, "//label[text()='#@core_follow_up_question_text']", @browser)
     click_core_tab(@browser, "Investigation") 
     
     # Enter the answer that meets the follow-up condition before the edit
@@ -81,6 +81,6 @@ describe 'Form Builder Admin Edit Follow-Up Functionality' do
     #watch_for_answer_spinner(@question_for_follow_up) do
     #  @browser.click("link=#{@form_name}") # A bit of a kluge. Clicking this link essential generates the onChange needed to process the follow-up logic
     #end
-    wait_for_element_present("//label[text()='#@follow_up_question_text']", @browser)
+    wait_for_element_present(:xpath, "//label[text()='#@follow_up_question_text']", @browser)
   end
 end

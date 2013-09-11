@@ -49,7 +49,7 @@ end
 
 When(/^I try to edit the question$/) do
   @browser.click("edit-question-#{@question_element.id}")
-  wait_for_element_present("edit-question-form", @browser)
+  wait_for_element_present(:id, "edit-question-form")
 end
 
 When(/^I try to add the question from the library$/) do

@@ -16,13 +16,13 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 When /^I go to edit the user$/ do
   @browser.click "link=ADMIN"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Admin Dashboard")
   @browser.click "link=Manage Users"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Users")
   @browser.click "link=#{@user.uid}"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "User Detail")
   @browser.click "link=Edit"
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Edit User")
 end
 
 When /^I remove the role$/ do

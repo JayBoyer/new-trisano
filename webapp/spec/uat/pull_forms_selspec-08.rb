@@ -52,7 +52,7 @@ describe 'Pulling forms into an event' do
   it "should validate that event_forms shows no existing forms" do
     click_core_tab(@browser, "Investigation")
     @browser.click("link=Add/Remove forms for this event")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Forms in Use")
     @browser.is_element_present("//div[@id='forms_in_use']//tr[2]").should_not be_true
   end
 
@@ -65,7 +65,7 @@ describe 'Pulling forms into an event' do
   it "should add a form to event" do
     @browser.click "forms_to_add[]"
     @browser.click "commit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "The list of forms in use was successfully updated.")
     @browser.is_text_present("The list of forms in use was successfully updated.").should be_true
     @browser.is_element_present("//div[@id='forms_in_use']//tr[2]").should be_true
   end

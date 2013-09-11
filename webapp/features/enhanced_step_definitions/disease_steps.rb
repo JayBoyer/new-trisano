@@ -29,12 +29,12 @@ end
 When /^I follow the "([^\"]*)" disease Core Fields link$/ do |disease_name|
   @disease = Disease.find_by_disease_name(disease_name)
   @browser.click("css=a[href='/trisano/diseases/#{@disease.id}/core_fields']")
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Event Fields", 30000)
 end
 
 When /^I follow the "([^\"]*)" disease Treatments link$/ do |disease_name|
   @disease = Disease.find_by_disease_name(disease_name)
   @browser.open "/trisano/diseases/#{@disease.id}/treatments" 
   @browser.click("css=a[href='/trisano/diseases/#{@disease.id}/treatments']")
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Treatments for", 30000)
 end

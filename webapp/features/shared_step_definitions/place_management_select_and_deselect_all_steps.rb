@@ -29,7 +29,6 @@ end
 
 When(/^I click merge for the first lab$/) do
   @browser.click("merge_#{@first_place_entity.id}")
-  @browser.wait_for_page_to_load($load_time)
 end
 
 When(/^I click the select-all option$/) do

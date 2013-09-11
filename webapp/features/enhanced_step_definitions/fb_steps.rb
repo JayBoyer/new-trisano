@@ -17,9 +17,9 @@
 
 When /^I go to the Builder interface for the form$/ do
   @browser.click "link=ADMIN"
-  @browser.wait_for_page_to_load 30000
+  wait_for_element_present(:text, "Admin Dashboard")
   @browser.click "link=Manage Forms"
-  @browser.wait_for_page_to_load 30000
+  wait_for_element_present(:text, "Form Information")
   click_build_form_by_id(@browser, @form.id)
 end
 

@@ -54,21 +54,4 @@ describe 'Encounter event labs' do
     @browser.is_text_present(@encounter_description).should be_true
   end
 
-#  it 'should add a lab to the encounter' do
-#    @browser.click("link=Edit Encounter")
-#    @browser.wait_for_page_to_load($load_time)
-#    add_lab_result(@browser, { :lab_name => @lab_name, :lab_result_text => @lab_result_1 })
-#    save_and_exit(@browser)
-#    @browser.is_text_present(@lab_name).should be_true
-#    @browser.is_text_present(@lab_result_1).should be_true
-#  end
-#
-#  it 'should show the encounter event labs on the morbidity event' do
-#    @browser.click("link=#{@cmr_last_name}")
-#    @browser.wait_for_page_to_load($load_time)
-#    @browser.is_text_present(@lab_name).should be_true
-#    @browser.is_text_present(@lab_test_type_1).should be_true
-#    @browser.is_text_present(@lab_result_1).should be_true
-#  end
-
 end

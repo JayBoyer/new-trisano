@@ -31,15 +31,15 @@ describe "trisano_helper_example_lab_results_selspec" do
   it "should create a CMR with 3 lab results" do 
     @browser.open("/trisano/cmrs")
     @browser.click("link=New CMR")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Before creating")
     @browser.type("event_active_patient__active_primary_entity__person_last_name", @cmr_name)
     @browser.click_core_tab(@browser, "Laboratory")
     @browser.type("event_lab_result_lab_result_text", "Lab Result 1")
     @browser.select("event_lab_result_specimen_source_id", "label=Blood")
     @browser.click("event_submit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW MORBIDITY EVENT")
     @browser.click("edit_cmr_link")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "EDIT MORBIDITY EVENT")
     @browser.click_core_tab(@browser, "Laboratory")
     @browser.click("link=New Lab Result")
     sleep 2 #because the following doesn't currently work
@@ -54,7 +54,7 @@ describe "trisano_helper_example_lab_results_selspec" do
     @browser.select("lab_result_specimen_source_id", "label=Nasopharyngeal Swab")
     @browser.click("save-button")
     @browser.click("event_submit")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW MORBIDITY EVENT")
     @browser.click_core_tab(@browser, "Laboratory")
   end
   

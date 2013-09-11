@@ -21,7 +21,7 @@ require File.dirname(__FILE__) + '/spec_helper'
 
     before :each do
       @browser.open "/trisano/events"
-      @browser.wait_for_page_to_load($load_time)
+      wait_for_element_present(:text, "Events")
     end
     
     it 'should have links to all the sub-pages' do
@@ -42,7 +42,7 @@ require File.dirname(__FILE__) + '/spec_helper'
 
     it 'should navigate successfully to the home page' do    
       @browser.click '//img[@alt=\'Logo\']'
-      @browser.wait_for_page_to_load($load_time)
+      wait_for_element_present(:text, "Welcome to TriSano")
       @browser.is_text_present('Welcome to TriSano').should be_true
     end
     
@@ -70,7 +70,7 @@ require File.dirname(__FILE__) + '/spec_helper'
     it 'should navigate successfully to the Users page' do
       click_nav_admin(@browser).should be_true
       @browser.click('id=admin_users')
-      @browser.wait_for_page_to_load($load_time)
+      wait_for_element_present(:text, "Users")
       @browser.is_text_present('Users').should be_true
     end
   end

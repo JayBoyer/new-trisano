@@ -31,24 +31,24 @@ describe 'Sytem functionality for routing and workflow' do
 
   it "should allow for new event_queues" do
     @browser.open "/trisano/admin"
-    @browser.wait_for_page_to_load $load_time
+    wait_for_element_present(:text, "Admin Dashboard")
     current_user = @browser.get_selected_label("user_id")
     if current_user != "default_user"
-      switch_user(@browser, "default_user")
+      switch_user(@driver, "default_user")
     end
 
     # We need a queue first
     @browser.click "admin_queues"
-    @browser.wait_for_page_to_load $load_time
-
+    wait_for_element_present(:text, "Event Queues")
+    
     @browser.click "create_event_queue"
-    @browser.wait_for_page_to_load $load_time
+    wait_for_element_present(:text, "Create Event Queue")
 
     @browser.type "event_queue_queue_name", "Enterics"
     @browser.select "event_queue_jurisdiction_id", "label=Utah County Health Department"
 
     @browser.click "event_queue_submit"
-    @browser.wait_for_page_to_load $load_time
+    wait_for_element_present(:text, "Event Queue Detail")
 
     @browser.is_text_present('Event queue was successfully created.').should be_true
     @browser.is_text_present('Enterics').should be_true
@@ -68,7 +68,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.select "jurisdiction_id", "label=Central Utah"
     @browser.type "note", "Routing is cool!"
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.get_selected_label('jurisdiction_id').should == "Central Utah"
     @browser.is_text_present("Event successfully routed.").should be_true
     @browser.get_html_source.include?("Routing is cool!").should be_true
@@ -82,7 +82,7 @@ describe 'Sytem functionality for routing and workflow' do
   it "should set event to 'accepted' when 'accept' is clicked and add note" do
     @browser.type("morbidity_event[note]", "This is a note.")
     @browser.click("accept_accept")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "successfully updated")
     @browser.get_html_source.include?("Accepted by Local Health Dept.").should be_true
     @browser.get_html_source.include?("Accepted by Central Utah Public Health Department.").should be_true
     @browser.get_html_source.include?("This is a note.").should be_true
@@ -91,7 +91,7 @@ describe 'Sytem functionality for routing and workflow' do
   it "should allow routing to an investigator queue" do
     @browser.get_html_source.include?('Assign to queue:').should be_true
     @browser.select "morbidity_event__event_queue_id", "label=Enterics-UtahCounty"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.get_html_source.include?("Event successfully routed").should be_true
   end
 
@@ -102,7 +102,7 @@ describe 'Sytem functionality for routing and workflow' do
 
   it "should set event to 'under investigation' when 'accept' is clicked" do
     @browser.click("accept_accept")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Under Investigation")
     @browser.get_html_source.include?("Under Investigation").should be_true
     @browser.is_element_present("//table[@class='list']//div[@id='investigator_info']//*[text() = 'default_user']").should be_true
     @browser.get_html_source.include?("Event successfully routed").should be_true
@@ -110,7 +110,7 @@ describe 'Sytem functionality for routing and workflow' do
 
   it "should set event to 'investigation complete' when 'mark investigation complete' is clicked" do
     @browser.click("investigation_complete_btn")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Investigation Complete")
     @browser.get_html_source.include?("Investigation Complete").should be_true
     @browser.get_html_source.include?("Completed investigation.").should be_true
   end
@@ -122,7 +122,7 @@ describe 'Sytem functionality for routing and workflow' do
 
   it "should set event to 'Approved by LHD' when 'accept' is clicked" do
     @browser.click("approve_approve")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Approved by Local Health Dept.")
     @browser.get_html_source.include?("Approved by Local Health Dept.").should be_true
     @browser.get_html_source.include?("Event successfully routed").should be_true
   end
@@ -134,7 +134,7 @@ describe 'Sytem functionality for routing and workflow' do
 
   it "should set event to 'Approved by State' when 'accept' is clicked" do
     @browser.click("approve_approve")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Approved by State")
     @browser.get_html_source.include?("Approved by State").should be_true
   end
 
@@ -148,7 +148,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "Davis_County"  #On
     @browser.click "Salt_Lake_Valley"  #On
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
 
     # Primary jurisdiction should be unchanged
     @browser.get_selected_label('jurisdiction_id').should == "Unassigned"
@@ -165,7 +165,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Route to Local Health Depts."
     @browser.click "Bear_River"  # On
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Davis County')]").should be_true
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Salt Lake Valley')]").should be_true
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Bear River')]").should be_true
@@ -176,7 +176,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "Davis_County"  # Off
     @browser.click "Salt_Lake_Valley"  # Off
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Davis County')]").should_not be_true
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Salt Lake Valley')]").should_not be_true
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Bear River')]").should be_true
@@ -186,7 +186,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Route to Local Health Depts."
     @browser.click "Bear_River"  # Off
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Davis County')]").should_not be_true
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Salt lake Valley')]").should_not be_true
     @browser.is_element_present("//table[@class='list']//div[@id='secondary_jurisdictions']//small[contains(text(), 'Bear River')]").should_not be_true
@@ -198,34 +198,34 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.select "jurisdiction_id", "label=Central Utah"
     @browser.click "Bear_River"   # On
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.get_selected_label('jurisdiction_id').should == "Central Utah"
 
-    switch_user(@browser, "surveillance_mgr").should be_true
+    switch_user(@driver, "surveillance_mgr").should be_true
     @browser.get_html_source.include?("Routing disabled").should be_true
     @browser.get_html_source.include?("Insufficient privileges to transition this event").should be_true
   end
 
   it "should deny access altogether when entitlements are outside any jurisdiction." do
-    switch_user(@browser, "default_user").should be_true
+    switch_user(@driver, "default_user").should be_true
     @browser.click "link=Route to Local Health Depts."
     @browser.click "Bear_River"  # Off
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
-    switch_user(@browser, "surveillance_mgr")
+    wait_for_element_present(:text, "Event successfully routed")
+    switch_user(@driver, "surveillance_mgr")
     @browser.is_text_present("You have accessed an out-of-jurisdiction event.").should be_true
   end
 
   it 'should allow creating a new investigator' do
-    switch_user(@browser, "default_user").should be_true
+    switch_user(@driver, "default_user").should be_true
     navigate_to_user_admin(@browser)
     @browser.click "//input[@value='Create New User']"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create User")
     @browser.type "user_uid", @uid
     @browser.type "user_user_name", @uname
     add_role(@browser, { :role => "Investigator", :jurisdiction => "Central Utah Public Health Department"})
     @browser.click "user_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "User was successfully created.")
     @browser.get_html_source.include?('User was successfully created.').should be_true
     @browser.get_html_source.include?(@uid).should be_true
     @browser.get_html_source.include?(@uname).should be_true
@@ -243,16 +243,16 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.select "jurisdiction_id", "label=Central Utah"
     @browser.click "Bear_River"   # On
     @browser.click "route_event_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
     @browser.get_selected_label('jurisdiction_id').should == "Central Utah"
 
     @browser.click("accept_accept")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Accepted by Local Health Dept.")
     @browser.get_html_source.include?("Accepted by Local Health Dept.").should be_true
 
     @browser.get_html_source.include?('Assign to investigator:').should be_true
     @browser.select "morbidity_event__investigator_id", "label=#{@uname}"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event successfully routed")
 
     @browser.get_html_source.include?("Event successfully routed").should be_true
 
@@ -263,23 +263,23 @@ describe 'Sytem functionality for routing and workflow' do
   it "should allow for filtering the view" do
     current_user = @browser.get_selected_label("user_id")
     if current_user != "default_user"
-      switch_user(@browser, "default_user")
+      switch_user(@driver, "default_user")
     end
 
     # By Queue
     @browser.open "/trisano/admin"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Admin Dashboard")
     @browser.click "admin_queues"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queues")
 
     @browser.click "create_event_queue"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create Event Queue")
 
     @browser.type "event_queue_queue_name", "Joe Investigator"
     @browser.select "event_queue_jurisdiction_id", "label=Summit County Public Health Department"
 
     @browser.click "event_queue_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Queue Detail")
 
     @browser.get_html_source.include?('Event queue was successfully created.').should be_true
     @browser.get_html_source.include?('JoeInvestigator').should be_true
@@ -298,7 +298,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Change View"
     @browser.add_selection "//select[@id='queues_selector']", "label=Enterics-UtahCounty"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@person_1).should be_true
     @browser.get_html_source.include?(@person_2).should_not be_true
@@ -306,7 +306,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Change View"
     @browser.add_selection "//select[@id='queues_selector']", "label=JoeInvestigator-SummitCounty"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@person_1).should_not be_true
     @browser.get_html_source.include?(@person_2).should_not be_true
@@ -315,7 +315,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Change View"
     @browser.add_selection "//select[@id='states_selector']", "label=New"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@person_1).should_not be_true
     @browser.get_html_source.include?(@person_2).should be_true
@@ -323,7 +323,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Change View"
     @browser.add_selection "//div[@id='change_view']//select[@id='states_selector']", "label=Assigned to Investigator"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@person_1).should be_true
     @browser.get_html_source.include?(@person_2).should_not be_true
@@ -335,7 +335,7 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.add_selection "//div[@id='change_view']//select[@id='queues_selector']", "label=Enterics-UtahCounty"
     @browser.click "set_as_default_view"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@person_1).should_not be_true
     @browser.get_html_source.include?(@person_2).should_not be_true
@@ -344,16 +344,15 @@ describe 'Sytem functionality for routing and workflow' do
     @browser.click "link=Change View"
     @browser.add_selection "//div[@id='change_view']//select[@id='investigators_selector']", "label=#{@uname}"
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@uname).should be_true
     @browser.get_xpath_count("//table[@class='list']//tr").should == "2"
 
     @browser.click "link=EVENTS"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:id, "change_view_btn")
 
     @browser.get_html_source.include?(@person_1).should_not be_true
     @browser.get_html_source.include?(@person_2).should_not be_true
   end
-
 end

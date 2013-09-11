@@ -47,7 +47,7 @@ describe 'Creating a new cmr from an existing patient' do
     @browser.click('link=Create a new event from this one')
     sleep(3)
     @browser.click('shallow_copy_btn')
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "CMR was successfully created.")
     @browser.is_text_present('CMR was successfully created.')
   end
 
@@ -77,14 +77,14 @@ describe 'Creating a new cmr from an existing patient' do
 
   it 'should show patient information changes in original cmr' do
     @browser.click('link=SEARCH')
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Event Search")
     @browser.type('name', @last_name)
     @browser.click("//input[@type='submit']")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "result")
     @browser.click("link=#{@calculated_values[:record_number]}")
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "View Morbidity Event")
     @browser.click('link=Edit')
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "Edit morbidity event")
     bd = Date.parse(@birth_date).strftime('%B %d, %Y')
     @browser.get_value('morbidity_event_interested_party_attributes_person_entity_attributes_person_attributes_birth_date').should == bd
   end

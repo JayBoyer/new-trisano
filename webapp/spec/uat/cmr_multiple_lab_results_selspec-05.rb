@@ -32,13 +32,13 @@ describe 'Adding multiple lab results to a CMR' do
     @browser.select "//div[@class='lab_result'][1]//select[contains(@name, 'test_result')]", "label=Positive / Reactive"
 
     @browser.click "link=Add a new lab result to this lab"
-    wait_for_element_present("//div[@class='lab_result'][2]")
+    wait_for_element_present(:xpath, "//div[@class='lab_result'][2]")
 
     @browser.select "//div[@class='lab_result'][2]//select[contains(@name, 'test_type')]", "Antibody index"
     @browser.select "//div[@class='lab_result'][2]//select[contains(@name, 'test_result')]", "Negative / Non-reactive"
 
     @browser.click "link=Add a new lab"
-    wait_for_element_present("//div[@id='labs']/fieldset/div[@class='lab']")
+    wait_for_element_present(:xpath, "//div[@id='labs']/fieldset/div[@class='lab']")
 
     @browser.type   "//div[@id='labs']/fieldset/div[@class='lab']//input[contains(@name, 'name')]", "Lab Two"
     @browser.select "//div[@id='labs']/fieldset/div[@class='lab']//select[contains(@name, 'test_type')]", "Core IgM Antibody"

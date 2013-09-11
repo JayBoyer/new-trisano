@@ -35,7 +35,7 @@ describe 'adding an export column' do
 
     navigate_to_export_admin(@browser).should be_true
     @browser.click("//input[@value='Create new Export Column']")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create Export Column")
 
     #associate some diseases
     %w(Hepatitis_A Hepatitis_B,_acute Hepatitis_B_virus_infection,_chronic).each do |id|
@@ -53,7 +53,7 @@ describe 'adding an export column' do
     @browser.type "export_column_length_to_output", "3"
 
     @browser.click "export_column_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Export Column Detail")
 
     @browser.is_text_present("Export Column was successfully created.").should be_true
     ['Hepatitis A','Hepatitis B, acute','Hepatitis B virus infection, chronic'].each do |text|
@@ -67,11 +67,11 @@ describe 'adding an export column' do
 
   it "should allow editing of an export column" do
     @browser.click "link=Edit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Export Column Detail")
     @browser.uncheck("css=input[id='Hepatitis_A']")
     @browser.type("export_column_name", @descriptive_name)
     @browser.click "export_column_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Export Column Detail")
     @browser.is_text_present('Hepatitis A').should_not be_true
     @browser.is_text_present("Export Column was successfully updated.").should be_true
     @browser.is_text_present(@descriptive_name).should be_true
@@ -79,33 +79,33 @@ describe 'adding an export column' do
 
   it "should allow adding an export conversion value" do
     @browser.click "link=Add a conversion value"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create Export Conversion Value")
     @browser.type "export_conversion_value_value_from", "One"
     @browser.type "export_conversion_value_value_to", "1"
     @browser.click "export_conversion_value_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Export Column Detail")
     @browser.is_text_present("Export Conversion Value was successfully created.").should be_true
   end
 
   it "should allow editing an export conversion value" do
     @browser.click("//table[4]//a[1]") # The first link in the third table is the Edit conversion value link.  Yeah, I know.
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Export Conversion Value")
     @browser.type "export_conversion_value_value_to", "999"
     @browser.click "export_conversion_value_submit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Export Column Detail")
     @browser.is_text_present("Export Conversion Value was successfully updated.").should be_true
     @browser.is_text_present("999").should be_true
   end
 
   it "should allow deleting of an export conversion value" do
     @browser.click("//table[4]//a[2]") # The second link in the third table is the Delete conversion value link.  Yeah, I know.
-    @browser.wait_for_page_to_load($load_time)
+    sleep(1)
     @browser.is_text_present("999").should_not be_true
   end
 
   it "should allow deleting of an export conversion value" do
     @browser.click "link=Delete"
-    @browser.wait_for_page_to_load($load_time)
+    sleep(1)
     @browser.is_text_present("Export Columns").should be_true
     @browser.is_text_present(@cdc_name).should be_true
   end

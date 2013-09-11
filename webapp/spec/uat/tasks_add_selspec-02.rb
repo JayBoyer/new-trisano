@@ -56,7 +56,7 @@ describe 'Adding a task to a CMR' do
 
   it 'should add a task with notes from show mode' do
     @browser.click "link=Show CMR"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
     add_task(@browser, {
         :task_name => @task_with_notes_name,
         :task_notes => @task_with_notes_notes,
@@ -68,7 +68,7 @@ describe 'Adding a task to a CMR' do
 
   it 'should add a task and assign to a user from show mode' do
     @browser.click "link=Show CMR"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
     add_task(@browser, {
         :task_name => @task_assigned_name,
         :task_category => 'Appointment',
@@ -80,7 +80,7 @@ describe 'Adding a task to a CMR' do
 
   it 'should display the tasks in edit mode' do
     @browser.click "link=Edit CMR"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     html_source = @browser.get_html_source
     html_source.include?(@task_name).should be_true
     html_source.include?(@task_with_notes_name).should be_true
@@ -113,7 +113,7 @@ describe 'Adding a task to a CMR' do
   end
 
   it "shouldn't show the user assignment drop down for a non-manager user" do
-    switch_user(@browser, "investigator")
+    switch_user(@driver, "investigator")
     @browser.click("link=Add Task")
     @browser.is_element_present("task_user_id").should be_false
   end

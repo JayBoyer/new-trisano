@@ -27,14 +27,14 @@ module TrisanoPlacesHelper
 
   def save_place_event(browser)
     browser.click "save_and_exit_btn"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Place event was successfully")
     return(browser.is_text_present("Place event was successfully created.") or
         browser.is_text_present("Place event was successfully updated."))
   end
 
   def edit_place(browser)
     browser.click "link=Edit Place"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Place")
     return(browser.is_text_present("Edit Place Event"))
   end
 

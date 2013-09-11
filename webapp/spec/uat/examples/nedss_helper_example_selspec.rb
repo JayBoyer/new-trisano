@@ -24,7 +24,7 @@ describe "test2" do
   it "describe what this thing should do here" do 
     @browser.open "/trisano/"
     @browser.click "link=Forms"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "FORMS")
     click_resource_edit(@browser, "forms", "Marge Not There").should == -1
     click_resource_show(@browser, "forms", get_unique_name(4)).should == -1
   end

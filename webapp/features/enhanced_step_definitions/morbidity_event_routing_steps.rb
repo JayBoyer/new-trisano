@@ -24,8 +24,7 @@ Given /^I am logged in as a "([^\"]*)" in "([^\"]*)"$/ do |role_name, jurisdicti
                               :jurisdiction_id => jurisdiction.entity.id,
                               :role_id => role.id }] })
   @browser.refresh
-  @browser.wait_for_page_to_load($load_time)
-  switch_user(@browser, @user.best_name)
+  switch_user(@driver, @user.best_name)
 end
 
 Given /^that event has been sent to the state$/ do

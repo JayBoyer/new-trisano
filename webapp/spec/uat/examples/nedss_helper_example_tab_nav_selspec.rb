@@ -23,7 +23,7 @@ describe "TrisanoHelper tab navigation" do
   it "should find each tab" do 
     @browser.open "/trisano/cmrs"
     @browser.click("link=New CMR")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW MORBIDITY EVENT")
     click_core_tab(@browser, "Clinical")
     @browser.is_text_present("Disease Information").should be_true
     click_core_tab(@browser, "Laboratory")
@@ -42,8 +42,7 @@ describe "TrisanoHelper tab navigation" do
     @browser.type("event_active_patient__active_primary_entity__person_last_name", "Tester")
     @browser.type("event_active_patient__active_primary_entity__person_first_name", "Tab")
     @browser.click("event_submit")
-    @browser.wait_for_page_to_load($load_time)
-    click_core_tab(@browser, "Investigation")
+    wait_for_element_present(:text, "VIEW MORBIDITY EVENT")
     @browser.is_text_present("Investigative Information").should be_true
   end
 end

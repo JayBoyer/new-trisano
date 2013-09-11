@@ -20,11 +20,11 @@ end
 
 When /^I navigate to show common test type$/ do
   @browser.click("link=ADMIN")
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Admin Dashboard", 5000)
   @browser.click("link=Manage Common Test Types")
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "List Common Test Types", 5000)
   @browser.click("link=Show")
-  @browser.wait_for_page_to_load
+  wait_for_element_present(:text, "Show a Common Test Type", 5000)
 end
 
 Then /^I should see a link to "([^\"]*)"$/ do |link_name|

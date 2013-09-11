@@ -66,15 +66,25 @@ module TrisanoHelper
     PLACE => "place_tab",
     OUTBREAK => "outbreak_tab"
   }
+  
+  LOAD_TIME = 30
 
-  def wait_for_element_present(name, browser=nil)
-    browser = @browser.nil? ? browser : @browser
-    !60.times{ return true if (browser.is_element_present(name) rescue false); sleep 1 }
+  def wait_for_element_present(how, what, seconds=LOAD_TIME)
+    wait = Selenium::WebDriver::Wait.new(:timeout => seconds)
+    if (how == :text)
+        wait.until { @driver.page_source().include?(what) }
+      else
+        wait.until { @driver.find_element(how, what) }
+    end
   end
 
-  def wait_for_element_not_present(name, browser=nil)
-    browser = @browser.nil? ? browser : @browser
-    !60.times{ return false unless (browser.is_element_present(name) rescue true); sleep 1 }
+  def wait_for_element_not_present(how, what, seconds=LOAD_TIME)
+    wait = Selenium::WebDriver::Wait.new(:timeout => seconds)
+    if (how == :text)
+        wait.until { !@driver.page_source().include?(what) }
+      else
+        wait.until { @driver.find_elements(how, what).count == 0 }
+    end
   end
 
   #  Use set_fields after you navigate to any location by passing in a hash of
@@ -111,10 +121,10 @@ module TrisanoHelper
   # It uses random words for text fields
   def create_cmr_from_hash(browser, cmr_hash)
     click_nav_new_cmr(browser)
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "New Morbidity Event")
     set_fields(browser,cmr_hash)
     browser.click('morbidity_event_submit')
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "CMR was successfully created.")
     return save_cmr(browser)
   end
 
@@ -178,12 +188,11 @@ module TrisanoHelper
 
   def click_logo(browser)
     browser.click 'logo'
-    browser.wait_for_page_to_load($load_time)
   end
 
   def click_nav_new_cmr(browser)
     browser.open "/trisano/cmrs/new"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "New CMR")
     return (browser.is_text_present("New Morbidity Event") and
         browser.is_text_present("New CMR") and
         browser.is_element_present("link=< Back to list") and
@@ -192,21 +201,21 @@ module TrisanoHelper
 
   def click_nav_cmrs(browser)
     browser.click 'link=EVENTS'
-    browser._for_page_to_load($load_time)
+    wait_for_element_present(:text, "Change View")
     return (browser.is_text_present("List Morbidity Events") and
         browser.is_element_present("link=EVENTS"))
   end
 
   def click_nav_search(browser)
     browser.click 'link=SEARCH'
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Event Search")
     return browser.is_text_present("Event Search")
   end
 
   def click_nav_forms(browser)
     click_nav_admin(browser)
     browser.click 'link=Manage Forms'
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Forms")
     return (browser.is_text_present("Form Information") and
         browser.is_text_present("Diseases") and
         browser.is_text_present("Jurisdiction") and
@@ -220,30 +229,30 @@ module TrisanoHelper
   def click_nav_admin(browser)
     unless browser.is_element_present("link=ADMIN")
       @browser.open "/trisano/events"
-      @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Events")
     end
     browser.click 'link=ADMIN'
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Admin Dashboard")
     browser.is_text_present("Admin Dashboard")
   end
 
   def edit_cmr(browser)
     browser.click "link=Edit"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     return(browser.get_html_source.include?("Person Information") and
         browser.get_html_source.include?("Street number"))
   end
 
   def show_cmr(browser)
     browser.click "link=Show"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
     return(browser.is_text_present("Person Information") and
         browser.is_text_present("Street number"))
   end
 
   def save_and_exit(browser)
     browser.click "save_and_exit_btn"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "CMR was successfully")
     return true
   end
 
@@ -253,7 +262,7 @@ module TrisanoHelper
 
   def save_and_continue(browser)
     browser.click "save_and_continue_btn"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "CMR was successfully")
     return true
   end
 
@@ -269,28 +278,14 @@ module TrisanoHelper
       browser.click "link=Print"
     end
 
-    wait_for_element_present("//div[contains(@id, 'printing_controls')]")
+    wait_for_element_present(:id, "//div[contains(@id, 'printing_controls')]")
     browser.click "print_all"
     @driver.execute_script("$j(\"//form[contains(@action, 'print')]\").target='doit';")
     browser.open_window("", "doit");
     browser.click "print_btn"
-    browser.wait_for_pop_up("doit", $load_time)
+    browser.wait_for_pop_up("doit")
     browser.select_window("doit")
     return(browser.get_html_source.include?('Confidential Case Report') && browser.get_html_source.include?('Printed'))
-  end
-
-  def navigate_to_people_search(browser)
-    click_nav_search(browser)
-    @browser.click('link=People Search')
-    @browser.wait_for_page_to_load($load_time)
-    return(browser.is_text_present("People Search") and
-        browser.is_text_present("Name") and
-        browser.is_text_present("Date of birth"))
-  end
-
-  def navigate_to_cmr_search(browser)
-    click_nav_search(browser)
-    return(browser.is_text_present("Name Criteria"))
   end
 
   #Use click_link_by_order to click the Nth element in a list of links of the same element type
@@ -311,7 +306,7 @@ module TrisanoHelper
     id = get_resource_id(browser, name)
     if (id > 0)
       browser.click "//a[contains(@href, '/trisano/" + resource + "/" + id.to_s + "/edit')]"
-      browser.wait_for_page_to_load "30000"
+      sleep(3)
       return 0
     else
       return -1
@@ -322,7 +317,7 @@ module TrisanoHelper
     id = get_resource_id(browser, name)
     if id > 0
       browser.click "//a[contains(@onclick, '/trisano/" + resource + "/" + id.to_s + "')]"
-      browser.wait_for_page_to_load "30000"
+      sleep(3)
       return 0
     else
       return -1
@@ -413,13 +408,9 @@ module TrisanoHelper
     return true
   end
 
-  def switch_user(browser, user_id)
-    current_user = @browser.get_selected_label("user_id")
-    if current_user != user_id
-      browser.select("user_id", "label=#{user_id}")
-      browser.wait_for_page_to_load
-      return browser.is_text_present("#{user_id}:")
-    end
+  def switch_user(driver, user_id)
+    select = Selenium::WebDriver::Support::Select.new(driver.find_element(:id, "user_id"))
+    select.select_by(:text, user_id)
   end
 
   #TODO
@@ -429,7 +420,7 @@ module TrisanoHelper
       q_id = get_form_element_id(browser, question, QUESTION_ID_PREFIX)
       browser.click("edit-question-" + q_id.to_s)
       sleep 2 #TODO replacing the wait below until it works properly
-      #wait_for_element_present("edit-question-form")
+      #wait_for_element_present(:id, "edit-question-form")
     when "delete"
       q_id = get_form_element_id(browser, question, QUESTION_ID_PREFIX)
       browser.click("delete-question-" + q_id.to_s)
@@ -573,7 +564,7 @@ module TrisanoHelper
 
   def add_task(browser, task_attributes={})
     browser.click("link=Add Task")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Add Event Task")
     browser.type("task_name", task_attributes[:task_name])
     browser.type("task_notes", task_attributes[:task_notes]) if task_attributes[:task_notes]
     browser.select("task_category_id", task_attributes[:task_category]) if task_attributes[:task_category]
@@ -583,14 +574,14 @@ module TrisanoHelper
     browser.select("task_repeating_interval", task_attributes[:task_repeating_interval]) if task_attributes[:task_repeating_interval]
     browser.select("task_user_id", task_attributes[:task_user_id]) if task_attributes[:task_user_id]
     browser.click("task_submit")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Task was successfully created.")
     return browser.is_text_present("Task was successfully created.")
   end
 
   # Debt: Dups add_task
   def edit_task(browser, task_attributes={})
     browser.click("link=Edit task")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Event Task")
     browser.type("task_name", task_attributes[:task_name])
     browser.type("task_notes", task_attributes[:task_notes]) if task_attributes[:task_notes]
     browser.select("task_category_id", task_attributes[:task_category]) if task_attributes[:task_category]
@@ -599,7 +590,7 @@ module TrisanoHelper
     browser.type("task_due_date", task_attributes[:task_due_date]) if task_attributes[:task_due_date]
     browser.select("task_user_id", task_attributes[:task_user_id]) if task_attributes[:task_user_id]
     browser.click("task_submit")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Task was successfully updated.")
     return browser.is_text_present("Task was successfully updated.")
   end
 
@@ -614,7 +605,7 @@ module TrisanoHelper
     browser.type("look_ahead", options[:look_ahead]) unless options[:look_ahead].nil?
     browser.type("look_back", options[:look_back]) unless options[:look_back].nil?
     browser.click("update_tasks_filter")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:text, "Show tasks for")
   end
 
   def is_text_present_in(browser, html_id, text)
@@ -632,7 +623,7 @@ module TrisanoHelper
       @browser.add_selection("//div[@id='change_view']//select[@id='diseases_selector']", "label=#{disease}")
     end if attributes[:diseases]
     @browser.click "change_view_btn"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_not_present(:text, "Event Types")
 
     # Fill in the rest...
   end
@@ -863,12 +854,12 @@ module TrisanoHelper
 
   def add_question_attributes(browser, element_id, question_attributes, expect_error=false)
     browser.click("add-question-#{element_id}")
-    wait_for_element_present("new-question-form", browser)
+    wait_for_element_present(:id, "new-question-form")
     fill_in_question_attributes(browser, question_attributes)
     browser.click "//input[contains(@id, 'create_question_submit')]"
 
     unless expect_error
-      wait_for_element_not_present("new-question-form", browser)
+      wait_for_element_not_present(:id, "new-question-form")
     else
       sleep 1
     end
@@ -893,7 +884,7 @@ module TrisanoHelper
   def add_follow_up_to_element(browser, element_name, element_id_prefix, condition, core_label=nil)
     element_id = get_form_element_id(browser, element_name, element_id_prefix)
     browser.click("add-follow-up-#{element_id}")
-    wait_for_element_present("new-follow-up-form", browser)
+    wait_for_element_present(:id, "new-follow-up-form")
     if core_label.nil?
       browser.type "follow_up_element_condition", condition
     else
@@ -902,13 +893,13 @@ module TrisanoHelper
 
     browser.select "follow_up_element_core_path", "label=#{core_label}" unless core_label.nil?
     browser.click "//input[contains(@id, 'create_follow_up_submit')]"
-    wait_for_element_not_present("new-follow-up-form", browser)
+    wait_for_element_not_present(:id, "new-follow-up-form")
   end
 
   def add_follow_up_to_core_field_config(browser, element_name, element_id_prefix, condition, core_label=nil)
     element_id = get_form_element_id_for_core_field(browser, element_name, element_id_prefix)
     browser.click("add-follow-up-#{element_id}")
-    wait_for_element_present("new-follow-up-form", browser)
+    wait_for_element_present(:id, "new-follow-up-form")
     if core_label.nil?
       browser.type "follow_up_element_condition", condition
     else
@@ -917,7 +908,7 @@ module TrisanoHelper
 
     browser.select "follow_up_element_core_path", "label=#{core_label}" unless core_label.nil?
     browser.click "//input[contains(@id, 'create_follow_up_submit')]"
-    wait_for_element_not_present("new-follow-up-form", browser)
+    wait_for_element_not_present(:id, "new-follow-up-form")
   end
 
   # Goes in reverse from the name provided, looking for the magic string of
@@ -1032,14 +1023,14 @@ module TrisanoHelper
 
   def copy_form_and_open_in_form_builder(browser, form_name)
     browser.click("copy_form_#{get_form_id(browser, form_name)}")
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "(copy)")
     browser.is_text_present('Form was successfully copied.').should be_true
     browser.click('//input[@id="form_submit"]')
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Form was successfully updated.")
     browser.is_text_present('Form was successfully updated.').should be_true
     browser.is_text_present('Not Published').should be_true
     browser.click('link=Builder')
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Form:")
     true
   end
 

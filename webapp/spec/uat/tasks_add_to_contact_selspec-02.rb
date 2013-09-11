@@ -48,7 +48,7 @@ describe 'Adding a task to a contact' do
     add_contact(@browser, { :last_name => @contact_last_name } )
     save_cmr(@browser)
     @browser.click("link=Show Contact")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW CONTACT EVENT")
   end
 
   it 'should add a task with no notes from contact show mode' do
@@ -62,7 +62,7 @@ describe 'Adding a task to a contact' do
 
   it 'should add a task with notes from contact show mode' do
     @browser.click "link=Show Contact"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "VIEW CONTACT EVENT")
     add_task(@browser, {
         :task_name => @task_with_notes_name,
         :task_notes => @task_with_notes_notes,
@@ -74,7 +74,7 @@ describe 'Adding a task to a contact' do
 
   it 'should display the tasks in contact edit mode' do
     @browser.click "link=Edit Contact"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Contact event")
     html_source = @browser.get_html_source
     html_source.include?(@task_name).should be_true
     html_source.include?(@task_with_notes_name).should be_true

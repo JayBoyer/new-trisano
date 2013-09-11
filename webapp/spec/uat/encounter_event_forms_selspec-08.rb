@@ -71,11 +71,10 @@ describe 'Encounter event forms' do
 
   it 'should add the encounter event form to it' do
     @browser.click("link=Edit Encounter")
-    @browser.wait_for_page_to_load($load_time)
-
+    wait_for_element_present(:text, "Edit Encounter Event")
     add_form_to_event(@browser, @form_name).should be_true
     @browser.click("link=Edit Encounter")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Encounter Event")
     @browser.get_html_source.include?(@form_name).should be_true
     @browser.get_html_source.include?(@question_text).should be_true
   end
@@ -103,7 +102,7 @@ describe 'Encounter event forms' do
       click_nav_cmrs(@browser).should be_true
       click_resource_edit(@browser, 'cmrs', @cmr_last_name).should be_true
       @browser.click("link=Edit Encounter")
-      @browser.wait_for_page_to_load($load_time)
+      wait_for_element_present(:text, "Edit Encounter Event")
       @browser.get_html_source.include?(@second_form_name).should be_true
       @browser.get_html_source.include?(@second_question_text).should be_true
     end

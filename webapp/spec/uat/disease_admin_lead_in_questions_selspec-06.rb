@@ -40,7 +40,7 @@ describe 'disease admin lead in questions' do
   it 'should create a new disease' do
     navigate_to_disease_admin(@browser).should be_true
     @browser.click("//input[@value='Create new disease']")
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Create Disease")
     create_disease(@browser, {
         :disease_name => @disease_name, 
         :contact_lead_in => @contact_lead_in, 

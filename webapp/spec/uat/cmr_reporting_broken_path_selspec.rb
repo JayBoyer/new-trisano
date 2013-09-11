@@ -22,7 +22,7 @@ describe 'invalid cmr' do
   
   before(:all) do
     @browser.open "/trisano/cmrs/new"
-    @browser.wait_for_page_to_load
+    wait_for_element_present(:text, "New CMR")
   end
 
   it 'should preserve the reporting agency field data' do

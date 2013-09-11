@@ -59,9 +59,9 @@ describe 'Copying an address from the Original Patient' do
   it 'should copy a change in address if copy is clicked again' do
     @city = get_unique_name(1) + '-copy-uat'
     @browser.click "link=" + @last_name
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Morbidity Event")
     @browser.click "link=Edit"
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
     @browser.type "//div[@id='person_form']//input[contains(@id, 'city')]", @city
     save_and_continue(@browser).should be_true
 
@@ -73,7 +73,7 @@ end
 
 def copy_address
   @browser.click("//a[contains(@id, 'edit-event')][1]")
-  @browser.wait_for_page_to_load($load_time)
+  wait_for_element_present(:text, "Edit Contact event")
   @browser.click "//input[@value='Copy From Original Patient']"
   sleep(5)
   save_cmr(@browser).should be_true

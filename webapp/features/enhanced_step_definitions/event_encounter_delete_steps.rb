@@ -22,11 +22,11 @@ end
 When /^I click the encounter parent link$/ do
   parent_event_name = @encounter.parent_event.party.full_name
   @browser.click("link=#{parent_event_name}")
-  @browser.wait_for_page_to_load($load_time)
+  wait_for_element_present(:text, "Demographic")
 end
 
 When /^I click the "([^\"]*)" link and accept the confirmation$/ do |link|
   @browser.click("link=#{link}")
   get_confirmation()
-  @browser.wait_for_page_to_load($load_time)
+  wait_for_element_present(:text, "uccessfully")  
 end

@@ -51,7 +51,7 @@ describe 'form builder investigation form for contacts' do
     add_contact(@browser, {:last_name => @contact_last_name, :first_name => "John", :disposition => "Unable to locate"})
     save_cmr(@browser).should be_true
     click_link_by_order(@browser, "edit-event", 1)
-    @browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit morbidity event")
   end
   
   it 'should have the investigation form' do

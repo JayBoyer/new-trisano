@@ -29,9 +29,9 @@ When(/^I add an existing clinician$/) do
   click_core_tab(@browser, "Clinical")
   @browser.type('clinician_search_name', @clinician.person.last_name)
   @browser.click('clinician_search')
-  wait_for_element_present("//div[@id='clinician_search_results']/table")
+  wait_for_element_present(:xpath, "//div[@id='clinician_search_results']//a[@id='add_clinician_entity_#{@clinician.id}']")
   @browser.click "//div[@id='clinician_search_results']//a[@id='add_clinician_entity_#{@clinician.id}']"
-  wait_for_element_present("//div[@class='existing_clinician']")
+  wait_for_element_present(:xpath, "//div[@class='existing_clinician']")
 end
 
 When(/^I add a new clinician$/) do
@@ -41,13 +41,13 @@ end
 
 When(/^I click remove for that clinician$/) do
   @browser.click("link=Remove")
-  wait_for_element_not_present("//div[@id='live_search_clinicians']/div[@class='existing_clinician']")
+  wait_for_element_not_present(:xpath, "//div[@id='live_search_clinicians']/div[@class='existing_clinician']")
 end
 
 When(/^I search for the deleted clinician$/) do
   click_core_tab(@browser, "Clinical")
   @browser.type_keys("clinicians_search", @common_name)
-  wait_for_element_present("//div[@id='clinicians_search_choices']/ul")
+  wait_for_element_present(:xpath, "//div[@id='clinicians_search_choices']/ul")
 end
 
 When(/^I check a clinician to remove$/) do

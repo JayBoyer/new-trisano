@@ -19,14 +19,14 @@ module TrisanoContactsHelper
 
   def show_contact(browser)
     browser.click "link=Show"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "View Contact")
     return(browser.is_text_present("Person Information") and
         browser.is_text_present("Street number"))
   end
 
   def edit_contact(browser)
     browser.click "link=Edit"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Edit Contact")
     return(browser.is_text_present("Person Information") and
         browser.is_text_present("Street number"))
   end
@@ -38,7 +38,7 @@ module TrisanoContactsHelper
 	sleep(2)
 	wait = Selenium::WebDriver::Wait.new(:timeout => 3)
     element = wait.until { @driver.find_element(:link_text, "Add a contact") }
-	element.click();
+    element.click()
 	wait = Selenium::WebDriver::Wait.new(:timeout => 3)
 	xpath = "//li[@class='contact'][#{index}]//input[contains(@id, 'last_name')]"
     wait.until { @driver.find_element(:xpath, xpath) }
@@ -53,7 +53,7 @@ module TrisanoContactsHelper
 
   def save_contact_event(browser)
     browser.click "save_and_exit_btn"
-    browser.wait_for_page_to_load($load_time)
+    wait_for_element_present(:text, "Contact event was")
     return(browser.is_text_present("Contact event was successfully created.") or
         browser.is_text_present("Contact event was successfully updated."))
   end
@@ -62,14 +62,14 @@ module TrisanoContactsHelper
   # TODO: Add multiples support
   def edit_contact_event(browser)
     browser.click "link=Edit Contact"
-    browser.wait_for_page_to_load($load_time)
-    return(browser.is_text_present("Edit Contact Event"))
+    wait_for_element_present(:text, "Edit Contact event")
+    return(browser.is_text_present("Edit Contact event"))
   end
 
   def remove_contact(browser, index=1)
   	wait = Selenium::WebDriver::Wait.new(:timeout => 3)
     element = wait.until { @driver.find_element(:xpath, "//div[@id='contact_child_events']//li[@class='contact'][#{index}]//input[contains(@id, '_destroy')]") }
-	element.click();
+	element.click()
   end
   
 end
