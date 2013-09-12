@@ -72,21 +72,27 @@ module TrisanoHelper
   def wait_for_element_present(how, what, seconds=LOAD_TIME)
     wait = Selenium::WebDriver::Wait.new(:timeout => seconds)
     if (how == :text)
-        wait.until { @driver.page_source().include?(what) }
-      else
-        wait.until { @driver.find_element(how, what) }
-    end
+      wait.until { @driver.page_source().include?(what) }
+    else
+      wait.until { @driver.find_element(how, what) }
+   end
   end
 
   def wait_for_element_not_present(how, what, seconds=LOAD_TIME)
     wait = Selenium::WebDriver::Wait.new(:timeout => seconds)
     if (how == :text)
-        wait.until { !@driver.page_source().include?(what) }
-      else
-        wait.until { @driver.find_elements(how, what).count == 0 }
+      wait.until { !@driver.page_source().include?(what) }
+    else
+      wait.until { @driver.find_elements(how, what).count == 0 }
     end
   end
 
+  def wait_for_text_or_text(what1, what2, seconds=LOAD_TIME)
+    wait = Selenium::WebDriver::Wait.new(:timeout => seconds)
+    wait.until { @driver.page_source().include?(what1) || @driver.page_source().include?(what2) }
+  end
+
+  
   #  Use set_fields after you navigate to any location by passing in a hash of
   #  fields and values and this method will set them all. It will work for
   #  updating existing items or creating new ones. cmr_helper_example shows how

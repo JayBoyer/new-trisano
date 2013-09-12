@@ -35,7 +35,6 @@ end
 
 When /^I answer all core field config questions$/ do
   CoreField.all(:conditions => ['event_type = ? and fb_accessible = true and disease_specific != true and repeater = false', @form.event_type]).each do |core_field|
-    puts "Answering #{core_field.key}"
     fill_in("#{core_field.key} before?", :with => "#{core_field.key} before answer")
     fill_in("#{core_field.key} after?", :with => "#{core_field.key} after answer")
   end
@@ -44,7 +43,6 @@ end
 Then /^I should see all core field config answers$/ do
   divs_text =  Nokogiri::HTML(response.body).css("div").text
   CoreField.all(:conditions => ['event_type = ? and fb_accessible = true and disease_specific != true and repeater = false', @form.event_type]).each do |core_field|
-    puts core_field.key
     divs_text.should contain("#{core_field.key} before answer"), "Expeted to see #{core_field.key} before answer"
     divs_text.should contain("#{core_field.key} after answer"), "Expeted to see #{core_field.key} answer answer"
   end

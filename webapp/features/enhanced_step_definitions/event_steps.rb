@@ -155,13 +155,13 @@ end
 When /^I save and continue$/ do
   element = @driver.find_element(:id, "save_and_continue_btn")
   element.click()
-  wait_for_element_present(:text, "was successfully")
+  wait_for_text_or_text("was successfully", "prohibited")
 end
 
 When /^I save and exit$/ do
   element = @driver.find_element(:id, "save_and_exit_btn")
   element.click()
-  wait_for_element_present(:text, "was successfully")
+  wait_for_text_or_text("was successfully", "prohibited")
 end
 
 Then /^events list should show (\d+) events$/ do |expected_count|
