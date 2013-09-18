@@ -89,8 +89,15 @@ module ApplicationHelper
     end
   end
 
-  def calculate_age(date)
-    (Date.today - date).to_i / 365
+  def calculate_age(date_birth)
+    date_today = Date.today
+    age = date_today.year - date_birth.year  
+    # can't use date_today.yday here because leap years mess it up
+    if((date_today.month < date_birth.month) || 
+       (date_today.month == date_birth.month && date_today.mday < date_birth.mday))
+      age -= 1
+    end
+    return age
   end
 
   def editable_content_tag(elemtype, obj, prop, editable, options = {}, editOptions = {}, ajaxOptions = {})
