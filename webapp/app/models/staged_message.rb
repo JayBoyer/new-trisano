@@ -87,10 +87,12 @@ class StagedMessage < ActiveRecord::Base
   belongs_to :message_batch
 
   before_validation :strip_line_feeds
+  before_create :set_message_control_id
   before_validation_on_create :set_state
   after_validation_on_create  :set_searchable_attributes
   before_destroy :remove_from_batch
 
+  validates_uniqueness_of :message_control_id
   validates_presence_of :hl7_message
   validates_length_of :hl7_message, :maximum => 10485760
   validates_inclusion_of :state, :in => self.states.values
@@ -123,15 +125,6 @@ class StagedMessage < ActiveRecord::Base
     bad_version_id    = reject_version_id
     @rejected = bad_message_type || bad_processing_id || bad_version_id
     return if @rejected
-
-    # check the last 500 staged messages for a duplicate control ID
-    # we do this only to reject duplicate messages sent in the recent past
-    # if we were to search ALL the staged messages, this could seriously degrade performance
-    last_500 = StagedMessage.all(:order => "id desc", :limit => 500)
-    control_ids = last_500.map {|m| m.id != self.id ? HL7::Message.new(m.hl7_message)[:MSH].message_control_id : nil }.compact
-    if control_ids.include?(hl7[:MSH].message_control_id)
-      add_hl7_error :duplicate_message_control_id, :msh, 1
-    end
 
     if patient.nil?
       add_hl7_error :missing_segment, :pid, 1
@@ -434,6 +427,14 @@ class StagedMessage < ActiveRecord::Base
     return if hl7_message.nil?
     self.hl7_message.gsub!(/\n/, '')
     self.hl7_message << "\n"
+  end
+  
+  def set_message_control_id
+    return if hl7_message.nil?
+    hl7 = HL7::Message.new(hl7_message)
+    return if hl7.nil?
+    return if hl7[:MSH].nil?
+    self.message_control_id = hl7[:MSH].message_control_id
   end
 
   def set_searchable_attributes
