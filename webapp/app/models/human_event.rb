@@ -144,18 +144,25 @@ class HumanEvent < Event
          jurisdictions.secondary_entity_id || secondary_jurisdiction_ids
            && ARRAY[#{(options[:access_sensitive_jurisdiction_ids] || []).join(',')}]::integer[])
       SQL
-      
       event_types = options[:event_types] || []
-      if event_types.empty?
-        where_clause << " AND (events.type = 'MorbidityEvent' OR events.type = 'ContactEvent' OR events.type = 'AssessmentEvent')"
+      is_contact_search = event_types.include?('ContactEvent')
+      is_contact_parent_search_only = false
+ 
+      event_type_clause = ""
+      if (is_contact_search && event_types.count == 1)
+        # we are searching only for contact events whose parent events meet the search criteria
+        is_contact_parent_search_only = true;
+        event_type_clause << " AND (events.type = 'MorbidityEvent' OR events.type = 'AssessmentEvent')"
+      elsif event_types.empty?
+        event_type_clause << " AND (events.type = 'MorbidityEvent' OR events.type = 'ContactEvent' OR events.type = 'AssessmentEvent')"
       else
         event_types_clause = []
         event_types.each { |event_type| event_types_clause << "events.type = '#{event_type}'" }
-        where_clause << " AND ("
-        where_clause << event_types_clause.join(" OR ")
-        where_clause << ")"
+        event_type_clause << " AND ("
+        event_type_clause << event_types_clause.join(" OR ")
+        event_type_clause << ")"
       end
-
+      
       states = options[:states] || []
       if states.empty?
         where_clause << " AND workflow_state != 'not_routed'"
@@ -322,12 +329,45 @@ class HumanEvent < Event
 
       SQL
 
-      count_select << "WHERE (#{where_clause})\n" unless where_clause.blank?
-      row_count = Event.count_by_sql(count_select)
+      real_select_temp = real_select.dup
+      count_select_temp = count_select.dup
+      where_clause_temp = where_clause + event_type_clause
+      count_select << "WHERE (#{where_clause_temp})\n" unless where_clause_temp.blank?
 
-      real_select << "WHERE (#{where_clause})\n" unless where_clause.blank?
+      real_select << "WHERE (#{where_clause_temp})\n" unless where_clause_temp.blank?
       real_select << "ORDER BY #{order_by_clause}"
+     
+      if (is_contact_search) 
+        # change the select criteria to include contact events whose parents meet the search critera
+        event_ids = Event.find_by_sql(real_select).map {|x| x.id}
+        if (event_ids.count > 0)
+          event_list = ''
+          is_first = true
+          event_ids.each do |id|
+            if !is_first
+              event_list += ','
+            end
+            is_first = false
+            event_list += id.to_s
+          end
+        
+          #if we are searching only for contact events whose parents meet the search criteria
+          contact_clause = "(events.type = 'ContactEvent' AND (events.parent_id IN (" + event_list + ")))" 
+          if (is_contact_parent_search_only)
+            expanded_where_clause = "WHERE (#{contact_clause})\n"
+          else # searching for parent events that meet the search critera and contact events whose parents meet the search criteria
+            expanded_where_clause = "WHERE " + (where_clause_temp.blank? ? "#{contact_clause}" :
+            "((#{where_clause_temp}) OR #{contact_clause})" )
+          end
+          real_select_temp << expanded_where_clause
+          real_select_temp << "ORDER BY #{order_by_clause}"
+          real_select = real_select_temp
+          count_select_temp << expanded_where_clause
+          count_select = count_select_temp
+        end
+      end
 
+      row_count = Event.count_by_sql(count_select)
       find_options = {
         :page          => options[:page],
         :total_entries => row_count

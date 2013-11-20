@@ -789,6 +789,7 @@ test:
   ignore_fts: 'xFull-text search ignored when using starts-with search'
   starts_with_first_name: "xStarts-with first name"
   starts_with_last_name: "xStarts-with last name"
+  starts_with_aka_name: "xStarts-with preferred (AKA) name"
   full_text_name: "xFull-text name"
   sent_to_cdc: "xSent to CDC"
   entered_on_date_range: 'xEntered-on date range (mm/dd/yyyy)'

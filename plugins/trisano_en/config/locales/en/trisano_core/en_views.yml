@@ -894,6 +894,7 @@ en:
   ignore_fts: 'Full-text search ignored when using starts-with search'
   starts_with_first_name: "Starts-with first name"
   starts_with_last_name: "Starts-with last name"
+  starts_with_aka_name: "Starts-with preferred (AKA) name"
   full_text_name: "Full-text name"
   sent_to_cdc: "Sent to CDC"
   entered_on_date_range: 'Entered-on date range (mm/dd/yyyy)'

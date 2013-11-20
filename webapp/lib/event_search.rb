@@ -36,6 +36,9 @@ module EventSearch
        :gender,
        :workflow_state,
        :city,
+       :area_code,
+       :phone_number,
+       :starts_with_aka_name,
        :county,
        :jurisdiction_ids,
        :birth_date,
@@ -111,7 +114,10 @@ module EventSearch
         joins << fulltext_join(options)
         joins << "LEFT OUTER JOIN external_codes people_gender ON people_gender.id = people.birth_gender_id"
         joins << "LEFT OUTER JOIN participations_risk_factors ON participations_risk_factors.participation_id = interested_party.id"
+        joins << "LEFT OUTER JOIN telephones ON telephones.entity_id = entities.id"
         joins << "LEFT OUTER JOIN addresses ON addresses.event_id = events.id"
+        joins << "LEFT OUTER JOIN answers on answers.event_id = events.id"
+        joins << "LEFT OUTER JOIN questions on questions.id = answers.question_id AND questions.short_name = 'AKA'"
         joins << "LEFT OUTER JOIN external_codes counties_addresses ON counties_addresses.id = addresses.county_id"
         joins << "LEFT OUTER JOIN disease_events ON disease_events.event_id = events.id"
         joins << "LEFT OUTER JOIN diseases ON diseases.id = disease_events.disease_id"
@@ -148,6 +154,9 @@ module EventSearch
         where << gender_conditions(options)
         where << workflow_conditions(options)
         where << city_conditions(options)
+        where << area_code_conditions(options)
+        where << phone_number_conditions(options)
+        where << aka_conditions(options)
         where << county_conditions(options)
         where << jurisdiction_conditions(options)
         where << sensitive_disease_conditions(options)
@@ -197,6 +206,14 @@ module EventSearch
 
     def city_conditions(options)
       starts_with_conditions(:addresses, :city, options)
+    end
+    
+    def area_code_conditions(options)
+      in_condition(:telephones, :area_code, options)
+    end
+
+    def phone_number_conditions(options)
+      in_condition(:telephones, :phone_number, options)
     end
 
     def county_conditions(options)
@@ -315,6 +332,18 @@ module EventSearch
         end
       end
       sanitize_sql_for_conditions(result) if defined? result
+    end
+    
+    def aka_conditions(options)
+      unless options[:starts_with_aka_name].blank?
+        sanitize_sql_for_conditions(["answers.text_answer ILIKE ?", options[:starts_with_aka_name] + "%"])
+      end
+    end
+
+    def in_condition(table, field, options)
+      unless options[field].blank?
+        sanitize_sql_for_conditions(["#{table.to_s}.#{field.to_s} IN (?)", options[field]])
+      end
     end
 
     def in_conditions(table, field, options)

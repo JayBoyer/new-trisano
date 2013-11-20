@@ -133,7 +133,22 @@ module SearchHelper
                                        { :skip_style => false })
         end
       end
+      
+      fields << div_tag(:class => :horiz) do
+        html =  label_tag(:area_code, t(:area_code))
+        html << text_field_tag(:area_code, params[:area_code], :size => 3)
+      end
 
+      fields << div_tag(:class => :horiz) do
+        html =  label_tag(:phone_number, t(:phone_number))
+        html << text_field_tag(:phone_number, params[:phone_number], :size => 7)
+      end
+      
+      fields << div_tag(:class => :horiz) do
+        html =  label_tag(:starts_with_aka_name, t(:starts_with_aka_name))
+        html << text_field_tag(:starts_with_aka_name, params[:starts_with_aka_name], :size => 25)
+      end
+      
       fields << div_tag(:class => :horiz) do
         returning "" do |html|
           html << label_tag(:county, t(:county))
