@@ -126,7 +126,9 @@ class StagedMessage < ActiveRecord::Base
     @rejected = bad_message_type || bad_processing_id || bad_version_id
     return if @rejected
 
-    if(!StagedMessage.all(:conditions => "message_control_id = '" + hl7[:MSH].message_control_id + "'").empty?)
+    if(!StagedMessage.all(:conditions => "message_control_id = '" +
+        hl7[:MSH].message_control_id + "' AND id != " +
+        (self.id == nil ? "0" : self.id.to_s)).empty?)
       add_hl7_error :duplicate_message_control_id, :msh, 1
     end
     
