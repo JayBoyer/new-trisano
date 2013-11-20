@@ -53,7 +53,7 @@
 
       %span.subsection-header
         =t('encounter_forms')
-      = render :partial => 'events/forms_print.html.haml', :locals => { :event => encounter }
+      = render :partial => 'events/forms_print.html.haml', :locals => { :event => encounter, :f => f }
       
       %br
       - ran = 1

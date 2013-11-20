@@ -24,7 +24,7 @@
           %span.print-value= h(lab.object.place_entity.place.name)
         - core_element_print(:accession_no, lab_result, :vert) do
           %span.print-label=ct('accession_no')
-          %span.print-value= lab_result.object.accession_no.blank? ? 'none' : h(lab_result.accession_no)
+          %span.print-value= lab_result.object.accession_no.blank? ? 'none' : h(lab_result.object.accession_no)
         - core_element_print(:test_type, lab_result, :vert) do
           %span.print-label=ct('test_type')
           %span.print-value= h(lab_result.object.test_type.try(:common_name))
