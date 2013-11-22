@@ -35,6 +35,8 @@ module EventSearch
        :diseases,
        :gender,
        :workflow_state,
+       :street_number,
+       :street_name,
        :city,
        :area_code,
        :phone_number,
@@ -153,6 +155,8 @@ module EventSearch
         where << disease_conditions(options)
         where << gender_conditions(options)
         where << workflow_conditions(options)
+        where << street_name_conditions(options)
+        where << street_number_conditions(options)
         where << city_conditions(options)
         where << area_code_conditions(options)
         where << phone_number_conditions(options)
@@ -204,6 +208,14 @@ module EventSearch
       end
     end
 
+    def street_number_conditions(options)
+      starts_with_conditions(:addresses, :street_number, options)
+    end
+    
+    def street_name_conditions(options)
+      starts_with_conditions(:addresses, :street_name, options)
+    end
+    
     def city_conditions(options)
       starts_with_conditions(:addresses, :city, options)
     end

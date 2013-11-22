@@ -175,6 +175,8 @@ class SearchController < ApplicationController
          :entered_on_start, params[:parsed_entered_start_date],
          :entered_on_end,   params[:parsed_entered_end_date],
          :city,             params[:city],
+         :street_number,    params[:street_number],
+         :street_name,      params[:street_name],
          :area_code,        params[:area_code],
          :phone_number,     params[:phone_number],
          :starts_with_aka_name, params[:starts_with_aka_name],

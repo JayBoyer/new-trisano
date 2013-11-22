@@ -124,7 +124,17 @@ module SearchHelper
   def demographic_criteria_fields(params, counties, genders)
     returning [] do |fields|
 
-      fields << div_tag(:class => :horiz) do
+    fields << div_tag(:class => :horiz) do
+      html =  label_tag(:street_number, t(:street_number))
+      html << text_field_tag(:street_number, params[:street_number], :size => 10)
+    end
+
+    fields << div_tag(:class => :horiz) do
+      html =  label_tag(:street_name, t(:street))
+      html << text_field_tag(:street_name, params[:street_name], :size => 25)
+    end
+
+    fields << div_tag(:class => :horiz) do
         returning "" do |html|
           html << label_tag(:city, t(:city))
           html << model_auto_completer('city', params[:city], "", "",
