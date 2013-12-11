@@ -22,7 +22,6 @@ class FormReference < ActiveRecord::Base
   belongs_to :form
   has_many :answers, :through => :event
 
-  after_create :create_answers_for_repeaters
   after_destroy :destroy_answers, :destroy_investigator_form_sections
 
   def destroy_investigator_form_sections
@@ -37,62 +36,4 @@ class FormReference < ActiveRecord::Base
     answers.map(&:destroy)
   end
 
-  def create_answers_for_repeaters
-    Answer.transaction do
-      if repeater_form_elements = form.repeater_elements
-        repeater_form_elements.each do |repeater_form_element|
-
-          repeater_form_object_key = repeater_form_element.core_field.key
-          core_path_array = ExtendedFormBuilder::CorePath[repeater_form_object_key]
-          core_path_array.pop #take off the last element, so we get the class/association, not the field
-
-          repeater_records = eval_core_path(:object => event, :core_path_array => core_path_array)
-          # No need to create answers for records that don't exist!
-          return nil if repeater_records.nil?
-
-          question_elements_for_repeater = form.form_element_cache.all_children_by_type("QuestionElement", repeater_form_element)
-
-          repeater_attributes = {
-            :new_repeater_radio_buttons => {},
-            :new_repeater_checkboxes => {},
-            :new_repeater_answers => []
-          } 
-
-          question_elements_for_repeater.each do |question_element|
-
-            case question_element.question.data_type
-            when :radio_button
-              repeater_attributes[:new_repeater_radio_buttons][question_element.question.id] = {
-                :event_id => event.id,
-                :radio_button_answer => [],
-                :export_conversion_value_id => "",
-                :code => ""
-              } 
-
-            when :checkbox
-              repeater_attributes[:new_repeater_checkboxes][question_element.question.id] = {
-                :event_id => event.id,
-                :check_box_answer => [],
-                :code => ""
-              }
-
-            else
-              repeater_attributes[:new_repeater_answers] << {
-                :event_id => event.id,
-                :question_id => question_element.question.id,
-                :text_answer => ""
-              }
-
-            end #case
-
-
-          end #questions_for_repater
-
-          repeater_records.each do |repeater_record|
-            repeater_record.update_attributes(repeater_attributes) 
-          end
-        end # each form element
-      end # if repeaters
-    end #transaction
-  end
 end
