@@ -211,8 +211,8 @@ module NameAndBirthdateSearch
   def name_and_bdate_order(options)
     returning [] do |order|
       order << name_order(options)
-      order << bdate_order(options)
       order << fulltext_order(options)
+      order << bdate_order(options)
       order << "people.entity_id"
       order << "events.id DESC"
     end.flatten.compact
