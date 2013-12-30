@@ -690,10 +690,6 @@ class Event < ActiveRecord::Base
     forms.select {|f| !template_ids.include?(f.template_id) }
   end
 
-  def create_form_answers_for_repeating_form_elements
-    self.form_references.each { |fr| fr.create_answers_for_repeaters }
-  end
-
   private
   def create_form_references
     return [] if self.disease_event.nil? || self.disease_event.disease_id.blank? || self.jurisdiction.nil?
