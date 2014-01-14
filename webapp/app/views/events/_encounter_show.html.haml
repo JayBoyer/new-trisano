@@ -2,6 +2,7 @@
   %tr
     %th=t 'investigator'
     %th=t 'encounter_date'
+    %th=t 'activity'
     %th=t 'description'
     %th=t 'location'
     %th &nbsp
@@ -18,6 +19,7 @@
     %tr
       %td{style}=h(encounter_event_data.user.best_name)
       %td{style}=ld(encounter_event_data.encounter_date)
+      %td{style}=h(encounter_event_data.get_activity)
       %td{style}=h(encounter_event_data.description)
       %td{style}=h(I18n.t("encounter_location_types.#{encounter_event_data.encounter_location_type}"))
       %td

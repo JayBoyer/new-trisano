@@ -104,6 +104,7 @@ module EventSearch
         fields << "counties_addresses.code_description AS county"
         fields << "places.short_name AS jurisdiction"
         fields << "disease_events.disease_onset_date AS onset_date"
+        fields << "lab_results.collection_date AS collection_date"
         fields << "search_results.rank AS rank" unless options[:fulltext_terms].blank?
       end.flatten.compact
     end
@@ -124,6 +125,10 @@ module EventSearch
         joins << "LEFT OUTER JOIN disease_events ON disease_events.event_id = events.id"
         joins << "LEFT OUTER JOIN diseases ON diseases.id = disease_events.disease_id"
         joins << "INNER JOIN participations jurisdictions_events ON jurisdictions_events.event_id = events.id AND (jurisdictions_events.type = 'Jurisdiction' )"
+        joins << "LEFT OUTER JOIN participations lab_events ON lab_events.id = " + 
+          "(SELECT id FROM participations WHERE participations.event_id = events.id AND (lab_events.type = 'Lab') ORDER BY updated_at DESC LIMIT 1)"
+        joins << "LEFT OUTER JOIN lab_results ON lab_results.id = " + 
+          "(SELECT id FROM lab_results where participation_id = lab_events.id ORDER BY collection_date DESC LIMIT 1)"
         joins << <<-JOIN
           INNER JOIN entities place_entities_participations ON place_entities_participations.id = jurisdictions_events.secondary_entity_id
             AND (place_entities_participations.entity_type = 'PlaceEntity' )
