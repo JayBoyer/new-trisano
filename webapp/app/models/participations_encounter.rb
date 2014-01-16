@@ -42,5 +42,17 @@ class ParticipationsEncounter < ActiveRecord::Base
   validates_presence_of :user, :encounter_location_type
   validates_date :encounter_date, :on_or_before => lambda { Date.today }
   validates_inclusion_of :encounter_location_type, :in => self.valid_location_types, :message => "is not valid"
+  
+  # find the Activity field of an attached STD form if available
+  # this should be a core field
+  def get_activity
+    event_id = self.encounter_event.id
+    question_ids = Question.find_by_sql("SELECT id FROM questions WHERE short_name = 'encounter_activity'")
+    answer = Answer.find(:first, :conditions => ["event_id = ? and question_id in (?) ", event_id, question_ids])
+    if(answer != nil && answer.text_answer != nil)
+      return answer.text_answer
+    end
+    return ""
+  end
  
 end

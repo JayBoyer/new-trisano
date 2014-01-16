@@ -314,6 +314,7 @@ en:
   clinical_info: 'Clinical Information'
   add_encounter: 'Add an encounter'
   encounter_date: 'Encounter date'
+  activity: 'Activity'
 
 #Event attachments
   event_attachment: 'Event Attachment'
