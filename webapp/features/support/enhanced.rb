@@ -81,6 +81,6 @@ end
 at_exit do
 
 # comment out the following 2 lines to leave the browser up at the end of the tests
-#  browser.stop
-#  server.stop
+  browser.stop
+  server.stop
 end
