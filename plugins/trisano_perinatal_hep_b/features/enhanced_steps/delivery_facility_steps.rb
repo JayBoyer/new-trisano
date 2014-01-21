@@ -38,8 +38,7 @@ When /^I complete the actual delivery facility fields$/ do
 end
 
 Then /^I should see the expected delivery facility data$/ do
-  @browser.wait_for_element("css=#expected_delivery_facility a")
-  @browser.wait_for_element("xpath=//label[text()='Expected delivery facility']")
+  wait_for_element_present(:xpath, "//label[text()='Expected delivery facility']")
   assert_match(/New Expected Delivery Facility/, @browser.get_text("xpath=//label[text() = 'Expected delivery facility']/.."))
   assert(@browser.element?("xpath=//*[@id='expected_delivery_facility']//label[text()='Place type']"))
   assert_match(/Hospital/, @browser.get_text("xpath=//*[@id='expected_delivery_facility']//label[text() = 'Place type']/.."))
@@ -52,8 +51,7 @@ Then /^I should see the expected delivery facility data$/ do
 end
 
 Then /^I should see the actual delivery data$/ do
-  @browser.wait_for_element("css=#actual_delivery_facility a")
-  @browser.wait_for_element("xpath=//label[text()='Actual delivery facility']")
+  wait_for_element_present(:xpath, "//label[text()='Actual delivery facility']")
   assert_match(/New Actual Delivery Facility/, @browser.get_text("xpath=//label[text() = 'Actual delivery facility']/.."))
   assert(@browser.element?("xpath=//*[@id='actual_delivery_facility']//label[text()='Place type']"))
   assert_match(/Hospital/, @browser.get_text("xpath=//*[@id='actual_delivery_facility']//label[text() = 'Place type']/.."))
@@ -83,25 +81,29 @@ When /^I remove the actual delivery data$/ do
 end
 
 When /^I search for an expected delivery facility$/ do
+  click_core_tab(@browser, CLINICAL)
+  wait_for_element_present(:xpath, "//label[text()='Expected delivery facility']/../input")
   @browser.type("xpath=//label[text()='Expected delivery facility']/../input", "New Exp")
   @browser.type_keys("xpath=//label[text()='Expected delivery facility']/../input", "e")
   @browser.wait_for_ajax
 end
 
 When /^I search for an actual delivery facility$/ do
+  click_core_tab(@browser, CLINICAL)
   @browser.type("xpath=//label[text()='Actual delivery facility']/../input", "New Act")
   @browser.type_keys("xpath=//label[text()='Actual delivery facility']/../input", "u")
   @browser.wait_for_ajax
 end
 
 When /^I select an expected delivery facility from the list$/ do
-  @browser.wait_for_element("xpath=//div[@class='autocomplete']/ul/li[contains(text(), 'New Expected Delivery Facility')]")
+  click_core_tab(@browser, CLINICAL)
+  wait_for_element_present(:xpath, "//label[text()='Expected delivery facility']/../input")
   @browser.type_keys("xpath=//label[text()='Expected delivery facility']/../input", "\t")
   @browser.wait_for_ajax
 end
 
 When /^I select an actual delivery facility from the list$/ do
-  @browser.wait_for_element("xpath=//div[@class='autocomplete']/ul/li[contains(text(), 'New Actual Delivery Facility')]")
+  wait_for_element_present(:xpath, "//div[@class='autocomplete']/ul/li[contains(text(), 'New Actual Delivery Facility')]")
   @browser.type_keys("xpath=//label[text()='Actual delivery facility']/../input", "\t")
   @browser.wait_for_ajax
 end

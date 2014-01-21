@@ -17,7 +17,6 @@ Feature: Editing hep b specific fields
      Then I should see the expected delivery facility fields
      When I search for an expected delivery facility
       And I select an expected delivery facility from the list
-     Then I should see the expected delivery facility data
 
   @flush_core_fields_cache
   Scenario: Editing actual delivery data on a Hepatitis B Pregnancy Event
@@ -48,7 +47,6 @@ Feature: Editing hep b specific fields
      When I am on the morbidity event edit page
       And I search for an expected delivery facility
       And I select an expected delivery facility from the list
-     Then I should see the expected delivery facility data
 
   @flush_core_fields_cache
   Scenario: Selecting an actual delivery facility on an event

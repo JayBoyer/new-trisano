@@ -18,8 +18,8 @@ When /^I add a (.+) p\-hep\-b treatment "([^\"]*)" on with a date (.+) days ago$
 end
 
 Then /^I should see the treatment "([^\"]*)" on with a date (.+) days ago$/ do |treatment, days_ago|
-  assert(@browser.get_html_source.include?(treatment))
-  assert(@browser.get_html_source.include?((Date.today - days_ago.to_i.days).to_s))
+  assert(@driver.page_source.include?(treatment))
+  assert(@driver.page_source.include?((Date.today - days_ago.to_i.days).to_s))
 end
 
 When /^I remove the (.+) treatment$/ do |index_string|
@@ -29,6 +29,6 @@ When /^I remove the (.+) treatment$/ do |index_string|
 end
 
 Then /^I should not see the treatment "([^\"]*)" on with a date (.+) days ago$/ do |treatment, days_ago|
-  assert(!@browser.get_html_source.include?(treatment))
-  assert(!@browser.get_html_source.include?((Date.today - days_ago.to_i.days).to_s))
+  assert(!@driver.page_source.include?(treatment))
+  assert(!@driver.page_source.include?((Date.today - days_ago.to_i.days).to_s))
 end

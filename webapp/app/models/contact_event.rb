@@ -163,8 +163,6 @@ class ContactEvent < HumanEvent
 
   def copy_event(new_event, event_components)
     super
-    # When we get a story asking for it, this is where we will copy over the (now poorly named) participations_contacts info to a new event.
-    # That is, disposition etc.
   end
 
   def validate

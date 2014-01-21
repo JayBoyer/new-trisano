@@ -1503,13 +1503,11 @@ describe Event, 'cloning an event' do
       @new_event.interested_party.secondary_entity_id.should == @org_event.interested_party.secondary_entity_id
       @new_event.jurisdiction.name.should == @jurisdiction_place.name
       @new_event.should be_new
-
-      # Only interested party and jurisdiction, nothing else
-      lambda {@new_event.save!}.should change(Participation, :count).by(2)
+      lambda {@new_event.save!}.should change(Participation, :count).by(1)
     end
 
     it "should create a new address instance and link it up" do
-      lambda {@new_event.save!}.should change(Address, :count)
+      lambda {@new_event.save!}.should_not change(Address, :count)
       @new_event.address.id.should_not == @org_event.address.id
       @new_event.address.street_name.should == 'Example Lane'
     end

@@ -42,10 +42,12 @@
         %label.horiz
           = check_box_tag("event_components[]", "disease_specific")
           =t 'disease_forms_and_answers'
-        -# Uncommend when contact issue is sorted out
-        -# %label.horiz
-        -#   = check_box_tag("event_components[]", "contacts")
-        -#   Contacts
+        %label.horiz
+          = check_box_tag("event_components[]", "contacts")
+          =t 'contacts'
+        %label.horiz
+          = check_box_tag("event_components[]", "encounters")
+          =t 'encounters'
         %label.horiz
           = check_box_tag("event_components[]", "notes")
           =t 'notes'

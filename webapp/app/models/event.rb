@@ -430,7 +430,8 @@ class Event < ActiveRecord::Base
     new_event.jurisdiction.secondary_entity = (User.current_user.jurisdictions_for_privilege(:create_event).first || Place.unassigned_jurisdiction).entity
     new_event.workflow_state = 'accepted_by_lhd' unless new_event.jurisdiction.place.is_unassigned_jurisdiction?
     new_event.acuity = self.acuity
-
+    new_event.save!
+    
     if event_components.include?("clinical")
       if self.disease_event
         new_event.build_disease_event(:hospitalized_id =>  self.disease_event.hospitalized_id,
@@ -441,7 +442,6 @@ class Event < ActiveRecord::Base
     end
 
     if event_components.include?("disease_specific")
-      new_event.save!
       new_event.add_forms(self.forms)
 
       self.answers.each do |answer|
@@ -475,7 +475,17 @@ class Event < ActiveRecord::Base
       end
     end
 
-    if event_components.include?("notes")
+    if event_components.include?("contacts")
+      contact_events = Event.find(:all, :conditions => ["type = 'ContactEvent' and parent_id = ?", self.id])
+      clone_child_events(new_event, contact_events, true)
+    end
+   
+    if event_components.include?("encounters")
+      encounter_events = Event.find(:all, :conditions => ["type = 'EncounterEvent' and parent_id = ?", self.id])
+      clone_child_events(new_event, encounter_events, false)
+    end
+   
+   if event_components.include?("notes")
       self.notes.each do |note|
         if note.note_type == "clinical"
           attrs = note.attributes
@@ -483,6 +493,18 @@ class Event < ActiveRecord::Base
           new_event.notes.build(attrs)
         end
       end
+    end
+  end
+  
+  def clone_child_events(parent_event, child_events, copy_interested_parties)
+    child_events.each do |event|
+      new_child_event = event.clone
+      new_child_event.parent_id = parent_event.id
+      if(copy_interested_parties)      
+        participation = Participation.find(:first, :conditions => ["type = 'InterestedParty' and event_id = ?", self.id])
+        new_child_event.build_interested_party(:primary_entity_id => participation.primary_entity_id)
+      end
+      new_child_event.save(false)
     end
   end
 
