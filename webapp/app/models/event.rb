@@ -442,47 +442,38 @@ class Event < ActiveRecord::Base
     end
 
     if event_components.include?("disease_specific")
-      new_event.add_forms(self.forms)
-
-      self.answers.each do |answer|
-        new_event.answers.create(:question_id => answer.question_id,
-          :text_answer => answer.text_answer,
-          :export_conversion_value_id => answer.export_conversion_value_id)
-      end
-
-      new_event.form_references.each do |reference|
-        # for answers in repeating sections, need to create corresponding investigator_form_sections
-        # and link them to the answers
-        repeater_section_elements = FormElement.find(:all, :conditions =>["form_id = ? and repeater = TRUE", reference.form_id])
-        repeater_section_elements.each do |element|
-
-          # find all of the form elements whose parent is the repeater_section_element
-          form_elements = FormElement.find(:all, :conditions =>["parent_id = ?", element.id])
-          form_elements.each do |form_element|
-            questions = Question.find(:all, :conditions =>["form_element_id = ?", form_element.id])
-            questions.each do |question|
-              new_event.answers.each do |answer|
-                if(answer.question_id == question.id)
-                  form_section = InvestigatorFormSection.new(:event_id => new_event.id, :section_element_id => element.id)
-                  form_section.save
-                  answer.repeater_form_object_id = form_section.id
-                  answer.repeater_form_object_type = form_section.class.base_class.name
-                end
-              end
-            end
-          end
-        end
-      end
+      copy_forms(self, new_event)
     end
 
     if event_components.include?("contacts")
-      contact_events = Event.find(:all, :conditions => ["type = 'ContactEvent' and parent_id = ?", self.id])
-      clone_child_events(new_event, contact_events, true)
+      contact_events = Event.find(:all, :conditions => ["type = 'ContactEvent' AND parent_id = ?", self.id])
+      copy_child_events(new_event, contact_events, true)
+      
+      # create contact events with basic data for child events promoted to AEs or CMRs
+      promoted_events = Event.find(:all, :conditions => ["(type = 'AssessmentEvent' OR type = 'MorbidityEvent') AND parent_id = ?", self.id])
+      promoted_events.each do |promoted_event|
+        contact_event = ContactEvent.new()
+
+        participation = Participation.find(:first, :conditions => ["type = 'InterestedParty' and event_id = ?", promoted_event.id])
+        contact_event.build_interested_party(:primary_entity_id => participation.primary_entity_id)
+        if(promoted_event.participations_contact_id != nil)
+          participation_contact = ParticipationsContact.find(:first, :conditions => ["id = ?", promoted_event.participations_contact_id])
+          new_participation_contact = participation_contact.clone()
+          new_participation_contact.save(false)
+          contact_event.participations_contact_id = new_participation_contact.id
+        end
+        contact_event.workflow_state = 'not_routed'
+        contact_event.parent_id = new_event.id
+        parent_jurisdiction = Jurisdiction.new
+        parent_jurisdiction.secondary_entity_id = new_event.jurisdiction.secondary_entity_id
+        contact_event.build_jurisdiction(parent_jurisdiction.attributes)
+        contact_event.save(false)
+      end
     end
    
     if event_components.include?("encounters")
-      encounter_events = Event.find(:all, :conditions => ["type = 'EncounterEvent' and parent_id = ?", self.id])
-      clone_child_events(new_event, encounter_events, false)
+      encounter_events = Event.find(:all, :conditions => ["type = 'EncounterEvent' AND parent_id = ?", self.id])
+      copy_child_events(new_event, encounter_events, false)
     end
    
    if event_components.include?("notes")
@@ -496,18 +487,58 @@ class Event < ActiveRecord::Base
     end
   end
   
-  def clone_child_events(parent_event, child_events, copy_interested_parties)
+  def copy_child_events(parent_event, child_events, copy_interested_parties)
     child_events.each do |event|
       new_child_event = event.clone
       new_child_event.parent_id = parent_event.id
       if(copy_interested_parties)      
-        participation = Participation.find(:first, :conditions => ["type = 'InterestedParty' and event_id = ?", self.id])
+        participation = Participation.find(:first, :conditions => ["type = 'InterestedParty' and event_id = ?", event.id])
         new_child_event.build_interested_party(:primary_entity_id => participation.primary_entity_id)
       end
+      
+      # save the child event so we can copy forms
+      new_child_event.save(false)
+      copy_forms(event, new_child_event)
       new_child_event.save(false)
     end
   end
+  
+  def copy_forms(old_event, new_event)
+    new_event.add_forms(old_event.forms)
 
+    old_event.answers.each do |answer|
+      new_event.answers.create(:question_id => answer.question_id,
+        :text_answer => answer.text_answer,
+        :export_conversion_value_id => answer.export_conversion_value_id)
+    end
+
+    new_event.form_references.each do |reference|
+      # for answers in repeating sections, need to create corresponding investigator_form_sections
+      # and link them to the answers
+      repeater_section_elements = FormElement.find(:all, :conditions =>["form_id = ? and repeater = TRUE", reference.form_id])
+      repeater_section_elements.each do |element|
+
+        # find all of the form elements whose parent is the repeater_section_element
+        form_elements = FormElement.find(:all, :conditions =>["parent_id = ?", element.id])
+        form_elements.each do |form_element|
+          questions = Question.find(:all, :conditions =>["form_element_id = ?", form_element.id])
+          questions.each do |question|
+            new_event.answers.each do |answer|
+              if(answer.question_id == question.id)
+                form_section = InvestigatorFormSection.new(:event_id => new_event.id, :section_element_id => element.id)
+                form_section.save
+                answer.repeater_form_object_id = form_section.id
+                answer.repeater_form_object_type = form_section.class.base_class.name
+              end
+            end
+          end
+        end
+      end
+    end  
+  end
+
+  
+  
   def events_quick_list(reload=false)
     if reload or @events_quick_list.nil?
       @events_quick_list = self.class.find_by_sql([<<-SQL, self.id, self.id])
