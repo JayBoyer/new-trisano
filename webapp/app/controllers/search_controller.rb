@@ -161,7 +161,7 @@ class SearchController < ApplicationController
 
   def max_search_results
     max_limit = config_option(:max_search_results).to_i
-    max_limit <= 0 ? 500 : max_limit
+    max_limit <= 0 ? 100 : max_limit
   end
 
   def convert_to_search_criteria(params)

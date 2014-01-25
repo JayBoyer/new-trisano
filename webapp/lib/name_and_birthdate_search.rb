@@ -84,7 +84,7 @@ module NameAndBirthdateSearch
     else
       returning "" do |result|
         result << "(\n#{fulltext(options[:fulltext_terms])}\n) search_results\n"
-        result << "INNER JOIN people ON search_result_id = people.id AND rank > 0.2"
+        result << "INNER JOIN people ON search_result_id = people.id AND rank > 0.3"
       end
     end
   end

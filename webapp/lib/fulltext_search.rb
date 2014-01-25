@@ -21,122 +21,77 @@ module FulltextSearch
   end
 
   module ClassMethods
+  
     def fulltext_join(options)
       unless options[:fulltext_terms].blank?
+        max_results = options[:limit].blank? ? 100 : options[:limit].to_i
         <<-JOIN
-          INNER JOIN (\n#{fulltext(options[:fulltext_terms])}\n) search_results
-              ON (search_results.search_result_id = people.id AND
-                  search_results.rank > 0.2)
+        INNER JOIN (\n#{fulltext(options[:fulltext_terms])}\n
+             LIMIT #{max_results}) search_results
+             ON (search_results.search_result_id = people.id AND
+                 search_results.rank > 0.3)
         JOIN
       end
     end
 
+    def order()
+      "rank DESC, last_name ASC, first_name ASC"
+    end
+
     def fulltext_order(options)
       unless options[:fulltext_terms].blank?
-        "rank DESC"
+        order()
       end
     end
-
-    # planner is better if fulltext is not in a function
+    
     def fulltext(terms)
-      terms = sanitize_sql_for_conditions(['?', terms])
-      returning [] do |result|
-        result << "SELECT"
-        result << fulltext_select(terms).join(",")
-        result << "FROM ("
-        result << text_search_results_query(terms)
-        result << ") b"
-        result << "ORDER BY rank DESC"
-      end.join("\n")
-    end
+      names = terms.split(/\s/)
+      first_name = names[0].upcase
+      last_name = names[0].upcase
+      operator = 'OR'
+      similarity =  "(GREATEST(similarity(first_name, '#{first_name}'), similarity(last_name, '#{last_name}'))) "
+      if(names.count > 1)
+        last_name = names[names.count-1].upcase
+        operator = 'AND'
+        similarity =  "(sqrt(similarity(first_name, '#{first_name}')) + sqrt(similarity(last_name, '#{last_name}')))/2 "
+        end
+      end
+      
+      sql = "SELECT * FROM people WHERE upper(last_name) = '#{last_name}' " +
+        "#{operator} upper(first_name) = '#{first_name}' LIMIT 1"
 
-    def fulltext_select(terms)
-      returning [] do |fields|
-        fields << "id AS search_result_id"
-        fields << "#{rank_field_defn(terms)} AS rank"
+      # if an exact match finds anything, do an exact match
+      if(Person.find_by_sql(sql).size > 0)
+        results = "SELECT id AS search_result_id, #{similarity} as rank FROM people WHERE upper(last_name) = upper('#{last_name}') " +
+         "#{operator} upper(first_name) = upper('#{first_name}') ORDER BY #{order()}"
+      else
+#        returning [] do |result|
+#          result << "SELECT id AS search_result_id, #{similarity} as rank FROM people " 
+#          result << "WHERE soundex(last_name) = soundex('#{last_name}') "
+#          result << "#{operator} "
+#          result << "soundex(first_name) = soundex('#{first_name}') "
+#          result << "ORDER BY #{order()} "
+#        end.join("\n")
+        
+        returning [] do |result|
+          result << "SELECT id AS search_result_id, "
+          result << similarity + "as rank "
+          result << "FROM people WHERE (first_name % '#{first_name}' OR last_name % '#{last_name}') AND "
+          result << similarity + " > 0.3 "
+          result << "ORDER BY #{order()} "
+        end.join("\n")
       end
     end
-
-    def rank_field_defn(terms)
-      returning [] do |parts|
-        parts << "summed_rank"
-        parts << "similarity(COALESCE(last_name, ''), #{terms})"
-        parts << "similarity(COALESCE(first_name, ''), #{terms})"
-        parts << soundex_calc(terms)
-      end.join(' + ')
-    end
-
-    def soundex_calc(terms)
-      calcs = returning([]) do |calc|
-        calc << "CASE WHEN soundex(#{terms}) = soundex(first_name) THEN 1 ELSE 0 END"
-        calc << "CASE WHEN soundex(#{terms}) = soundex(last_name) THEN 1 ELSE 0 END"
-        calc << "CASE WHEN metaphone(#{terms}, 10) = metaphone(first_name, 10) THEN 1 ELSE 0 END"
-        calc << "CASE WHEN metaphone(#{terms}, 10) = metaphone(last_name, 10) THEN 1 ELSE 0 END"
-      end.join(" + \n\t\t")
-      "(\n\t\t#{calcs}\n\t) / 4"
-    end
-
-    def text_search_results_query(terms)
-      returning [] do |parts|
-        parts << "SELECT"
-        parts << text_search_fields
-        parts << "FROM ("
-        parts << tsquery_sub_queries(terms)
-        parts << ") a"
-        parts << "GROUP BY id, first_name, last_name"
-      end.join("\n")
-    end
-
-    def text_search_fields
-      "id, last_name, first_name, SUM(rank) AS summed_rank"
-    end
-
-    def tsquery_sub_queries(terms)
-      returning [] do |subs|
-        subs << full_name_trgrm_query(terms)
-        subs << first_name_trgrm_query(terms)
-        subs << last_name_trgrm_query(terms)
-        subs << full_name_simple_tsvector_query(terms)
-      end.join("\nUNION\n")
-    end
-
-    def full_name_trgrm_query(terms)
-      trgrm_query(terms, "get_full_name(first_name, last_name)")
-    end
-
-    def first_name_trgrm_query(terms)
-      trgrm_query(terms, "first_name")
-    end
-
-    def last_name_trgrm_query(terms)
-      trgrm_query(terms, "last_name")
-    end
-
-    def trgrm_query(terms, name)
-      %Q[
-         SELECT id, first_name, last_name,
-            ts_rank(get_trigram_tsvector(#{name}),
-                to_tsquery('simple_no_stop'::regconfig, array_to_string(show_trgm(lower(#{terms})), '|'::text))) AS rank
-         FROM people
-         WHERE
-             get_trigram_tsvector(#{name}) @@
-             to_tsquery('simple_no_stop'::regconfig, array_to_string(show_trgm(lower(#{terms})), '|'::text))
-      ]
-    end
-
-    def full_name_simple_tsvector_query(terms)
-      %Q[
-         SELECT id, first_name, last_name,
-             ts_rank(
-                 to_tsvector('simple_no_stop'::regconfig, get_full_name(first_name, last_name)),
-                 to_tsquery('simple_no_stop'::regconfig, array_to_string(regexp_split_to_array(#{terms}, E'\\\\s+'), '|'))
-              )
-         FROM people
-             WHERE
-             to_tsvector(get_full_name(first_name, last_name)) @@
-             to_tsquery('simple_no_stop'::regconfig, array_to_string(regexp_split_to_array(#{terms}, E'\\\\s+'), '|'))
-      ]
-    end
-
+#          if(terms.count > 1)
+#            join = "INNER JOIN (" +
+#              "SELECT id AS search_result_id, (similarity(first_name, '#{first_name}') + similarity(last_name, '#{last_name}')) as rank " + 
+#              "FROM people WHERE (first_name % '#{first_name}' OR last_name % '#{last_name}') AND " + 
+#              "similarity(first_name, '#{first_name}')+similarity(last_name, '#{last_name}') > 0.3 LIMIT #{max_results}) "
+#          else
+#            join = "INNER JOIN (" +
+#              "SELECT id AS search_result_id, GREATEST(similarity(first_name, '#{name}'), similarity(last_name, '#{name}')) as rank " + 
+#              "FROM people WHERE (first_name % '#{name}' OR last_name % '#{name}') AND " + 
+#              "GREATEST(first_name, '#{name}'), similarity(last_name, '#{name}') > 0.3 LIMIT #{max_results}) "
+#          end    
   end
 end
