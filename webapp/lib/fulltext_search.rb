@@ -54,7 +54,6 @@ module FulltextSearch
         last_name = names[names.count-1].upcase
         operator = 'AND'
         similarity =  "(sqrt(similarity(first_name, '#{first_name}')) + sqrt(similarity(last_name, '#{last_name}')))/2 "
-        end
       end
       
       sql = "SELECT * FROM people WHERE upper(last_name) = '#{last_name}' " +
@@ -82,16 +81,5 @@ module FulltextSearch
         end.join("\n")
       end
     end
-#          if(terms.count > 1)
-#            join = "INNER JOIN (" +
-#              "SELECT id AS search_result_id, (similarity(first_name, '#{first_name}') + similarity(last_name, '#{last_name}')) as rank " + 
-#              "FROM people WHERE (first_name % '#{first_name}' OR last_name % '#{last_name}') AND " + 
-#              "similarity(first_name, '#{first_name}')+similarity(last_name, '#{last_name}') > 0.3 LIMIT #{max_results}) "
-#          else
-#            join = "INNER JOIN (" +
-#              "SELECT id AS search_result_id, GREATEST(similarity(first_name, '#{name}'), similarity(last_name, '#{name}')) as rank " + 
-#              "FROM people WHERE (first_name % '#{name}' OR last_name % '#{name}') AND " + 
-#              "GREATEST(first_name, '#{name}'), similarity(last_name, '#{name}') > 0.3 LIMIT #{max_results}) "
-#          end    
   end
 end
