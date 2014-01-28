@@ -105,30 +105,27 @@ module EventSearch
         fields << "places.short_name AS jurisdiction"
         fields << "disease_events.disease_onset_date AS onset_date"
         fields << "lab_results.collection_date AS collection_date"
-        fields << "search_results.rank AS rank" unless options[:fulltext_terms].blank?
+        fields << "#{search_rank(options)} AS rank" unless options[:fulltext_terms].blank?
       end.flatten.compact
     end
 
     def event_search_joins(options)
+      fulltext_options = fulltext(options)
+      
       returning [] do |joins|
         joins << "INNER JOIN participations interested_party ON interested_party.event_id = events.id AND (interested_party.type = 'InterestedParty' )"
         joins << "INNER JOIN entities ON entities.id = interested_party.primary_entity_id AND (entities.entity_type = 'PersonEntity' )"
-        joins << "INNER JOIN people ON people.entity_id = entities.id"
-        joins << fulltext_join(options)
+        joins << "INNER JOIN people ON people.entity_id = entities.id" + (fulltext_options.blank? ? "" : " AND " + fulltext_options)
         joins << "LEFT OUTER JOIN external_codes people_gender ON people_gender.id = people.birth_gender_id"
-        joins << "LEFT OUTER JOIN participations_risk_factors ON participations_risk_factors.participation_id = interested_party.id"
+        if(!pregnancy_conditions(options).blank?)
+          joins << "LEFT OUTER JOIN participations_risk_factors ON participations_risk_factors.participation_id = interested_party.id"
+        end
         joins << "LEFT OUTER JOIN telephones ON telephones.entity_id = entities.id"
         joins << "LEFT OUTER JOIN addresses ON addresses.event_id = events.id"
-        joins << "LEFT OUTER JOIN answers on answers.event_id = events.id"
-        joins << "LEFT OUTER JOIN questions on questions.id = answers.question_id AND questions.short_name = 'AKA'"
         joins << "LEFT OUTER JOIN external_codes counties_addresses ON counties_addresses.id = addresses.county_id"
         joins << "LEFT OUTER JOIN disease_events ON disease_events.event_id = events.id"
         joins << "LEFT OUTER JOIN diseases ON diseases.id = disease_events.disease_id"
         joins << "INNER JOIN participations jurisdictions_events ON jurisdictions_events.event_id = events.id AND (jurisdictions_events.type = 'Jurisdiction' )"
-        joins << "LEFT OUTER JOIN participations lab_events ON lab_events.id = " + 
-          "(SELECT id FROM participations WHERE participations.event_id = events.id AND (lab_events.type = 'Lab') ORDER BY updated_at DESC LIMIT 1)"
-        joins << "LEFT OUTER JOIN lab_results ON lab_results.id = " + 
-          "(SELECT id FROM lab_results where participation_id = lab_events.id ORDER BY collection_date DESC LIMIT 1)"
         joins << <<-JOIN
           INNER JOIN entities place_entities_participations ON place_entities_participations.id = jurisdictions_events.secondary_entity_id
             AND (place_entities_participations.entity_type = 'PlaceEntity' )
@@ -138,6 +135,17 @@ module EventSearch
           LEFT OUTER JOIN participations associated_jurisdictions_events ON associated_jurisdictions_events.event_id = events.id
             AND (associated_jurisdictions_events.type = 'AssociatedJurisdiction' )
         JOIN
+        joins << <<-JOIN
+          LEFT OUTER JOIN lab_results on lab_results.id = (SELECT lab_results.id FROM lab_results 
+            INNER JOIN participations ON participations.event_id = events.id AND participations.type = 'Lab' AND lab_results.participation_id = participations.id
+            ORDER BY lab_results.collection_date DESC LIMIT 1)
+        JOIN
+        if(!aka_conditions(options).blank?)
+          joins << <<-JOIN
+            LEFT OUTER JOIN answers ON events.id = (SELECT answers.event_id FROM answers
+              INNER JOIN questions ON questions.id = answers.question_id AND questions.short_name = 'AKA' LIMIT 1)
+          JOIN
+        end
       end.flatten.compact
     end
 

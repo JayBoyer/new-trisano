@@ -135,7 +135,7 @@ class Person < ActiveRecord::Base
     # Defaults to not showing deleted people. Override by providing the option:
     #   :show_deleted => true
     def find_all_for_filtered_view(options = {})
-      options[:fulltext_terms] ||= "#{options[:last_name]} #{options[:first_name]}".strip
+      options[:fulltext_terms] ||= "#{options[:first_name]} #{options[:last_name]}".strip
       options.delete(:fulltext_terms) if options[:fulltext_terms].blank? || options[:use_starts_with_search]
 
       row_count = Person.count_by_sql(construct_count_sql(options))
@@ -170,7 +170,6 @@ class Person < ActiveRecord::Base
       returning [] do |fields|
         unless options[:person_type].blank?
           fields << "DISTINCT(entities.id)"
-          fields << "search_results.rank AS rank" if include_fulltext?(options)
         end
         fields << "people.*"
         fields << "addresses.street_number"
@@ -180,6 +179,7 @@ class Person < ActiveRecord::Base
         fields << "addresses.state_id"
         fields << "addresses.postal_code"
         fields << "states.code_description AS state_name"
+        fields << search_rank(options) + " AS rank"
       end
     end
 
@@ -204,13 +204,13 @@ class Person < ActiveRecord::Base
         end
         joins << "LEFT JOIN addresses ON people.entity_id = addresses.entity_id AND addresses.event_id IS NULL"
         joins << "LEFT JOIN external_codes AS states ON addresses.state_id = states.id"
-        joins << fulltext_join(options) if include_fulltext?(options)
       end.compact
     end
 
     def people_search_conditions(options)
       returning [] do |conditions|
         conditions << name_conditions(options)
+        conditions << fulltext(options) if include_fulltext?(options)
         conditions << birth_date_conditions(options)
         conditions << type_conditions(options)
         conditions << deleted_conditions(options)

@@ -16,8 +16,8 @@ module Trisano
         end
 
         module ClassMethods
-          def name_and_bdate_select_with_translations
-            name_and_bdate_select_without_translations.map do |field|
+          def name_and_bdate_select_with_translations(options)
+            name_and_bdate_select_without_translations(options).map do |field|
               field.gsub(/external_codes/, 'translated_codes')
             end
           end

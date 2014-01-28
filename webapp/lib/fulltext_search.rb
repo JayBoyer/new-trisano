@@ -21,19 +21,23 @@ module FulltextSearch
   end
 
   module ClassMethods
-  
+
+  #TODO delete
     def fulltext_join(options)
       unless options[:fulltext_terms].blank?
-        max_results = options[:limit].blank? ? 100 : options[:limit].to_i
         <<-JOIN
-        INNER JOIN (\n#{fulltext(options[:fulltext_terms])}\n
-             LIMIT #{max_results}) search_results
-             ON (search_results.search_result_id = people.id AND
-                 search_results.rank > 0.3)
+        INNER JOIN 
+          (SELECT id AS search_result_id, 
+            #{similarity} + "as rank 
+            FROM people WHERE 
+              #{fulltext(options)} 
+            AND similarity + " > 0.3 
+          ) search_results
+          ON (search_results.search_result_id = people.id AND #{search_rank(options)} > 0.3)
         JOIN
       end
     end
-
+  
     def order()
       "rank DESC, last_name ASC, first_name ASC"
     end
@@ -44,41 +48,42 @@ module FulltextSearch
       end
     end
     
-    def fulltext(terms)
-      names = terms.split(/\s/)
-      first_name = names[0].upcase
-      last_name = names[0].upcase
-      operator = 'OR'
-      similarity =  "(GREATEST(similarity(first_name, '#{first_name}'), similarity(last_name, '#{last_name}'))) "
-      if(names.count > 1)
-        last_name = names[names.count-1].upcase
-        operator = 'AND'
-        similarity =  "(sqrt(similarity(first_name, '#{first_name}')) + sqrt(similarity(last_name, '#{last_name}')))/2 "
+    def search_rank(options)
+      similarity = "1.0"
+      unless options[:fulltext_terms].blank?
+        terms = options[:fulltext_terms]
+        names = terms.split(/\s/)
+        similarity =  "(GREATEST(similarity(first_name, '#{names[0]}'), similarity(last_name, '#{names[0]}'))) "
+        if(names.count > 1)
+          similarity =  "(sqrt(similarity(first_name, '#{names[0]}')) + sqrt(similarity(last_name, '#{names[1]}')))/2 "
+        end
       end
+      return similarity
+    end
+    
+    def fulltext(options)
+      unless options[:fulltext_terms].blank?
+        terms = options[:fulltext_terms]
+        names = terms.split(/\s/)
+        first_name = names[0].upcase
+        last_name = names[0].upcase
+        operator = 'OR'
+        similarity = search_rank(options)
+        if(names.count > 1)
+          last_name = names[names.count-1].upcase
+          operator = 'AND'
+        end
       
-      sql = "SELECT * FROM people WHERE upper(last_name) = '#{last_name}' " +
-        "#{operator} upper(first_name) = '#{first_name}' LIMIT 1"
+        sql = "SELECT * FROM people WHERE upper(last_name) = '#{last_name}' " +
+          "#{operator} upper(first_name) = '#{first_name}' LIMIT 1"
 
-      # if an exact match finds anything, do an exact match
-      if(Person.find_by_sql(sql).size > 0)
-        results = "SELECT id AS search_result_id, #{similarity} as rank FROM people WHERE upper(last_name) = upper('#{last_name}') " +
-         "#{operator} upper(first_name) = upper('#{first_name}') ORDER BY #{order()}"
-      else
-#        returning [] do |result|
-#          result << "SELECT id AS search_result_id, #{similarity} as rank FROM people " 
-#          result << "WHERE soundex(last_name) = soundex('#{last_name}') "
-#          result << "#{operator} "
-#          result << "soundex(first_name) = soundex('#{first_name}') "
-#          result << "ORDER BY #{order()} "
-#        end.join("\n")
-        
-        returning [] do |result|
-          result << "SELECT id AS search_result_id, "
-          result << similarity + "as rank "
-          result << "FROM people WHERE (first_name % '#{first_name}' OR last_name % '#{last_name}') AND "
-          result << similarity + " > 0.3 "
-          result << "ORDER BY #{order()} "
-        end.join("\n")
+        # if an exact match finds anything, do an exact match
+        if(Person.find_by_sql(sql).size > 0)
+          results = " (upper(last_name) = '#{last_name}' #{operator} upper(first_name) = '#{first_name}') "
+        else
+#          results = " (soundex(last_name) = '#{last_name}' #{operator} soundex(first_name) = '#{first_name}') "
+         results = " ((first_name % '#{first_name}' OR last_name % '#{last_name}')\n  AND #{similarity} > 0.3) "
+        end
       end
     end
   end

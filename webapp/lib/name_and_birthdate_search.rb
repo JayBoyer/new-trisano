@@ -49,7 +49,7 @@ module NameAndBirthdateSearch
 
   def create_name_and_bdate_sql(options)
     returning [] do |sql|
-      sql << select(name_and_bdate_select)
+      sql << select(name_and_bdate_select(options))
       sql << from(name_and_bdate_from(options))
       sql << name_and_bdate_joins(options).join("\n")
       sql << where(name_and_bdate_conditions(options))
@@ -57,7 +57,7 @@ module NameAndBirthdateSearch
     end.compact.join("\n")
   end
 
-  def name_and_bdate_select
+  def name_and_bdate_select(options)
     returning [] do |fields|
       fields << "people.entity_id"
       fields << "people.last_name"
@@ -75,6 +75,7 @@ module NameAndBirthdateSearch
       fields << "sec_juris.secondary_jurisdiction_entity_ids AS secondary_jurisdictions"
       fields << "events.deleted_at"
       fields << "people.middle_name"
+      fields << search_rank(options) + " AS rank"
     end
   end
 
@@ -83,8 +84,10 @@ module NameAndBirthdateSearch
       "people"
     else
       returning "" do |result|
-        result << "(\n#{fulltext(options[:fulltext_terms])}\n) search_results\n"
-        result << "INNER JOIN people ON search_result_id = people.id AND rank > 0.3"
+        result << "(SELECT id AS search_result_id FROM people WHERE "
+        result << "(" + fulltext(options) + ")) search_results \n"
+        result << "INNER JOIN people ON search_result_id = people.id AND "
+        result << search_rank(options) + " > 0.3"
       end
     end
   end
