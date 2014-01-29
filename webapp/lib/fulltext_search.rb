@@ -84,6 +84,13 @@ module FulltextSearch
         if(names.count > 1)
           last_name = names[names.count-1].upcase
           operator = 'AND'
+          
+          # We were expecting "first last", fix it if we got "last, first"
+          if(first_name.end_with?(","))
+            temp = first_name[0,first_name.size-1]
+            first_name = last_name
+            last_name = temp
+          end
         end
       
         date_conditions = birth_date_conditions(options)

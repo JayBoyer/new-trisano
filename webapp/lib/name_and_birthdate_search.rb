@@ -21,7 +21,7 @@ module NameAndBirthdateSearch
     options[:fulltext_terms] = options[:fulltext_terms].strip if options[:fulltext_terms]
     validate_bdate(options)
     unless options[:use_starts_with_search]
-      options[:fulltext_terms] ||= "#{options.delete(:last_name)} #{options.delete(:first_name)}".strip
+      options[:fulltext_terms] ||= "#{options.delete(:first_name)} #{options.delete(:last_name)}".strip
     end
     find_or_paginate_by_sql(create_name_and_bdate_sql(options), options)
   end
