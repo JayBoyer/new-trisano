@@ -22,22 +22,6 @@ module FulltextSearch
 
   module ClassMethods
 
-  #TODO delete
-    def fulltext_join(options)
-      unless options[:fulltext_terms].blank?
-        <<-JOIN
-        INNER JOIN 
-          (SELECT id AS search_result_id, 
-            #{similarity} + "as rank 
-            FROM people WHERE 
-              #{fulltext(options)} 
-            AND similarity + " > 0.3 
-          ) search_results
-          ON (search_results.search_result_id = people.id AND #{search_rank(options)} > 0.3)
-        JOIN
-      end
-    end
-  
     def order()
       "rank DESC, last_name ASC, first_name ASC"
     end
@@ -51,12 +35,40 @@ module FulltextSearch
     def search_rank(options)
       similarity = "1.0"
       unless options[:fulltext_terms].blank?
+        rank_date = search_rank_date(options)
+        rank_name = search_rank_name(options)
+        similarity = 
+          "(CASE\n" +
+          "  WHEN birth_date IS NULL THEN #{rank_name}\n" +
+          "  WHEN first_name IS NULL AND last_name IS NULL THEN #{rank_date}\n" +
+          "  ELSE (0.667*#{rank_name} + 0.333*#{rank_date})\n" +
+          "END)"
+      end
+      return similarity
+    end
+
+    def search_rank_name(options)
+      similarity = "1.0"
+      unless options[:fulltext_terms].blank?
         terms = options[:fulltext_terms]
         names = terms.split(/\s/)
         similarity =  "(GREATEST(similarity(first_name, '#{names[0]}'), similarity(last_name, '#{names[0]}'))) "
         if(names.count > 1)
-          similarity =  "(sqrt(similarity(first_name, '#{names[0]}')) + sqrt(similarity(last_name, '#{names[1]}')))/2 "
+          similarity =  "(sqrt(similarity(first_name, '#{names[0]}'))/2 + sqrt(similarity(last_name, '#{names[1]}'))/2) "
         end
+      end
+      return similarity
+    end
+    
+    def search_rank_date(options)
+      similarity = "1.0"
+      unless options[:birth_date].blank?
+        if (options[:birth_date].to_s.size == 4 && options[:birth_date].to_i != 0)
+          pattern = "YYYY"
+        else
+          pattern = "YYYY-MM-DD"
+        end
+        similarity = "similarity(to_char(birth_date, '#{pattern}'), '" + options[:birth_date].to_s + "')"
       end
       return similarity
     end
@@ -68,23 +80,41 @@ module FulltextSearch
         first_name = names[0].upcase
         last_name = names[0].upcase
         operator = 'OR'
-        similarity = search_rank(options)
+        similarity = search_rank_name(options)
         if(names.count > 1)
           last_name = names[names.count-1].upcase
           operator = 'AND'
         end
       
-        sql = "SELECT * FROM people WHERE upper(last_name) = '#{last_name}' " +
-          "#{operator} upper(first_name) = '#{first_name}' LIMIT 1"
+        date_conditions = birth_date_conditions(options)
+      
+        sql = "SELECT * FROM people WHERE (upper(last_name) = '#{last_name}' " +
+          "#{operator} upper(first_name) = '#{first_name}') " + 
+          (date_conditions.blank?  ? "" : "AND " + date_conditions ) + 
+          " LIMIT 1"
 
         # if an exact match finds anything, do an exact match
-        if(Person.find_by_sql(sql).size > 0)
-          results = " (upper(last_name) = '#{last_name}' #{operator} upper(first_name) = '#{first_name}') "
+        if(!options.has_key?(:fuzzy_only) && Person.find_by_sql(sql).size > 0)
+          results = " ((upper(last_name) = '#{last_name}' #{operator} upper(first_name) = '#{first_name}') " +
+            (date_conditions.blank? ? ")" : "AND " + date_conditions + ")" )
         else
-#          results = " (soundex(last_name) = '#{last_name}' #{operator} soundex(first_name) = '#{first_name}') "
-         results = " ((first_name % '#{first_name}' OR last_name % '#{last_name}')\n  AND #{similarity} > 0.3) "
+#         commented out a soundex search, it is very similar speed but search results are not as good
+#         results = " (soundex(last_name) = soundex('#{last_name}') #{operator} soundex(first_name) = soundex('#{first_name}')) " +
+         results = " (((first_name % '#{first_name}' OR last_name % '#{last_name}')\n  AND #{similarity} > 0.3) " +
+            (date_conditions.blank? ? ")" : "OR " + date_conditions + ")" )
         end
       end
     end
+    
+    def birth_date_conditions(options)
+      unless options[:birth_date].blank?
+        if (options[:birth_date].to_s.size == 4 && options[:birth_date].to_i != 0)
+          conditions = "(EXTRACT(YEAR FROM birth_date) = " + options[:birth_date].to_s + ")"
+        else
+          conditions = "(birth_date = '" + options[:birth_date].to_scd  + "')"
+        end
+      end
+    end
+
   end
 end

@@ -177,7 +177,6 @@ module EventSearch
         where << county_conditions(options)
         where << jurisdiction_conditions(options)
         where << sensitive_disease_conditions(options)
-        where << birth_date_conditions(options)
         where << entered_on_conditions(options)
         where << first_reported_conditions(options)
         where << pregnancy_conditions(options)
@@ -274,17 +273,6 @@ module EventSearch
          OR associated_jurisdictions_events.secondary_entity_id IN (?))
       SQL
       sanitize_sql_for_conditions(conditions)
-    end
-
-    def birth_date_conditions(options)
-      unless options[:birth_date].blank?
-        if (options[:birth_date].size == 4 && options[:birth_date].to_i != 0)
-          conditions = ["EXTRACT(YEAR FROM birth_date) = ?", options[:birth_date]]
-        else
-          conditions = ["birth_date = ?", options[:birth_date]]
-        end
-        sanitize_sql_for_conditions(conditions)
-      end
     end
 
     def entered_on_conditions(options)

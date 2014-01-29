@@ -50,7 +50,6 @@ class Person < ActiveRecord::Base
     :conditions => "participations.type = 'Reporter'",
     :order => 'last_name, first_name'
 
-
   def xml_fields
     [:birth_date,
      :first_name,
@@ -211,7 +210,6 @@ class Person < ActiveRecord::Base
       returning [] do |conditions|
         conditions << name_conditions(options)
         conditions << fulltext(options) if include_fulltext?(options)
-        conditions << birth_date_conditions(options)
         conditions << type_conditions(options)
         conditions << deleted_conditions(options)
         conditions << excluding_conditions(options)
@@ -244,12 +242,6 @@ class Person < ActiveRecord::Base
           sw << ["first_name ILIKE ?", options[:first_name].strip + '%']   unless options[:first_name].blank?
           sw << ["middle_name ILIKE ?", options[:middle_name].strip + '%'] unless options[:middle_name].blank?
         end.map{|sw| sanitize_sql_for_conditions(sw)}.join("\nAND\n")
-      end
-    end
-
-    def birth_date_conditions(options)
-      unless options[:birth_date].blank?
-        sanitize_sql_for_conditions(["(birth_date IS NULL OR birth_date = ?)",options[:birth_date]])
       end
     end
 

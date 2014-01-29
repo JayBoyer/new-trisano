@@ -83,11 +83,12 @@ module NameAndBirthdateSearch
     if options[:fulltext_terms].blank?
       "people"
     else
+      options[:fuzzy_only] = "";
       returning "" do |result|
         result << "(SELECT id AS search_result_id FROM people WHERE "
         result << "(" + fulltext(options) + ")) search_results \n"
         result << "INNER JOIN people ON search_result_id = people.id AND "
-        result << search_rank(options) + " > 0.3"
+        result << search_rank_name(options) + " > 0.3"
       end
     end
   end
@@ -156,18 +157,7 @@ module NameAndBirthdateSearch
       conditions << "pplentities.deleted_at IS NULL"
       conditions << interested_party_filter_conditions
       conditions << name_conditions(options, :last_name, :first_name, :use_starts_with_search)
-      conditions << bdate_conditions(options)
     end.compact
-  end
-
-  def bdate_conditions(options)
-    return if options[:birth_date].blank?
-    if options.any? {|k,v| k != :birth_date && !v.blank?}
-      sql = "(birth_date = ? OR birth_date IS NULL)"
-    else
-      sql = "birth_date = ?"
-    end
-    sanitize_sql_for_conditions([sql, options[:birth_date]])
   end
 
   def sensitive_disease_conditions
