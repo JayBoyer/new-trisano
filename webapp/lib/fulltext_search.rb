@@ -111,7 +111,7 @@ module FulltextSearch
         if (options[:birth_date].to_s.size == 4 && options[:birth_date].to_i != 0)
           conditions = "(EXTRACT(YEAR FROM birth_date) = " + options[:birth_date].to_s + ")"
         else
-          conditions = "(birth_date = '" + options[:birth_date].to_scd  + "')"
+          conditions = "(birth_date = '" + options[:birth_date].to_s  + "')"
         end
       end
     end
