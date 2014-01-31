@@ -117,14 +117,14 @@ Feature: Searching for Events using core fields for criteria.
 
   Scenario: Searching for an event w/ fulltext
     Given a simple morbidity event in jurisdiction Unassigned for last name Jones
-      And a simple morbidity event in jurisdiction Unassigned for last name Joans
+      And a simple morbidity event in jurisdiction Unassigned for last name Jonas
       And another morbidity event
       And I am logged in as a super user
      When I search for events with the following criteria:
-       | name  |
-       | Jones |
+       | name |
+       | Jone |
      Then I should see "Jones"
-      And I should see "Joans"
+      And I should see "Jonas"
       And I should not see "There was a problem with your search criteria"
 
   Scenario: Searching for an events should limit results to configured max

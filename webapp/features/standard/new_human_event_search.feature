@@ -26,13 +26,13 @@ Feature: Searching for existing people or events before adding a CMR or AE
      Then I should see a morbidity event search form
       And I should not see a link to enter a new CMR
 
-  Scenario: Searching for a person uses soundex
+  Scenario: Searching for a person uses TriGram
     Given a simple morbidity event for last name Jones
-      And a simple morbidity event for last name Joans
+      And a simple morbidity event for last name Jonas
       And I am logged in as a super user
-     When I search for morbidity events with last_name = "Jones"
-     Then I should see results for Jones and Joans
-      And the search field should contain Jones
+     When I search for morbidity events with last_name = "Jone"
+     Then I should see results for Jones and Jonas
+      And the search field should contain Jone
 
   Scenario: Searches include contact, morbidity and assessment events
     Given a simple morbidity event for last name Jones
@@ -72,8 +72,8 @@ Feature: Searching for existing people or events before adding a CMR or AE
      When I search for morbidity events with last_name = "Jones"
      Then I should see the following results:
       |last_name|first_name|
-      |Jones    |Mick      |
       |Jones    |David     |
+      |Jones    |Mick      |
       |Jones    |Steve     |
 
      When I search for morbidity events with last_name "Jones" and first_name = "David"

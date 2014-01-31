@@ -33,14 +33,14 @@ module FulltextSearch
     end
     
     def search_rank(options)
-      similarity = "1.0"
+      similarity = "0.01"
       unless options[:fulltext_terms].blank?
-        rank_date = search_rank_date(options)
+        rank_date = (options[:birth_date].blank?) ? "1.0" : search_rank_date(options)
         rank_name = search_rank_name(options)
         similarity = 
           "(CASE\n" +
           "  WHEN birth_date IS NULL THEN #{rank_name}\n" +
-          "  WHEN first_name IS NULL AND last_name IS NULL THEN #{rank_date}\n" +
+          "  WHEN first_name IS NULL AND last_name IS NULL THEN #{search_rank_date(options)}\n" +
           "  ELSE (0.667*#{rank_name} + 0.333*#{rank_date})\n" +
           "END)"
       end
@@ -48,20 +48,29 @@ module FulltextSearch
     end
 
     def search_rank_name(options)
-      similarity = "1.0"
+      similarity = "0.01"
       unless options[:fulltext_terms].blank?
-        terms = options[:fulltext_terms]
-        names = terms.split(/\s/)
-        similarity =  "(GREATEST(similarity(first_name, '#{names[0]}'), similarity(last_name, '#{names[0]}'))) "
-        if(names.count > 1)
-          similarity =  "(sqrt(similarity(first_name, '#{names[0]}'))/2 + sqrt(similarity(last_name, '#{names[1]}'))/2) "
+        names = full_name(options)
+        similarity = 
+          "\n    (CASE\n" +
+          "    WHEN first_name IS NULL AND last_name IS NULL THEN (0.01)\n" +
+          "    WHEN last_name IS NULL THEN (similarity(first_name, '#{names[0]}'))\n"
+        if(names.count < 2)
+          similarity +=  
+            "    WHEN first_name IS NULL THEN (similarity(last_name, '#{names[0]}'))\n" +
+            "    ELSE (GREATEST(similarity(first_name, '#{names[0]}'), similarity(last_name, '#{names[0]}')))\n"
+        else
+          similarity +=  
+            "    WHEN first_name IS NULL THEN (similarity(last_name, '#{names[1]}'))\n" +
+            "    ELSE (sqrt(similarity(first_name, '#{names[0]}'))/2 + sqrt(similarity(last_name, '#{names[1]}'))/2)\n"
         end
+        similarity += "  END)"
       end
       return similarity
     end
     
     def search_rank_date(options)
-      similarity = "1.0"
+      similarity = "0.01"
       unless options[:birth_date].blank?
         if (options[:birth_date].to_s.size == 4 && options[:birth_date].to_i != 0)
           pattern = "YYYY"
@@ -75,24 +84,16 @@ module FulltextSearch
     
     def fulltext(options)
       unless options[:fulltext_terms].blank?
-        terms = options[:fulltext_terms]
-        names = terms.split(/\s/)
-        first_name = names[0].upcase
-        last_name = names[0].upcase
+        names = full_name(options)
+        first_name = names[0]
+        last_name = names[0]
         operator = 'OR'
         similarity = search_rank_name(options)
         if(names.count > 1)
-          last_name = names[names.count-1].upcase
+          last_name = names[1]
           operator = 'AND'
-          
-          # We were expecting "first last", fix it if we got "last, first"
-          if(first_name.end_with?(","))
-            temp = first_name[0,first_name.size-1]
-            first_name = last_name
-            last_name = temp
-          end
         end
-      
+###p first_name + " " + last_name
         date_conditions = birth_date_conditions(options)
       
         sql = "SELECT * FROM people WHERE (upper(last_name) = '#{last_name}' " +
@@ -120,6 +121,25 @@ module FulltextSearch
         else
           conditions = "(birth_date = '" + options[:birth_date].to_s  + "')"
         end
+      end
+    end
+    
+    # turn a string of the form "first" or "last, first" or "first last"
+    # into an array ["first"] or ["first", "last"]
+    def full_name(options)
+      unless options[:fulltext_terms].blank?
+        terms = options[:fulltext_terms].upcase
+        if(terms.include?(","))
+          names = terms.split(",")
+          if(names.count > 1)
+            temp = names[0]
+            names[0] = names[1]
+            names[1] = temp
+          end
+        else
+          names = terms.split(/\s/)
+        end
+        return names
       end
     end
 

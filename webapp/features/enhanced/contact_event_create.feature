@@ -74,5 +74,5 @@ Feature: Creating new contact events
     When I am on the contact event edit page
     And I click the "Create new contact event" link and wait to see "Contact search"
     And I fill in "contact_search_name" with "Bad search!!!!"
-    And I press "Search" and wait to see "Invalid search criteria"
-    Then I should see "Invalid search criteria"
+    And I press "Search" and wait to see "No results"
+    Then I should see "No results"

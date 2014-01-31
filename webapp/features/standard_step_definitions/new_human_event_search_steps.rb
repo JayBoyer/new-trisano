@@ -160,10 +160,10 @@ Then /^I should not see a link to enter a new CMR$/ do
   response.should_not have_selector("a[href='#{new_cmr_path}']")
 end
 
-Then /^I should see results for Jones and Joans$/ do
+Then /^I should see results for Jones and Jonas$/ do
   response.should have_selector("table.list") do |table|
     table.should contain("Jones")
-    table.should contain("Joans")
+    table.should contain("Jonas")
   end
 end
 
@@ -171,8 +171,8 @@ Then /^I should see no results$/ do
   response.should contain("No results")
 end
 
-Then /^the search field should contain Jones$/ do
-  field_labeled("Last name").value.should == "Jones"
+Then /^the search field should contain Jone$/ do
+  field_labeled("Last name").value.should == "Jone"
 end
 
 Then /^I should see results for morbidity and contact event records$/ do
@@ -275,6 +275,7 @@ Then /^I should be in edit mode for a new copy of (.+)$/ do |last_name|
 end
 
 Then /^I should see the following results:$/ do |results|
+
   results.rows.each_with_index do |result, i|
     response.should have_selector("table > tr:nth-child(#{i+2}) > td:nth-child(1)") { |td|
       td.inner_text.should =~ /#{result[0]}, #{result[1]}/

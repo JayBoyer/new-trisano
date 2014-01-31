@@ -6,7 +6,7 @@
 # terms of the GNU Affero General Public License as published by the
 # Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
-#
+#script/
 # TriSano is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -43,32 +43,32 @@ describe "searching" do
     describe "with actual events" do
       before do
         @james = searchable_event!(:morbidity_event, "James")
-        @jaime = searchable_event!(:morbidity_event, "Jaime")
+        @jamie = searchable_event!(:morbidity_event, "Jamie")
       end
 
-      it "searching for 'james' should return 'James' first" do
+      it "searching for 'james' should return 'James' only" do
         result = Event.find_by_criteria(:fulltext_terms => 'james')
-        result.map(&:last_name).should == ["James", "Jaime"]
+        result.map(&:last_name).should == ["James"]
       end
 
       it "searching for 'jame' should return 'James' first" do
         result = Event.find_by_criteria(:fulltext_terms => 'jame')
-        result.map(&:last_name).should == ["James", "Jaime"]
+        result.map(&:last_name).should == ["James", "Jamie"]
       end
 
       it "searching for 'jam' should return 'James' first" do
         result = Event.find_by_criteria(:fulltext_terms => 'jam')
-        result.map(&:last_name).should == ["James", "Jaime"]
+        result.map(&:last_name).should == ["James", "Jamie"]
       end
 
-      it "searching for 'jaime' should return 'Jaime' first" do
-        result = Event.find_by_criteria(:fulltext_terms => 'jaime')
-        result.map(&:last_name).should == ['Jaime', 'James']
+      it "searching for 'jami' should return 'Jamie' first" do
+        result = Event.find_by_criteria(:fulltext_terms => 'jami')
+        result.map(&:last_name).should == ['Jamie', 'James']
       end
 
-      it "searching for 'jaime ' with a trailing space should not cause an error" do
-        result = Event.find_by_criteria(:fulltext_terms => 'jaime ')
-        result.map(&:last_name).should == ['Jaime', 'James']
+      it "searching for 'jami ' with a trailing space should not cause an error" do
+        result = Event.find_by_criteria(:fulltext_terms => 'jami ')
+        result.map(&:last_name).should == ['Jamie', 'James']
       end
     end
   end
@@ -86,17 +86,17 @@ describe "searching" do
     describe "with people in the db" do
       before do
         @james = searchable_person!('James')
-        @jaime = searchable_person!('Jaime')
+        @jamie = searchable_person!('Jamie')
       end
 
       it "should return 'James' first" do
-        result = Person.find_all_for_filtered_view(:last_name => 'james')
-        result.map(&:last_name).should == ["James", "Jaime"]
+        result = Person.find_all_for_filtered_view(:last_name => 'jame')
+        result.map(&:last_name).should == ["James", "Jamie"]
       end
 
       it "using 'jame' should return 'James' first" do
         result = Person.find_all_for_filtered_view(:last_name => 'jame')
-        result.map(&:last_name).should == ['James', 'Jaime']
+        result.map(&:last_name).should == ['James', 'Jamie']
       end
     end
 
@@ -121,27 +121,27 @@ describe "searching" do
     describe "with events in the db" do
       before do
         @james = searchable_event!(:morbidity_event, 'James')
-        @jaime = searchable_event!(:morbidity_event, 'Jaime')
+        @jamie = searchable_event!(:morbidity_event, 'Jamie')
       end
 
       it "should return 'James'" do
         result = HumanEvent.find_by_name_and_bdate(:last_name => 'james')
-        result.collect(&:last_name).should == ['James', 'Jaime']
+        result.collect(&:last_name).should == ['James', 'Jamie']
       end
 
       it "using 'jame' should return 'James' first" do
         result = HumanEvent.find_by_name_and_bdate(:last_name => 'jame')
-        result.collect(&:last_name).should == ['James', 'Jaime']
+        result.collect(&:last_name).should == ['James', 'Jamie']
       end
 
       it "should return 'James' using fulltext search" do
         result = HumanEvent.find_by_name_and_bdate(:fulltext_terms => 'james')
-        result.collect(&:last_name).should == ['James', 'Jaime']
+        result.collect(&:last_name).should == ['James', 'Jamie']
       end
 
       it "should return 'James' using fulltext search with trailing whitespace" do
         result = HumanEvent.find_by_name_and_bdate(:fulltext_terms => 'james ')
-        result.collect(&:last_name).should == ['James', 'Jaime']
+        result.collect(&:last_name).should == ['James', 'Jamie']
       end
 
     end
