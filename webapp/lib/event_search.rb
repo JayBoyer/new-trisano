@@ -285,7 +285,7 @@ module EventSearch
 
     def record_number_conditions(options)
       unless options[:record_number].blank?
-        sanitize_sql_for_conditions(['events.record_number = ?', options[:record_number]])
+        sanitize_sql_for_conditions(['events.record_number = ?', options[:record_number].strip()])
       end
     end
 
