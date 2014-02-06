@@ -26,7 +26,7 @@ class Attachment < ActiveRecord::Base
         [I18n.t('attachment_types.death-certificate'), "death-certificate"],
         [I18n.t('attachment_types.edn-notification'), "edn-notification"],
         [I18n.t('attachment_types.edn-followup'), "edn-followup"],
-        [I18n.t('attachment_types.evca'), "eVCA"],
+        [I18n.t('attachment_types.evca'), "evca"],
         [I18n.t('attachment_types.igra-report'), "igra-report"],
         [I18n.t('attachment_types.ijr'), "ijr"],
         [I18n.t('attachment_types.lab'), "lab"],

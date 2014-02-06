@@ -143,7 +143,9 @@ class Place < ActiveRecord::Base
     end
 
     def diagnostic_type_codes
-      %w(H L C O S CF PUB OOS)
+	#%w(H L C O S CF PUB OOS)
+	#Lei Comments Add place type for std program
+      %w(H L C O S CF PUB OOS 01 02 03 04 06 07 10 13 14 15 16 18 66 77 99)
     end
 
     def epi_type_codes

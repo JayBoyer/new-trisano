@@ -821,7 +821,8 @@
 - code_name: "placetype"
   the_code: "O"
   code_description: "Other"
-  sort_order: 75
+#  sort_order: 75
+  sort_order: 98
 
 - code_name: "placetype"
   the_code: "S"
@@ -877,6 +878,83 @@
   the_code: 'OOS'
   code_description: 'Out-of-state Public Health Agency'
   sort_order: 73
+
+# New place type for std program
+- code_name: 'placetype'
+  the_code: '01'
+  code_description: 'HIV Counseling/Testing Site'
+  sort_order: 74  
+
+- code_name: 'placetype'
+  the_code: '02'
+  code_description: 'STD Clinic'
+  sort_order: 75
+
+- code_name: 'placetype'
+  the_code: '03'
+  code_description: 'Drug Treatment'
+  sort_order: 76
+
+- code_name: 'placetype'
+  the_code: '04'
+  code_description: 'Family Planning'
+  sort_order: 77
+
+- code_name: 'placetype'
+  the_code: '06'
+  code_description: 'TB Clinic'
+  sort_order: 78
+
+- code_name: 'placetype'
+  the_code: '07'
+  code_description: 'Other HD Clinic'
+  sort_order: 79
+
+- code_name: 'placetype'
+  the_code: '10'
+  code_description: 'Hospital (ER)'
+  sort_order: 4 
+
+- code_name: 'placetype'
+  the_code: '13'
+  code_description: 'Blood Bank'
+  sort_order: 80 
+
+- code_name: 'placetype'
+  the_code: '14'
+  code_description: 'Labor and Delivery'
+  sort_order: 81
+
+- code_name: 'placetype'
+  the_code: '15'
+  code_description: 'Prenatal'
+  sort_order: 82
+
+- code_name: 'placetype'
+  the_code: '16'
+  code_description: 'Job Corps'
+  sort_order: 83
+
+- code_name: 'placetype'
+  the_code: '18'
+  code_description: 'Mental Health Services'
+  sort_order: 84
+
+- code_name: 'placetype'
+  the_code: '66'
+  code_description: 'Indian Health Services'
+  sort_order: 86
+
+- code_name: 'placetype'
+  the_code: '77'
+  code_description: 'Military'
+  sort_order: 87
+
+- code_name: 'placetype'
+  the_code: '99'
+  code_description: 'Unknown'
+  sort_order: 99
+
 
   ### PARTICIPATION RELATIONSHIPS ###
   
