@@ -37,7 +37,8 @@ set :processing_id, "P^"
 set :auth_login_timeout, 90
 set :password_reset_timeout, 60 * 24 * 3
 set :default_admin_uid, 'trisano_admin'
-set :user_switching, false
+set :user_switching, true
+set :auth_src_header, 'TRISANO_UID'
 
 ## Telephone configuration
 set :phone_number, '^(\d{3})-?(\d{4})$'
