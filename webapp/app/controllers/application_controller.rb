@@ -233,7 +233,7 @@ class ApplicationController < ActionController::Base
   private
 
   def user_from_env(auth_src_env)
-    if RAILS_ENV == "development" || RAILS_ENV == "test" || RAILS_ENV == "uattest" || RAILS_ENV == "feature"
+    if RAILS_ENV == "development" || RAILS_ENV == "test" || RAILS_ENV == "uattest" || RAILS_ENV == "feature" || RAILS_ENV == "demo"
       ENV[auth_src_env].blank? ? 'default' : ENV[auth_src_env]
     else
       ENV[auth_src_env]
