@@ -93,7 +93,7 @@ module FulltextSearch
           last_name = names[1]
           operator = 'AND'
         end
-###p first_name + " " + last_name
+
         date_conditions = birth_date_conditions(options)
       
         sql = "SELECT * FROM people WHERE (upper(last_name) = '#{last_name}' " +
@@ -129,6 +129,10 @@ module FulltextSearch
     def full_name(options)
       unless options[:fulltext_terms].blank?
         terms = options[:fulltext_terms].upcase
+        
+        # escape 's in names such as O'neill 
+        terms = terms.gsub("'", "''")
+        
         if(terms.include?(","))
           names = terms.split(",")
           if(names.count > 1)
