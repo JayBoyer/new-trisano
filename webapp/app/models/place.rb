@@ -50,7 +50,7 @@ class Place < ActiveRecord::Base
 
   named_scope :diagnostic_facilities, lambda { |name|
     { :conditions => ["places.name ILIKE ? AND codes.code_name = 'placetype' AND codes.the_code IN (?) AND entities.deleted_at IS NULL", name + '%', Place.diagnostic_type_codes],
-      :include => [:place_types, :entity],
+      :joins => [:place_types, :entity],
       :order => 'LOWER(TRIM(places.name)) ASC'
     }
   }
@@ -93,7 +93,8 @@ class Place < ActiveRecord::Base
 
     def all_by_name_and_types(name, type_codes, short_name=false)
       type_codes = [ type_codes ] unless type_codes.is_a?(Array)
-      self.all(:include => [:place_types, :entity],
+      self.all(
+        :joins => [:place_types, :entity],
         :conditions => [ "LOWER(places.#{short_name ? 'short_name' : 'name'}) = ? AND codes.the_code IN (?) AND codes.code_name = 'placetype' AND entities.deleted_at IS NULL", name.downcase, type_codes ],
         :order => "LOWER(TRIM(name))")
     end
@@ -189,7 +190,7 @@ class Place < ActiveRecord::Base
         )
       else
         self.all(
-          :include => [:place_types, :entity],
+          :joins => [:place_types, :entity],
           :conditions => "codes.the_code = '#{code}' AND codes.code_name = 'placetype' AND entities.deleted_at IS NULL",
           :order => 'name, places.id'
         )
