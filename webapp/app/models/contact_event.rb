@@ -32,7 +32,8 @@ class ContactEvent < HumanEvent
       :note_text => '"#{I18n.translate(\'workflow.event_created_for_jurisdiction\', :locale => I18n.default_locale)} #{self.jurisdiction.name}."'} do
       promote_to_morbidity_event
       assign_to_lhd
-    end
+      assign_to_investigator
+    end    
     state :new, :meta => {:note_text => '"#{I18n.translate(\'workflow.event_created_for_jurisdiction\', :locale => I18n.default_locale)} #{self.jurisdiction.name}."'} do
       assign_to_lhd
     end
