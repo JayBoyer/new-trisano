@@ -45,3 +45,17 @@ prep-clean.sh
 kdhe-prod-deploy.sh
 *.swn
 *.swm
+webapp/app/pdfs/rvct_687.fdf
+webapp/app/pdfs/rvct_687.pdf
+webapp/config/ldap.yml
+webapp/config/site_config.yml
+webapp/config/database.yml
+.idea
+.project
+webapp/.rvmrc
+webapp/config/deploy
+webapp/~temp
+webapp/log
+webapp/public/javascripts/ext
+webapp/vendor/trisano
+
