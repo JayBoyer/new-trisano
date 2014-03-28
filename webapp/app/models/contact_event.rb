@@ -30,7 +30,7 @@ class ContactEvent < HumanEvent
   workflow do
     state :not_routed, :meta => {:description => I18n.translate('workflow.not_participating_in_workflow'),
       :note_text => '"#{I18n.translate(\'workflow.event_created_for_jurisdiction\', :locale => I18n.default_locale)} #{self.jurisdiction.name}."'} do
-      promote_to_morbidity_event
+      promote_event
       assign_to_lhd
       assign_to_investigator
     end    
@@ -71,8 +71,8 @@ class ContactEvent < HumanEvent
       #   undo_workflow_side_effects
       # end
       assign_to_lhd
+      complete_investigation :complete
       investigate :accept
-      reject_by_investigator :reject
       assign_to_queue
       assign_to_investigator
     end

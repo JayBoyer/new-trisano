@@ -76,8 +76,8 @@ class MorbidityEvent < HumanEvent
       #   undo_workflow_side_effects
       # end
       assign_to_lhd
+      complete_investigation :complete
       investigate :accept
-      reject_by_investigator :reject
       assign_to_queue
       assign_to_investigator
     end

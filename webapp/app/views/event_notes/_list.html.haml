@@ -18,7 +18,7 @@
   %table.list
     %tr
       %th.forminformation
-        = h(note.user.best_name)
+        = h(note.user.nil? ? 'unknown' : note.user.best_name)
       %th
     %tr.roll
       %td.forminformation

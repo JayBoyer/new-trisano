@@ -47,13 +47,9 @@ module Routing
       event :reset_to_new, :transitions_to => :new, :meta => {:priv_required => :route_event_to_any_lhd}
     end
 
-    def promote_to_morbidity_event
-      event :promote_as_new, :transitions_to => :new, :meta => {:priv_required => :create_event} do
-        add_note I18n.translate("system_notes.event_promoted_from_to", :locale => I18n.default_locale, :from => self.type.humanize.downcase, :to => "morbidity event")
-      end
-      event :promote_as_accepted, :transitions_to => :accepted_by_lhd, :meta => {:priv_required => :create_event} do
-        add_note I18n.translate("system_notes.event_promoted_from_to", :locale => I18n.default_locale, :from => self.type.humanize.downcase, :to => "morbidity event")
-      end
+    def promote_event
+      event :promote_as_new, :transitions_to => :new, :meta => {:priv_required => :create_event}
+      event :promote_as_accepted, :transitions_to => :accepted_by_lhd, :meta => {:priv_required => :create_event}
     end
 
     def accept_by_lhd(action=:accept)

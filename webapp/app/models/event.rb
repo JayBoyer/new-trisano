@@ -150,11 +150,11 @@ class Event < ActiveRecord::Base
                                 :allow_destroy => true,
                                 :reject_if => proc { |attrs| check_contact_attrs(attrs) }
   accepts_nested_attributes_for :place_child_events, 
-                  			        :allow_destroy => true,
-                  			        :reject_if => :place_exposure_blank?
+                                      :allow_destroy => true,
+                                      :reject_if => :place_exposure_blank?
   accepts_nested_attributes_for :encounter_child_events,
                                 :allow_destroy => true,
-		 	                    	    :reject_if => proc { |attrs| check_encounter_attrs(attrs) }
+                                         :reject_if => proc { |attrs| check_encounter_attrs(attrs) }
   accepts_nested_attributes_for :notes, :reject_if => proc { |attrs| !attrs.has_key?('note') || attrs['note'].blank?}
   accepts_nested_attributes_for :address, :reject_if => :nested_attributes_blank? 
   accepts_nested_attributes_for :investigator_form_sections,
@@ -607,13 +607,14 @@ class Event < ActiveRecord::Base
       end
     end
 
+    type_old = self.type
     self['type'] = MorbidityEvent.to_s
     # Pull morb forms
     if self.disease_event && self.disease_event.disease
       jurisdiction = self.jurisdiction ? self.jurisdiction.secondary_entity_id : nil
       self.add_forms(Form.get_published_investigation_forms(self.disease_event.disease_id, jurisdiction, 'morbidity_event'))
     end
-    self.add_note(I18n.translate("system_notes.event_promoted_from_to", :locale => I18n.default_locale, :from => self.type.humanize.downcase, :to => "morbidity event"))
+    self.add_note(I18n.translate("system_notes.event_promoted_from_to", :locale => I18n.default_locale, :from => type_old, :to => "morbidity event"))
     self.created_at = Time.now
 
     if self.save
@@ -630,7 +631,7 @@ class Event < ActiveRecord::Base
   def promote_to_assessment_event
     raise(I18n.t("cannot_promote_unsaved_event")) if self.new_record?
 
-    # In case the event is in a state that doesn't exist for a morbidity evnet.
+    # In case the event is in a state that doesn't exist for a morbidity event.
     # Also check that the event type supports the not_routed state. (Assessment Events do not.)
     if self.respond_to?(:not_routed?) && self.not_routed?
       if self.jurisdiction.place.is_unassigned_jurisdiction?
@@ -640,13 +641,14 @@ class Event < ActiveRecord::Base
       end
     end
 
+    type_old = self.type
     self['type'] = AssessmentEvent.to_s
     # Pull assessment event forms
     if self.disease_event && self.disease_event.disease
       jurisdiction = self.jurisdiction ? self.jurisdiction.secondary_entity_id : nil
       self.add_forms(Form.get_published_investigation_forms(self.disease_event.disease_id, jurisdiction, 'assessment_event'))
     end
-    self.add_note(I18n.translate("system_notes.event_promoted_from_to", :locale => I18n.default_locale, :from => self.type.humanize.downcase, :to => "morbidity event"))
+    self.add_note(I18n.translate("system_notes.event_promoted_from_to", :locale => I18n.default_locale, :from => type_old, :to => "assessment event"))
     self.created_at = Time.now
 
     if self.save
