@@ -18,8 +18,6 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'state_case_no'::text THEN 'inv173_l'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'tb_previous'::text THEN 'tb102'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'previous_tb_year'::text THEN 'tb103'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_smear_test'::text THEN 'tb108'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_test'::text THEN 'tb109'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'smear_test'::text THEN 'tb110'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'smear_anatomic_code'::text THEN 'tb111'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'fluid_test_result'::text THEN 'tb113'::text
@@ -39,7 +37,7 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'drug_use_history'::text THEN 'tb149a'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'excessive_alcohol_use'::text THEN 'tb150a'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'count_status'::text THEN 'tb153'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'drug_suscept_test_init'::text THEN 'tb156'::text
+            WHEN lower(tb_qa_views.question_short_name::text) = 'drug_suscept_test'::text THEN 'tb156'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_first_isolate_collect'::text THEN 'tb157'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_conversion'::text THEN 'tb173'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_first_neg_sputum'::text THEN 'tb175'::text
@@ -47,7 +45,7 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'reason_therapy_stop'::text THEN 'tb177'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'outpatient_provider_type'::text THEN 'tb178'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'dot'::text THEN 'tb179'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'dot_weeks2'::text THEN 'tb181'::text
+            WHEN lower(tb_qa_views.question_short_name::text) = 'dot_weeks'::text THEN 'tb181'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'follow_up_drug_test'::text THEN 'tb182'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_final_isolate_collect'::text THEN 'tb183'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'tb_site'::text THEN 'tb205'::text
@@ -69,10 +67,6 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'rvct_cntry_birth_guardian_1'::text THEN 'tb217'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'rvct_cntry_birth_guardian_2'::text THEN 'tb218'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'tb_death'::text THEN 'tb220'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_collect_date'::text THEN 'tb221'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_collection_date'::text THEN 'tb223'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_report_date'::text THEN 'tb225'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_lab_type'::text THEN 'tb227'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'smear_collect_date'::text THEN 'tb228'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'smear_exam_type'::text THEN 'tb230'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'fluid_collect_date'::text THEN 'tb231'::text
@@ -84,7 +78,7 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'naa_anatomic_code'::text THEN 'tb239'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'naa_result_date'::text THEN 'tb240'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'naa_lab_type'::text THEN 'tb242'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'tb_evaulated_reason'::text THEN 'tb254'::text
+            WHEN lower(tb_qa_views.question_short_name::text) = 'tb_evaluated_reason'::text THEN 'tb254'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'immi_enforce'::text THEN 'tb256'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'additional_tb_risk'::text THEN 'tb257'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'other_tb_risk'::text THEN 'tb258'::text

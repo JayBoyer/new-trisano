@@ -277,6 +277,8 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :print_pdfs, :collection => { :pdf => :get }
   
+  map.resources :print_ooj_fr, :collection => { :pdfoojfr => :get }
+  
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
