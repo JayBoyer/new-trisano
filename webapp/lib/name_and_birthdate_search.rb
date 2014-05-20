@@ -80,15 +80,14 @@ module NameAndBirthdateSearch
   end
 
   def name_and_bdate_from(options)
-    if options[:fulltext_terms].blank?
+    if options[:fulltext_terms].blank? && options[:birth_date].blank?
       "people"
     else
-      options[:fuzzy_only] = "";
       returning "" do |result|
         result << "(SELECT id AS search_result_id FROM people WHERE "
         result << "(" + fulltext(options) + ")) search_results \n"
         result << "INNER JOIN people ON search_result_id = people.id AND "
-        result << search_rank_name(options) + " > 0.3"
+        result << search_rank(options) + " > 0.3"
       end
     end
   end

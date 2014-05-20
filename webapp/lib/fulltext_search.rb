@@ -21,34 +21,34 @@ module FulltextSearch
   end
 
   module ClassMethods
-
-    def order()
-      "rank DESC, last_name ASC, first_name ASC"
-    end
-
+  
     def fulltext_order(options)
-      unless options[:fulltext_terms].blank?
-        order()
-      end
+      "rank DESC, last_name ASC, first_name ASC"
     end
     
     def search_rank(options)
-      similarity = "0.01"
-      unless options[:fulltext_terms].blank?
-        rank_date = (options[:birth_date].blank?) ? "1.0" : search_rank_date(options)
-        rank_name = search_rank_name(options)
-        similarity = 
-          "(CASE\n" +
-          "  WHEN birth_date IS NULL THEN #{rank_name}\n" +
-          "  WHEN first_name IS NULL AND last_name IS NULL THEN #{search_rank_date(options)}\n" +
-          "  ELSE (0.667*#{rank_name} + 0.333*#{rank_date})\n" +
-          "END)"
+      similarity = "(0.01)"
+      unless name_and_date_blank?(options)
+        if (options[:birth_date].blank?)
+          similarity = search_rank_name(options)
+        elsif (options[:fulltext_terms].blank?)
+          similarity = search_rank_date(options)
+        else
+          rank_date = search_rank_date(options)
+          rank_name = search_rank_name(options)
+          similarity = 
+            "(CASE\n" +
+            "  WHEN birth_date IS NULL THEN #{rank_name}\n" +
+            "  WHEN first_name IS NULL AND last_name IS NULL THEN #{search_rank_date(options)}\n" +
+            "  ELSE (0.667*#{rank_name} + 0.333*#{rank_date})\n" +
+            "END)"
+        end
       end
       return similarity
     end
 
     def search_rank_name(options)
-      similarity = "0.01"
+      similarity = "(0.01)"
       unless options[:fulltext_terms].blank?
         names = full_name(options)
         similarity = 
@@ -70,7 +70,7 @@ module FulltextSearch
     end
     
     def search_rank_date(options)
-      similarity = "0.01"
+      similarity = "(0.01)"
       unless options[:birth_date].blank?
         if (options[:birth_date].to_s.size == 4 && options[:birth_date].to_i != 0)
           pattern = "YYYY"
@@ -83,34 +83,38 @@ module FulltextSearch
     end
     
     def fulltext(options)
-      unless options[:fulltext_terms].blank?
+      unless name_and_date_blank?(options)
         names = full_name(options)
-        first_name = names[0]
-        last_name = names[0]
-        operator = 'OR'
-        similarity = search_rank_name(options)
-        if(names.count > 1)
-          last_name = names[1]
-          operator = 'AND'
-        end
-
-        date_conditions = birth_date_conditions(options)
-      
-        sql = "SELECT * FROM people WHERE (upper(last_name) = '#{last_name}' " +
-          "#{operator} upper(first_name) = '#{first_name}') " + 
-          (date_conditions.blank?  ? "" : "AND " + date_conditions ) + 
-          " LIMIT 1"
-
-        # if an exact match finds anything, do an exact match
-        if(!options.has_key?(:fuzzy_only) && Person.find_by_sql(sql).size > 0)
-          results = " ((upper(last_name) = '#{last_name}' #{operator} upper(first_name) = '#{first_name}') " +
-            (date_conditions.blank? ? ")" : "AND " + date_conditions + ")" )
+        if(names.nil?)
+          first_name = nil
+          last_name = nil
         else
+          first_name = names[0]
+          last_name = first_name
+          operator = 'OR'
+          if(names.count > 1)
+            last_name = names[1]
+            operator = 'AND'
+          end
+        end
+        date_conditions = birth_date_conditions(options)
+        similarity = search_rank(options)
+        # set up exact match conditions
+        conditions = (names.nil? ? "" : " (upper(last_name) = '#{last_name}' " + "#{operator} upper(first_name) = '#{first_name}') ") + 
+          ((!names.nil? && !date_conditions.blank?) ? "AND "  : "") +
+          (date_conditions.blank?  ? "" : date_conditions )
+        sql = "SELECT * FROM people WHERE " + conditions + " LIMIT 1" 
+        # if an exact match not found
+        if(Person.find_by_sql(sql).size < 1)
 #         commented out a soundex search, it is very similar speed but search results are not as good
 #         results = " (soundex(last_name) = soundex('#{last_name}') #{operator} soundex(first_name) = soundex('#{first_name}')) " +
-         results = " (((first_name % '#{first_name}' OR last_name % '#{last_name}')\n  AND #{similarity} > 0.3) " +
-            (date_conditions.blank? ? ")" : "OR " + date_conditions + ")" )
+          # set conditions for a fuzzy search
+          conditions = (names.nil? ? "" : " (last_name % '#{last_name}' OR first_name % '#{first_name}')\n ") + 
+            ((!names.nil? && !date_conditions.blank?) ? "OR "  : "") +
+            (date_conditions.blank?  ? "" : date_conditions ) + 
+            "\n  AND #{similarity} > 0.3 "
         end
+        return conditions
       end
     end
     
@@ -125,7 +129,7 @@ module FulltextSearch
     end
     
     # turn a string of the form "first" or "last, first" or "first last"
-    # into an array ["first"] or ["first", "last"]
+    # into an uppercase array ["FIRST"] or ["FIRST", "LAST"]
     def full_name(options)
       unless options[:fulltext_terms].blank?
         terms = options[:fulltext_terms].upcase
@@ -143,8 +147,18 @@ module FulltextSearch
         else
           names = terms.split(/\s/)
         end
+        names.each do |name|
+          name.strip!
+        end
         return names
       end
+    end
+    
+    def name_and_date_blank?(options)
+      if options[:fulltext_terms].blank? && options[:birth_date].blank?
+        return true
+      end
+      return false
     end
 
   end

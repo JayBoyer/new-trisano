@@ -76,7 +76,7 @@ Feature: Searching for existing people or events before adding a CMR or AE
       |Jones    |Mick      |
       |Jones    |Steve     |
 
-     When I search for morbidity events with last_name "Jones" and first_name = "David"
+     When I search for morbidity events with last_name "Jones" and first_name = "Davi"
      Then I should see the following results:
       |last_name|first_name|
       |Jones    |David     |
@@ -87,7 +87,6 @@ Feature: Searching for existing people or events before adding a CMR or AE
      Then I should see the following results:
       |last_name|first_name|
       |Jones    |Mick      |
-      |Jones    |Steve     |
 
      When I search for morbidity events with birth date = "January 08, 1947"
      Then I should see the following results:

@@ -105,13 +105,13 @@ module EventSearch
         fields << "places.short_name AS jurisdiction"
         fields << "disease_events.disease_onset_date AS onset_date"
         fields << "lab_results.collection_date AS collection_date"
-        fields << "#{search_rank(options)} AS rank" unless options[:fulltext_terms].blank?
+        fields << "#{search_rank(options)} AS rank" unless name_and_date_blank?(options)
       end.flatten.compact
     end
 
     def event_search_joins(options)
       fulltext_options = fulltext(options)
-      
+
       returning [] do |joins|
         joins << "INNER JOIN participations interested_party ON interested_party.event_id = events.id AND (interested_party.type = 'InterestedParty' )"
         joins << "INNER JOIN entities ON entities.id = interested_party.primary_entity_id AND (entities.entity_type = 'PersonEntity' )"
@@ -150,7 +150,7 @@ module EventSearch
     end
 
     def event_search_order(options)
-      if options[:fulltext_terms].blank?
+      if name_and_date_blank?(options)
         "type DESC, last_name, first_name ASC"
       else
         fulltext_order(options)

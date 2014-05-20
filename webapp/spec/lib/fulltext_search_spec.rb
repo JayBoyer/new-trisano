@@ -124,8 +124,8 @@ describe "searching" do
         @jamie = searchable_event!(:morbidity_event, 'Jamie')
       end
 
-      it "should return 'James'" do
-        result = HumanEvent.find_by_name_and_bdate(:last_name => 'james')
+      it "should return 'James, Jamie'" do
+        result = HumanEvent.find_by_name_and_bdate(:last_name => 'jamess')
         result.collect(&:last_name).should == ['James', 'Jamie']
       end
 
@@ -136,11 +136,11 @@ describe "searching" do
 
       it "should return 'James' using fulltext search" do
         result = HumanEvent.find_by_name_and_bdate(:fulltext_terms => 'james')
-        result.collect(&:last_name).should == ['James', 'Jamie']
+        result.collect(&:last_name).should == ['James']
       end
 
-      it "should return 'James' using fulltext search with trailing whitespace" do
-        result = HumanEvent.find_by_name_and_bdate(:fulltext_terms => 'james ')
+      it "should return 'James, Jamie' using fulltext search with trailing whitespace" do
+        result = HumanEvent.find_by_name_and_bdate(:fulltext_terms => 'jame ')
         result.collect(&:last_name).should == ['James', 'Jamie']
       end
 
