@@ -145,7 +145,9 @@ module Export
       end
 
       def kansas_and_std?
-        config_option(:cdc_state) == "20" and !(self.attributes["avr_group_ids"] =~ /\b#{AvrGroup.std.id}\b/).blank?
+        avr_group_ids = self.attributes["avr_group_ids"]
+        avr_group_ids = avr_group_ids.nil? ? "" : avr_group_ids.to_s
+        config_option(:cdc_state) == "20" and !(avr_group_ids =~ /\b#{AvrGroup.std.id}\b/).blank?
       end
 
       def after_find

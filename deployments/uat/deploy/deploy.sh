@@ -17,7 +17,8 @@ local_ce_code_path="$HOME/code/trisano"
 # Hostname of the server you would normally use to access
 # via SSH. You may want to add an entry to ~/.ssh/config
 # to set user or proxies
-ssh_host="trisano-uat-www.cchd.org"
+#ssh_host="trisano-uat-www.cchd.org"
+ssh_host="uattwo-www.cchd.org"
 
 # This is last part of the path you used for script/prepare_plugins
 # For example, if you used script/prepare_plugins ../deployments/production
@@ -27,9 +28,10 @@ deployment_descriptor="uat"
 # This is the path the source code is expected to be deployed to
 remote_deployment_target_path="/opt/TriSano"
 
-# In order for the cache warming script to execute, the live url
+# grep  the cache warming script to execute, the live url
 # of the site is given here, along with ports and proxied paths.
-live_url="http://trisano-uat-www.cchd.org"
+#live_url="trisano-uat-www.cchd.org"
+live_url="uattwo-www.cchd.org"
 
 # After the deployment is done, return us back here.
 original_path=$PWD
@@ -93,11 +95,12 @@ case $response in
     echo "Clean up old releases"
     cap $cap_deploy_prefix deploy:cleanup
 
-    echo "Clearing cache"
-    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
+##    echo "Clearing cache"
+##    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
 
-    echo "Warming cache (process will run in background)"
-    ssh $ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=uat bundle exec rake cache:warm[$live_url,100] --trace" &
+##    echo "Warming cache (process will run in background)"
+## can't warm the cache if TriSano is not running
+##    ssh $ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=uat bundle exec rake cache:warm[$live_url,100] --trace" &
     
     cd $original_path
     git tag -a -m "$USER deployed $target_tag to $target_name at `date -u`" "deployed-to-$ssh_host-`date -u +%Y-%m-%d_%H-%M`"

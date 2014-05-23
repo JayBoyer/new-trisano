@@ -16,6 +16,8 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 # Settings specified here will take precedence over those in config/environment.rb
 
+#require 'ehcache'
+
 # The test environment is used exclusively to run your application's
 # test suite.  You never need to work with it otherwise.  Remember that
 # your test database is "scratch space" for the test suite and is wiped
@@ -25,9 +27,10 @@ config.cache_classes = true
 # Log error messages when you accidentally call methods on nil.
 config.whiny_nils = true
 
-# Show full error reports and disable caching
-config.action_controller.consider_all_requests_local = true
-config.action_controller.perform_caching             = false
+# Show full error reports
+config.action_controller.consider_all_requests_local = false
+config.action_controller.perform_caching             = true
+config.action_view.cache_template_loading            = true
 
 # Disable request forgery protection in test environment
 config.action_controller.allow_forgery_protection    = false
@@ -69,3 +72,7 @@ config.logger = DEFAULT_LOGGER
 
 #make translation fail loud
 #require 'trisano/i18n/fail_fast'
+
+require 'redis-store'
+config.gem 'redis-store'
+config.cache_store = :redis_store, { :host => "localhost" }

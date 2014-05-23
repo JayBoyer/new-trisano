@@ -67,22 +67,11 @@ before "deploy:migrate", "deploy:dump_db"
 before "deploy:rollback",  "deploy:restore_db"
 
 namespace :deploy do
-  ## Create a task for delayed_job workers rather than using the built-in task because
-  ## this allows more fine-grained selection of the roles that will run the task
-  desc 'Restart delayed_job worker(s)'
-  task :restart_workers, :roles => :app do
-    run "sudo RAILS_ENV=#{rails_env} #{current_path}/script/delayed_job --pid-dir=#{current_path}/tmp/pids/ stop"
-    run "sudo RAILS_ENV=#{rails_env} #{current_path}/script/delayed_job --pid-dir=#{current_path}/tmp/pids/ start"
-  end
-
   ## Replacement database.yml updater that just links in a shared file rather than generating one
   task :update_database_yml, :roles => :app do
     run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
   end
 end
-
-## Run a cleanup, reindex, and restart workers after every deploy:restart
-after 'deploy:restart', 'deploy:restart_workers'
 
 task :test_mailer_config do
   rails_env = fetch :rails_env, 'production'

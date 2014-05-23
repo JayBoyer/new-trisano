@@ -53,20 +53,6 @@ require 'selenium/server'
   driver = Selenium::WebDriver.for :remote, :url => "http://localhost:4444/wd/hub/"
   browser.start :driver => driver
  
-# Allow profiling of cucumber features
-if ENV['RUBY_PROF'].present?
-  require 'ruby-prof'
-  RubyProf.start
-
-  at_exit do
-    results = RubyProf.stop
-    puts ARGV.inspect
-    File.open "tmp/cucumber_#{Time.now}", 'w' do |file|
-      RubyProf::CallTreePrinter.new(results).print(file)
-    end
-  end 
-
-end
 Before do
   @browser = browser
   @driver = driver

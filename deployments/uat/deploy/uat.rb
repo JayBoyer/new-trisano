@@ -1,5 +1,6 @@
 require "rvm/capistrano"
-server "trisano-uat-www.cchd.org", :app, :web, :db, :primary => true
+server "uattwo-www.cchd.org", :app, :web, :db, :primary => true
+#server "trisano-uat-www.cchd.org", :app, :web, :db, :primary => true
 
 #Override default deploy to location
 set :deploy_to, "/opt/#{application}"
@@ -18,7 +19,8 @@ set :bi_server_url               , "http://pentaho-dev.cchd.org:8080/pentaho/Log
 set :help_url                    , "https://wiki.csinitiative.com/display/tri35/Help"
 set :mailer                      , "smtp"
 ## TODO Jay
-set :mailer_host                 , 'trisano-uat-www.cchd.org'
+#set :mailer_host                 , 'trisano-uat-www.cchd.org'
+set :mailer_host                 , 'uattwo-www.cchd.org'
 set :mailer_address              , 'smtp.cchd.org'
 set :mailer_port                 , 25
 set :mailer_domain               , 'southernnevadahealthdristrict.org'
@@ -66,14 +68,6 @@ before "deploy:rollback",  "deploy:restore_db"
 after "deploy:setup", "deploy:write_shared_database_yml"
 
 namespace :deploy do
-  ## Create a task for delayed_job workers rather than using the built-in task because
-  ## this allows more fine-grained selection of the roles that will run the task
-  desc 'Restart delayed_job worker(s)'
-  task :restart_workers, :roles => :app do
-    run "cd #{current_path}; RAILS_ENV=uat ruby ./script/delayed_job.rb --pid-dir=#{current_path}/tmp/pids/ stop"
-    run "cd #{current_path}; RAILS_ENV=uat ruby ./script/delayed_job.rb --pid-dir=#{current_path}/tmp/pids/ start"
-  end
-
   ## Replacement database.yml updater that just links in a shared file rather than generating one
   task :update_database_yml, :roles => :app do
     run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
@@ -101,9 +95,6 @@ namespace :deploy do
     put db_config.to_yaml, "#{shared_path}/config/database.yml"
   end
 end
-
-## Run a cleanup, reindex, and restart workers after every deploy:restart
-after 'deploy:restart', 'deploy:restart_workers'
 
 task :test_mailer_config do
   rails_env = fetch :rails_env, 'uat'

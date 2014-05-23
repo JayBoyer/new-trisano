@@ -23,23 +23,6 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 require 'tasks/rails'
 require 'tasks/helpers'
-require "#{RAILS_ROOT}/app/helpers/migration_helpers"
-require "#{RAILS_ROOT}/app/models/privilege"
-require "#{RAILS_ROOT}/app/models/code_name"
-require "#{RAILS_ROOT}/app/models/treatment"
-require "#{RAILS_ROOT}/lib/trisano/application"
-require "#{RAILS_ROOT}/lib/trisano/repeater"
-require "#{RAILS_ROOT}/app/models/email_address"
-require "#{RAILS_ROOT}/app/models/managed_contents"
-require "#{RAILS_ROOT}/app/models/event_type_transition"
-require "#{RAILS_ROOT}/app/models/export_column"
-require "#{RAILS_ROOT}/app/models/tb_phin_pdf"
-require "#{RAILS_ROOT}/app/models/staged_message"
-require "#{RAILS_ROOT}/app/models/role"
-require "#{RAILS_ROOT}/app/models/privileges_role"
-require "#{RAILS_ROOT}/app/models/entity"
-require "#{RAILS_ROOT}/app/models/place_entity"
-require "#{RAILS_ROOT}/app/models/role_membership"
 begin; require 'parallel_tests/tasks'; rescue LoadError; end
 include Tasks::Helpers::Commands
 

@@ -6,7 +6,7 @@ namespace :cache do
       include ActionController::UrlWriter
 
       default_url_options[:host] = args[:host] || raise("Must supply host as first argument")
-      default_url_options[:protocol] = "https"
+      default_url_options[:protocol] = "http"
 
       limit = args[:limit].to_i || 1000
 

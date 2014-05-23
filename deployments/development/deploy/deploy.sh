@@ -27,7 +27,7 @@ remote_deployment_target_path="/opt/trisano"
 
 # In order for the cache warming script to execute, the live url
 # of the site is given here, along with ports and proxied paths.
-live_url="https://demo.trisano.com:8080/production"
+live_url="demo.trisano.com:8080/production"
 
 # After the deployment is done, return us back here.
 original_path=$PWD

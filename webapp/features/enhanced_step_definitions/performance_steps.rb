@@ -29,23 +29,8 @@ Given /^I stop benchmarking of "(.+)"$/ do |title|
 end
 
 Given /^I begin monitoring performance$/ do
-  start_monitoring
 end
 
 Given /^I end monitoring performance of "(.+)"$/ do |title|
-  end_monitoring(title)
 end
 
-def start_monitoring
- require 'ruby-prof'
- RubyProf.start 
-end
-
-def end_monitoring(title)
-  results = RubyProf.stop
-  outdir = "#{RAILS_ROOT}/log/perf/#{title}"
-  `mkdir -p #{outdir}`
-  File.open "#{outdir}/#{Time.now}", 'w' do |file|
-    RubyProf::CallTreePrinter.new(results).print(file)
-  end
-end

@@ -1,5 +1,4 @@
 class ActionController::Base
-#  class Base
   # This is a patch for actionpackcsi_2.3.5.p8 gem
   # OVERWRITE candidate_for_layout? in ActionController to prevent jruby/performance hit for using throw/rescue
   #TODO Jay
@@ -10,7 +9,6 @@ class ActionController::Base
       if(options[:nothing])
         return false
       end         
-puts "JJJJJJJJJJJ options " + options.to_s + " class: " + self.class.name.to_s
       template ||= default_template(options[:action])
       if options.values_at(:text, :xml, :json, :file, :inline, :partial, :nothing, :update).compact.empty?
         begin
@@ -27,5 +25,4 @@ puts "JJJJJJJJJJJ options " + options.to_s + " class: " + self.class.name.to_s
     rescue ActionView::MissingTemplate
       false
     end
-#  end
 end

@@ -44,7 +44,7 @@ require 'logging'
 # or
 #   uninitialized constant Logging::MAX_LEVEL_LENGTH (NameError)
 # when an Appender or Layout is created BEFORE any Logger is instantiated:
-Logging.init :debug, :info, :warn, :error, :fatal
+#Logging.init :debug, :info, :warn, :error, :fatal
 
 layout = Logging::Layouts::Pattern.new :pattern => "[%d] [%-5l] %m\n"
 

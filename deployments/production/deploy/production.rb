@@ -72,11 +72,12 @@ after "deploy:setup", "deploy:write_shared_database_yml"
 namespace :deploy do
   ## Create a task for delayed_job workers rather than using the built-in task because
   ## this allows more fine-grained selection of the roles that will run the task
-  desc 'Restart delayed_job worker(s)'
-  task :restart_workers, :roles => :app do
-    run "cd #{current_path}; RAILS_ENV=production ruby ./script/delayed_job.rb --pid-dir=#{current_path}/tmp/pids/ stop"
-    run "cd #{current_path}; RAILS_ENV=production ruby ./script/delayed_job.rb --pid-dir=#{current_path}/tmp/pids/ start"
-  end
+  # not available in jruby
+#  desc 'Restart delayed_job worker(s)'
+#  task :restart_workers, :roles => :app do
+#    run "cd #{current_path}; RAILS_ENV=production ruby ./script/delayed_job.rb --pid-dir=#{current_path}/tmp/pids/ stop"
+#    run "cd #{current_path}; RAILS_ENV=production ruby ./script/delayed_job.rb --pid-dir=#{current_path}/tmp/pids/ start"
+#  end
 
   ## Replacement database.yml updater that just links in a shared file rather than generating one
   task :update_database_yml, :roles => :app do
@@ -107,7 +108,7 @@ namespace :deploy do
 end
 
 ## Run a cleanup, reindex, and restart workers after every deploy:restart
-after 'deploy:restart', 'deploy:restart_workers'
+#after 'deploy:restart', 'deploy:restart_workers'
 
 task :test_mailer_config do
   rails_env = fetch :rails_env, 'production'

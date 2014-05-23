@@ -29,7 +29,7 @@ remote_deployment_target_path="/opt/TriSano"
 
 # In order for the cache warming script to execute, the live url
 # of the site is given here, along with ports and proxied paths.
-live_url="http://trisano-demo-www.cchd.org"
+live_url="trisano-demo-www.cchd.org"
 
 # After the deployment is done, return us back here.
 original_path=$PWD
@@ -93,11 +93,12 @@ case $response in
     echo "Clean up old releases"
     cap $cap_deploy_prefix deploy:cleanup
 
-    echo "Clearing cache"
-    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
+##    echo "Clearing cache"
+##    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
 
-    echo "Warming cache (process will run in background)"
-    ssh $ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=demo bundle exec rake cache:warm[$live_url,100] --trace" &
+##    echo "Warming cache (process will run in background)"
+## can't warm the cache if TriSano is not running
+##    ssh $ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=demo bundle exec rake cache:warm[$live_url,100] --trace" &
     
     cd $original_path
     git tag -a -m "$USER deployed $target_tag to $target_name at `date -u`" "deployed-to-$ssh_host-`date -u +%Y-%m-%d_%H-%M`"
