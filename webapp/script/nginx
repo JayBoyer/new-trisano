@@ -1,0 +1,73 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          nginx
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the nginx web server
+# Description:       starts nginx using start-stop-daemon
+### END INIT INFO
+
+PATH=/opt/nginx/sbin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/opt/nginx/sbin/nginx
+NAME=nginx
+DESC=nginx
+
+JRUBY_OPTS="--1.8 --server -J-Xmn512m -J-Xms4g -J-Xmx4g -J-XX:ReservedCodeCacheSize=256M -J-XX:+UseCodeCacheFlushing"
+JAVA_HOME=/usr/lib/jvm/jdk1.7.0_25
+
+# The following two lines are uncommented to dump out the jruby and java environment settings to files
+#/home/trisano_rails/.rvm/rubies/jruby-1.7.3/bin/jruby  --properties > /home/trisano_rails/temp/jr_opts.txt
+#java -XX:+PrintFlagsFinal > /home/trisano_rails/temp/java_opts.txt
+
+# MUST MATCH /opt/nginx/conf/nginx.conf
+#PID_FILE=/var/run/nginx.pid
+PID_FILE=/opt/nginx/logs/$NAME.pid
+
+test -x $DAEMON || exit 0
+
+# Include nginx defaults if available
+if [ -f /etc/default/nginx ] ; then
+          . /etc/default/nginx
+fi
+
+set -e
+
+case "$1" in
+  start)
+        echo -n "Starting $DESC: "
+        start-stop-daemon --start --quiet --make-pidfile --pidfile /opt/nginx/logs/$NAME.pid \
+                --exec $DAEMON -- $DAEMON_OPTS
+        echo "$NAME."
+        ;;
+  stop)
+        echo -n "Stopping $DESC: "
+        start-stop-daemon --stop --quiet --pidfile /opt/nginx/logs/$NAME.pid \
+                --exec $DAEMON
+        echo "$NAME."
+        ;;
+  restart|force-reload)
+        echo -n "Restarting $DESC: "
+        start-stop-daemon --stop --quiet --pidfile \
+                /opt/nginx/logs/$NAME.pid --exec $DAEMON
+        sleep 1
+        start-stop-daemon --start --quiet --make-pidfile --pidfile \
+                /opt/nginx/logs/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS
+        echo "$NAME."
+        ;;
+reload)
+        echo -n "Reloading $DESC configuration: "
+        start-stop-daemon --stop --signal HUP --quiet --make-pidfile --pidfile /opt/nginx/logs/$NAME.pid \
+                --exec $DAEMON
+        echo "$NAME."
+        ;;
+*)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

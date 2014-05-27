@@ -93,8 +93,8 @@ case $response in
     echo "Clean up old releases"
     cap $cap_deploy_prefix deploy:cleanup
 
-##    echo "Clearing cache"
-##    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
+    echo "Clearing cache"
+    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
 
 ##    echo "Warming cache (process will run in background)"
 ## can't warm the cache if TriSano is not running

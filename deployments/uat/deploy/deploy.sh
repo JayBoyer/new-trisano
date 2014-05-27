@@ -18,7 +18,7 @@ local_ce_code_path="$HOME/code/trisano"
 # via SSH. You may want to add an entry to ~/.ssh/config
 # to set user or proxies
 #ssh_host="trisano-uat-www.cchd.org"
-ssh_host="uattwo-www.cchd.org"
+ssh_host="trisano-uat-www.cchd.org"
 
 # This is last part of the path you used for script/prepare_plugins
 # For example, if you used script/prepare_plugins ../deployments/production
@@ -31,7 +31,7 @@ remote_deployment_target_path="/opt/TriSano"
 # grep  the cache warming script to execute, the live url
 # of the site is given here, along with ports and proxied paths.
 #live_url="trisano-uat-www.cchd.org"
-live_url="uattwo-www.cchd.org"
+live_url="trisano-uat-www.cchd.org"
 
 # After the deployment is done, return us back here.
 original_path=$PWD
@@ -95,8 +95,8 @@ case $response in
     echo "Clean up old releases"
     cap $cap_deploy_prefix deploy:cleanup
 
-##    echo "Clearing cache"
-##    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
+    echo "Clearing cache"
+    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
 
 ##    echo "Warming cache (process will run in background)"
 ## can't warm the cache if TriSano is not running

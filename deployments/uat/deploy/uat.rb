@@ -1,5 +1,5 @@
 require "rvm/capistrano"
-server "uattwo-www.cchd.org", :app, :web, :db, :primary => true
+server "trisano-uat-www.cchd.org", :app, :web, :db, :primary => true
 #server "trisano-uat-www.cchd.org", :app, :web, :db, :primary => true
 
 #Override default deploy to location
@@ -20,7 +20,7 @@ set :help_url                    , "https://wiki.csinitiative.com/display/tri35/
 set :mailer                      , "smtp"
 ## TODO Jay
 #set :mailer_host                 , 'trisano-uat-www.cchd.org'
-set :mailer_host                 , 'uattwo-www.cchd.org'
+set :mailer_host                 , 'trisano-uat-www.cchd.org'
 set :mailer_address              , 'smtp.cchd.org'
 set :mailer_port                 , 25
 set :mailer_domain               , 'southernnevadahealthdristrict.org'
