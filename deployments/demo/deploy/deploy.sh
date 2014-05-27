@@ -94,11 +94,10 @@ case $response in
     cap $cap_deploy_prefix deploy:cleanup
 
     echo "Clearing cache"
-    ssh $ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
+    ssh trisano_rails@$ssh_host "redis-cli KEYS '*' | xargs redis-cli DEL"
 
 ##    echo "Warming cache (process will run in background)"
-## can't warm the cache if TriSano is not running
-##    ssh $ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=demo bundle exec rake cache:warm[$live_url,100] --trace" &
+##    ssh trisano_rails@$ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=demo bundle exec rake cache:warm[$live_url,100] --trace" &
     
     cd $original_path
     git tag -a -m "$USER deployed $target_tag to $target_name at `date -u`" "deployed-to-$ssh_host-`date -u +%Y-%m-%d_%H-%M`"
