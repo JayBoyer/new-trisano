@@ -76,7 +76,7 @@ class HumanEvent < Event
   accepts_nested_attributes_for :participations_contact, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
   accepts_nested_attributes_for :participations_encounter, :reject_if => proc { |attrs| attrs.all? { |k, v| ((k == "user_id") ||  (k == "encounter_location_type")) ? true : v.blank? } }
 
-  after_save :associate_longitudinal_data
+  after_save :associate_longitudinal_data, :purge_event_from_cache
 
   class << self
 
@@ -1018,4 +1018,9 @@ class HumanEvent < Event
       address.update_attributes(:entity_id => interested_party.primary_entity_id)
     end
   end
+  
+  def purge_event_from_cache
+    redis.delete_matched("views/events/#{self.id}/*")
+  end
+
 end
