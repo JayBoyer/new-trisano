@@ -55,11 +55,6 @@ Rails::Initializer.run do |config|
   config.plugins = [ :rails_inheritable_attributes_manager, :trisano_locales, :all ]
   config.plugin_paths << "#{RAILS_ROOT}/vendor/trisano"
 
-  if (RAILS_ENV == 'uat' || RAILS_ENV == 'production')
-    # force eager load of libraries so that we can use threadsafe
-    config.eager_load_paths += ["#{RAILS_ROOT}/lib"]
-  end
-
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
   config.load_paths += %W( #{RAILS_ROOT}/lib/exporters )
@@ -133,6 +128,7 @@ Rails::Initializer.run do |config|
     end
 
     require 'rails_inheritable_attributes_manager'
+    require 'validates_timeliness_formats'
     require "active_record/errors"
     require "active_record/scopes"
     require "active_record/rollback_transactions"
@@ -162,18 +158,6 @@ Rails::Initializer.run do |config|
 
     # Use a custom xml parser for handling incoming xml
     ActiveSupport::XmlMini.backend = :NamespaceFilter
-    
-    if (RAILS_ENV != 'uat' && RAILS_ENV != 'production')
-     require 'validates_timeliness_formats'
-    else
-      # autoload is turned off by threadsafe, so load the plugin models and controllers here
-      Dir[Pathname(RAILS_ROOT) + 'vendor/trisano/**/app/**/*.rb'].each do |path|
-        require path
-      end
-    
-      # turn on threadsafe for jruby
-      config.threadsafe!
-    end
   end
 
 end
