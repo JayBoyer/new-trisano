@@ -1,5 +1,7 @@
 require 'date'
-require 'pg' 
+require 'dbi'
+require 'dbd/Jdbc'
+require 'jdbc/postgres'
 require 'pdf_forms'
 
 class PrintOojFrController < ApplicationController
@@ -82,7 +84,7 @@ class PrintOojFrController < ApplicationController
                                     
             @@hash_output = {}
             @@note_fields = Array.new
-            @@res = ''
+            @@sth = ''
             @@sqlStr = ''
             out_filename = ''
  
@@ -94,8 +96,8 @@ class PrintOojFrController < ApplicationController
                 template = '/opt/TriSano/current/app/pdfs/template/ooj_fr_template.pdf'
             end
             if Rails.env.development?
-                pdf_path = '/home/varghese/code/trisano/webapp/app/pdfs/'
-                template = '/home/varghese/code/trisano/webapp/app/pdfs/template/ooj_fr_template.pdf'
+                pdf_path = File.expand_path('~/code/trisano/webapp/app/pdfs/')
+                template = File.expand_path('~/code/trisano/webapp/app/pdfs/template/ooj_fr_template.pdf')
             end
             if Rails.env.demo?
                 pdf_path = '~/code/trisano/webapp/app/pdfs/'
@@ -112,8 +114,7 @@ class PrintOojFrController < ApplicationController
             username = config[Rails.env]["username"]
             pass = config[Rails.env]["password"]
             port = config[Rails.env]["port"]
-            @@conn = PGconn.open( :host => host, :dbname => database, :user => username, :password => pass, :port => port )
-
+            @@dbh = DBI.connect("DBI:Jdbc:postgresql:" + "//" + host + ":" + port.to_s + "/" + database, username, pass, 'driver' => 'org.postgresql.Driver')
             
             def limits(inputString, length)
                 limit = 0
@@ -134,49 +135,38 @@ class PrintOojFrController < ApplicationController
                 end
             end
 
-            def arrangeDate ( inputString )
-                    if inputString.length > 0 && inputString != nil
-                            inputString = inputString[4,2] + "/" + inputString[6,2] + "/" + inputString[0,4]
-                    end        
-            end
-
-            def trimDashes(inputString)
-                if inputString.include? '-'
-                    inputString = inputString.gsub!(/-/,'')
-                end
-                if inputString.include? '/'
-                    inputString = inputString.gsub!(/\//,'')
-                end
-                return inputString
-            end
-
-            def formatDate (inputString)
-                if inputString != '' && inputString != nil
-                    modString = trimDashes(inputString)
-                    modDateString = arrangeDate(modString)
-                end
-            end
-            
-            def compareDates(date1, date2, comparison)
+            def compareDateStrings(date1, date2, comparison)
                 if (date1 && date2) != '' && (date1 && date2) != nil
                     date1 = Date.strptime date1, '%Y-%m-%d'
                     date2 = Date.strptime date2, '%Y-%m-%d'
-                    
-                    if (date1 < date2) && comparison == 'early'
-                        return date1.to_s
-                    elsif (date1 > date2) && comparison == 'early'
-                        return date2.to_s
-                    elsif (date1 < date2) && comparison == 'late'
-                        return date2.to_s
-                    elsif (date1 > date2) && comparison == 'late'
-                        return date1.to_s
-                    end
+                    compareDates(date1, date2, comparison)
                 end
+            end
+            
+            def compareDates()
+                if (date1 < date2) && comparison == 'early'
+                    return date1.to_s
+                elsif (date1 > date2) && comparison == 'early'
+                    return date2.to_s
+                elsif (date1 < date2) && comparison == 'late'
+                    return date2.to_s
+                elsif (date1 > date2) && comparison == 'late'
+                    return date1.to_s
+                end
+            end
+            
+            def formatDate(date)
+                date.strftime("%m/%d/%Y")                  
+            end
+            
+            def formatDateString(date_string)
+                date = Date.strptime(date_string, '%Y-%m-%d')
+                date_string = formatDate(date)
             end
             
             def reset
                 @@sqlStr = ''
-                @@res = ''
+                @@sth = ''
             end
 
             @first_name = ''
@@ -225,8 +215,8 @@ class PrintOojFrController < ApplicationController
                         LEFT JOIN public.users u on u.id = e.investigator_id
                         WHERE e.id=" + @@event_id
 
-            @@res = @@conn.exec(@@sqlStr)
-            @@res.each do |row|
+            @@sth = @@dbh.execute(@@sqlStr)
+            @@sth.each do |row|
                 @first_name = row['first_name']
                 @last_name = row['last_name']
                 @middle_name = row['middle_name']
@@ -273,9 +263,8 @@ class PrintOojFrController < ApplicationController
                 end
             
                 if @birth_date != '' && @birth_date != nil
-                    @birth_date = formatDate(@birth_date)
-                    @@hash_output['ooj_dob'] = @birth_date
-                    @@hash_output['fr_dob'] = @birth_date
+                    @@hash_output['ooj_dob'] = formatDate(@birth_date)
+                    @@hash_output['fr_dob'] = formatDate(@birth_date)
                 end    
             
                 if @birth_sex != '' && @birth_sex != nil
@@ -358,10 +347,10 @@ class PrintOojFrController < ApplicationController
                         LEFT JOIN telephones t on t.entity_id = p.primary_entity_id 
                         where e.id=" + @@event_id
                         
-            @@res = @@conn.exec(@@sqlStr)
+            @@sth = @@dbh.execute(@@sqlStr)
                 @phonenumbs = ''
-                if @@res.num_tuples > 0
-                    @@res.each_with_index do |row, index|
+                if @@sth.column_names().length > 0
+                    @@sth.each_with_index do |row, index|
                         @areacode = row['area_code']
                         @phonenum = row['phone_number']
                         @extension = row['extension']
@@ -375,7 +364,7 @@ class PrintOojFrController < ApplicationController
                         if @extension != '' && @extension != nil
                             @phonenumbs = @phonenumbs + "x" + @extension
                         end
-                        if index != @@res.num_tuples - 1
+                        if index != @@sth.column_names.length - 1
                             @phonenumbs = @phonenumbs + ", "
                         end
                     end
@@ -394,10 +383,10 @@ class PrintOojFrController < ApplicationController
                         LEFT JOIN public.external_codes ec ON l.test_result_id = ec.id
                         WHERE pa.event_id=" + @@event_id
                         
-            @@res = @@conn.exec(@@sqlStr)
+            @@sth = @@dbh.execute(@@sqlStr)
                 @labs = ''
-                if @@res.num_tuples > 0
-                    @@res.each_with_index do |row, index|
+                if @@sth.column_names.length > 0
+                    @@sth.each_with_index do |row, index|
                         @test_type = row['test_type']
                         @organism = row['organism_name']
                         @testresult = row['test_result']
@@ -440,7 +429,7 @@ class PrintOojFrController < ApplicationController
                         if @collectiondate != '' && @collectiondate != nil
                             @labs = @labs + 'CollectDate:' + formatDate(@collectiondate)
                         end
-                        if index != @@res.num_tuples - 1
+                        if index != @@sth.column_names.length - 1
                             @labs = @labs + "; "
                         end
                     end
@@ -463,9 +452,9 @@ class PrintOojFrController < ApplicationController
                         WHERE e.id=" + @@event_id + "and lower(f.short_name) in ('std_new_field_record', 'std_field_record', 'std_physical_desc', 'std_coinfection', 'std_new_interview_record')
                         ORDER BY q.short_name"
                         
-            @@res = @@conn.exec(@@sqlStr)
-                if @@res.num_tuples > 0
-                    @@res = @@res
+            @@sth = @@dbh.execute(@@sqlStr)
+                if @@sth.column_names.length > 0
+                    @@sth = @@sth
                 else
                     reset
                     @@sqlStr = "SELECT a.event_id, a.question_id, q.short_name AS question_short_name, q.question_text, a.id AS answer_id, a.text_answer AS answer_text, s.name AS section_name, a.repeater_form_object_id, 
@@ -481,11 +470,11 @@ class PrintOojFrController < ApplicationController
                         WHERE e.id=" + @@event_id + "and lower(f.short_name) in ('std_contact_field_record', 'std_physical_desc', 'std_coinfection', 'std_new_interview_record')
                         ORDER BY q.short_name"
                         
-                        @@res = @@conn.exec(@@sqlStr)
+                    @@sth = @@dbh.execute(@@sqlStr)
                 end 
                 
                 
-            @@res.each do |row|
+            @@sth.each do |row|
               @question_short_name = row['question_short_name']
               @answer_text = row['answer_text']
               @disease_name = row['disease_name']
@@ -502,7 +491,7 @@ class PrintOojFrController < ApplicationController
                         @answer_text = @answer_text.gsub(/\"/,'')
                         
                         if @data_type == "date"
-                            @answer_text = formatDate(@answer_text)
+                            @answer_text = formatDateString(@answer_text)
                         end
                     
                         if !@@hash_dispo_fields.key?(@question_short_name)
@@ -619,7 +608,7 @@ class PrintOojFrController < ApplicationController
                 @@hash_output[field_name] = @@note_fields[i]
             end 
 
-            @@conn.close
+            @@dbh.disconnect
 
             if @@hash_output.size > 0
                 fdf = PdfForms::Fdf.new @@hash_output

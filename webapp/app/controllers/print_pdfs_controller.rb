@@ -1,5 +1,7 @@
 require 'date'
-require 'pg' 
+require 'dbi'
+require 'dbd/Jdbc'
+require 'jdbc/postgres'
 require 'pdf_forms'
 
 class PrintPdfsController < ApplicationController
@@ -12,8 +14,8 @@ class PrintPdfsController < ApplicationController
 			@@hash_pdf_fields = {}
 			@@hash_output = {}
 			@@indvChars = Array.new
-			@@res = ''
-			@@resnrq = ''
+			@@sth = ''
+			@@sthnrq = ''
 			@@sqlStr = ''
 			@@idrs_var = ''
 			@@fdrs_var = ''
@@ -32,8 +34,8 @@ class PrintPdfsController < ApplicationController
 				template = '/opt/TriSano/current/app/pdfs/template/tb_fields_template.pdf'
 			end
 			if Rails.env.development?
-				pdf_path = '/home/varghese/code/trisano/webapp/app/pdfs/'
-				template = '/home/varghese/code/trisano/webapp/app/pdfs/template/tb_fields_template.pdf'
+				pdf_path = File.expand_path('~/code/trisano/webapp/app/pdfs/')
+				template = File.expand_path('~/code/trisano/webapp/app/pdfs/template/tb_fields_template.pdf')
 			end
 			
 			#pdf_path = 'C:/pdfs/'
@@ -46,7 +48,7 @@ class PrintPdfsController < ApplicationController
 			username = config[Rails.env]["username"]
 			pass = config[Rails.env]["password"]
 			port = config[Rails.env]["port"]
-			@@conn = PGconn.open( :host => host, :dbname => database, :user => username, :password => pass, :port => port )
+            @@dbh = DBI.connect("DBI:Jdbc:postgresql:" + "//" + host + ":" + port.to_s + "/" + database, username, pass, 'driver' => 'org.postgresql.Driver')
 					
 			def limits(inputString, length)
 				limit = 0
@@ -67,29 +69,34 @@ class PrintPdfsController < ApplicationController
 				end
 			end
 
-			def arrangeDate ( inputString )
-					if inputString.length > 0 && inputString != nil
-							inputString = inputString[4,2] + inputString[6,2] + inputString[0,4]
-					end		
-			end
-
-			def trimDashes(inputString)
-				if inputString.include? '-'
-					inputString = inputString.gsub!(/-/,'')
-				end
-                if inputString.include? '/'
-					inputString = inputString.gsub!(/\//,'')
-				end
-				return inputString
-			end
-
-			def formatDate (inputString)
-				if inputString != '' && inputString != nil
-					modString = trimDashes(inputString)
-					modDateString = arrangeDate(modString)
-				end
-			end
-
+            def compareDateStrings(date1, date2, comparison)
+                if (date1 && date2) != '' && (date1 && date2) != nil
+                    date1 = Date.strptime date1, '%Y-%m-%d'
+                    date2 = Date.strptime date2, '%Y-%m-%d'
+                    compareDates(date1, date2, comparison)
+                end
+            end
+            
+            def compareDates()
+                if (date1 < date2) && comparison == 'early'
+                    return date1.to_s
+                elsif (date1 > date2) && comparison == 'early'
+                    return date2.to_s
+                elsif (date1 < date2) && comparison == 'late'
+                    return date2.to_s
+                elsif (date1 > date2) && comparison == 'late'
+                    return date1.to_s
+                end
+            end
+            
+            def formatDate(date)
+                date.strftime("%m%d%Y")                  
+            end
+            
+            def formatDateString(date_string)
+                date = Date.strptime(date_string, '%Y-%m-%d')
+                date_string = formatDate(date)
+            end
 
 			def reset 
 				@@count = 0
@@ -105,8 +112,8 @@ class PrintPdfsController < ApplicationController
 				@@setOther = false
 				@@lateDate = '1900-01-01'
 				begin
-					if !@@res.num_tuples.zero?
-						@@res.clear
+					if !@@sth.column_names().length.zero?
+						@@sth.cancel
 					end
 				rescue
 				end
@@ -119,8 +126,8 @@ class PrintPdfsController < ApplicationController
 				@single_question_answer_r = ''
 				@phin_var_r = ''
 				begin
-					if !@@resrpt.num_tuples.zero?
-						@@resrpt.clear
+					if !@@sthrpt.column_names().length.zero?
+						@@sthrpt.cancel
 					end
 				rescue
 				end
@@ -128,12 +135,12 @@ class PrintPdfsController < ApplicationController
 
 			def PdfMapping(varName)
 				sqlStr = "SELECT * FROM tb_phin_pdfs where phin_var = '" + varName + "' order by var_order" 
-				res = @@conn.exec(sqlStr)
-				return res
+				sth = @@dbh.execute(sqlStr)
+				return sth
 			end
 
-			def populatePdfFields(res)
-				res.each do |row|
+			def populatePdfFields(sth)
+				sth.each do |row|
 					pdf_field = ''
 					pdf_field = row['pdf_var']
 					@@hash_pdf_fields[@@count] = pdf_field
@@ -179,9 +186,9 @@ class PrintPdfsController < ApplicationController
 			def repeatID(testDate, eventID, question)
 				rpt_id = 0
 				sqlStr = "SELECT repeater_form_object_id FROM tb_qa_views where answer_text = '" + testDate + "' and lower(question_short_name) = '" + question + "' and event_id =" + eventID 
-				res = @@conn.exec(sqlStr)
-				if !@@res.num_tuples.zero?
-					res.each do |row|
+				sth = @@dbh.execute(sqlStr)
+				if !@@sth.column_names().length.zero?
+					sth.each do |row|
 						rpt_id =  row['repeater_form_object_id']
 					end
 				end
@@ -191,8 +198,8 @@ class PrintPdfsController < ApplicationController
 			#INV111 and INV177
 			@@sqlStr = "SELECT * FROM public.events where id =" + @@event_id
 					  
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 			  @investigation_started_date = row['investigation_started_date']
 			  @first_reported_PH_date = row['first_reported_PH_date']
 			end 
@@ -230,8 +237,8 @@ class PrintPdfsController < ApplicationController
 
 			@@sqlStr = "SELECT a.city, ex.code_description as county, a.postal_code, a.street_number, a.street_name, a.unit_number, ex.the_code as state FROM public.addresses a LEFT JOIN public.external_codes ex ON a.state_id = ex.id LEFT JOIN public.external_codes e ON a.county_id = e.id WHERE a.event_id=" + @@event_id
 
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 			  @city = row['city']
 			  @county = row['county']
 			  @postal_code = row['postal_code']
@@ -299,8 +306,8 @@ class PrintPdfsController < ApplicationController
 
 			@@sqlStr = "SELECT DISTINCT p.first_name, p.last_name, p.middle_name, p.birth_date, ex.the_code as birth_sex, ext.the_code as ethnicity, p.date_of_death, extc.the_code as dead FROM public.people p LEFT JOIN public.participations pa ON p.entity_id = pa.primary_entity_id LEFT JOIN public.events e ON pa.event_id = e.id LEFT JOIN public.external_codes ex ON p.birth_gender_id = ex.id LEFT JOIN public.external_codes ext ON p.ethnicity_id = ext.id LEFT JOIN public.disease_events de ON de.event_id = e.id LEFT JOIN public.external_codes extc ON de.died_id = extc.id WHERE e.id=" + @@event_id
 
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 			  @first_name = row['first_name']
 			  @last_name = row['last_name']
 			  @middle_name = row['middle_name']
@@ -399,8 +406,8 @@ class PrintPdfsController < ApplicationController
 			#INV172, INV173
 			@@sqlStr = "SELECT answer_text FROM tb_phin_qa_single_views WHERE phin_var = 'inv172_l' and event_id =" + @@event_id
 
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 			  @city_case_num = row['answer_text']
 			 end 
 
@@ -460,8 +467,8 @@ class PrintPdfsController < ApplicationController
 
 			@@sqlStr = "SELECT answer_text FROM tb_phin_qa_single_views WHERE phin_var = 'inv173_l' and event_id =" + @@event_id
 
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 			  @state_case_num = row['answer_text']
 			end 
 
@@ -521,8 +528,8 @@ class PrintPdfsController < ApplicationController
 			#Process non-repeating questions
 			@@sqlStr = "SELECT * FROM  tb_phin_qa_single_views where phin_var is not null and event_id =" + @@event_id + " order by phin_var"
 
-			@@resnrq = @@conn.exec(@@sqlStr)
-			@@resnrq.each do |row|
+			@@sthnrq = @@dbh.execute(@@sqlStr)
+			@@sthnrq.each do |row|
 			  @single_question_answer_orig = row['answer_text']
 			  @single_question_answer = row['answer_text'].downcase
 			  @single_question_answer_code = row['answer_code']
@@ -591,7 +598,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb100' 
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb100 = PdfMapping('pg1_tb100')
 						populatePdfFields(res_tb100)
@@ -884,7 +891,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb157'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb157 = PdfMapping('tb157')
 						populatePdfFields(res_tb157)
@@ -904,7 +911,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb175' 
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb175 = PdfMapping('tb175')
 						populatePdfFields(res_tb175)
@@ -914,7 +921,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb176'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb176 = PdfMapping('tb176')
 						populatePdfFields(res_tb176)
@@ -1004,7 +1011,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb183'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb183 = PdfMapping('tb183')
 						populatePdfFields(res_tb183)
@@ -1226,7 +1233,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb221'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb221 = PdfMapping('tb221')
 						populatePdfFields(res_tb221)
@@ -1236,7 +1243,7 @@ class PrintPdfsController < ApplicationController
 					end	
 					
 					if @phin_var == 'tb223'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb223 = PdfMapping('tb223')
 						populatePdfFields(res_tb223)
@@ -1246,7 +1253,7 @@ class PrintPdfsController < ApplicationController
 					end	
 					
 					if @phin_var == 'tb225'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb225 = PdfMapping('tb225')
 						populatePdfFields(res_tb225)
@@ -1266,7 +1273,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb228'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb228 = PdfMapping('tb228')
 						populatePdfFields(res_tb228)
@@ -1288,7 +1295,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb231'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb231 = PdfMapping('tb231')
 						populatePdfFields(res_tb231)
@@ -1298,7 +1305,7 @@ class PrintPdfsController < ApplicationController
 					end	
 					
 					if @phin_var == 'tb233'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb233 = PdfMapping('tb233')
 						populatePdfFields(res_tb233)
@@ -1332,7 +1339,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb236'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb236 = PdfMapping('tb236')
 						populatePdfFields(res_tb236)
@@ -1362,7 +1369,7 @@ class PrintPdfsController < ApplicationController
 					end
 					
 					if @phin_var == 'tb240'
-						dateString = formatDate(@single_question_answer)
+						dateString = formatDateString(@single_question_answer)
 						@@indvChars = breakUp(dateString)
 						res_tb240 = PdfMapping('tb240')
 						populatePdfFields(res_tb240)
@@ -1685,8 +1692,8 @@ class PrintPdfsController < ApplicationController
 						#Write it to pg5 and pg6 comment fields  						
 						@@sqlStr = "SELECT * FROM  tb_phin_pdf_orig where phin_var = 'pg5_comm_pg6_comm' order by pdf_var, var_order"
 
-						rescomm = @@conn.exec(@@sqlStr)
-						rescomm.each_with_index do |row, index|
+						sthcomm = @@dbh.execute(@@sqlStr)
+						sthcomm.each_with_index do |row, index|
 							pdf_comm_var = row['pdf_var']
 								if sentenceArray.length > 0
 									@@hash_output[pdf_comm_var] = sentenceArray[index]
@@ -1700,10 +1707,10 @@ class PrintPdfsController < ApplicationController
 			#Populate Initial Drug Regimen
 			 @@sqlStr = "SELECT * FROM  tb_initial_drug_regimen_views where event_id =" + @@event_id + " order by treatment_date"
 
-			@@residr = @@conn.exec(@@sqlStr)
+			@@sthidr = @@dbh.execute(@@sqlStr)
 			treat_date_set = false
 			treat_date_initial = ''
-			@@residr.each do |row|
+			@@sthidr.each do |row|
 			  @idr_drug = row['pdf_var']
 			  @treat_date = row['treatment_date']
 				if @idr_drug != '' && @idr_drug != nil
@@ -1719,11 +1726,11 @@ class PrintPdfsController < ApplicationController
 			#Populate Initial Drug Regimen Other Drug
 			@@sqlStr = "SELECT * FROM  tb_initial_drug_regimen_other_views where event_id =" + @@event_id + " order by treatment_date"
 
-			@@residro = @@conn.exec(@@sqlStr)
+			@@sthidro = @@dbh.execute(@@sqlStr)
 			treat_date_set_o = false
 			treat_date_initial_o = ''
 			idr_setOther = false
-			@@residro.each do |row|
+			@@sthidro.each do |row|
 			  @idr_drug_o = row['pdf_var']
 			  @treat_date_o = row['treatment_date']
 			  @drug_name_o = row['drug_name']
@@ -1753,7 +1760,7 @@ class PrintPdfsController < ApplicationController
 			treat_date_final = ''
 			
 			if treat_date_initial != '' && treat_date_initial != nil && treat_date_initial_o != '' && treat_date_initial_o != nil
-						treat_date_final = compareDates(treat_date_initial, treat_date_initial_o, 'early')
+						treat_date_final = compareDateStrings(treat_date_initial, treat_date_initial_o, 'early')
 			end
 			if (treat_date_initial == '' || treat_date_initial == nil) && (treat_date_initial_o != '' && treat_date_initial_o != nil)
 						treat_date_final = treat_date_initial_o
@@ -1781,8 +1788,8 @@ class PrintPdfsController < ApplicationController
 
 
 			@@sqlStr = "SELECT * FROM  tb_initial_drug_susceptibility_results_views where event_id =" + @@event_id
-			@@residrs = @@conn.exec(@@sqlStr)
-			@@residrs.each_with_index do |row, index|
+			@@sthidrs = @@dbh.execute(@@sqlStr)
+			@@sthidrs.each_with_index do |row, index|
 			  @idrs_question_short_name = row['question_short_name']
 			  @idrs_answer_text = row['answer_text']
 			  @idrs_repeat_id = row['repeater_form_object_id']
@@ -1825,7 +1832,7 @@ class PrintPdfsController < ApplicationController
 						@@tb_drug_test_result = @idrs_pdf_var
 					end
 					
-					if index == @@residrs.num_tuples - 1
+					if index == @@sthidrs.column_names().length - 1
 						evalRecord
 					end
 				end
@@ -1835,8 +1842,8 @@ class PrintPdfsController < ApplicationController
 
 			#Populate Final Drug Susceptibility Results
 			@@sqlStr = "SELECT * FROM  tb_final_drug_susceptibility_results_views where event_id =" + @@event_id
-			@@resfdrs = @@conn.exec(@@sqlStr)
-			@@resfdrs.each_with_index do |row, index|
+			@@sthfdrs = @@dbh.execute(@@sqlStr)
+			@@sthfdrs.each_with_index do |row, index|
 			  @fdrs_question_short_name = row['question_short_name']
 			  @fdrs_answer_text = row['answer_text']
 			  @fdrs_repeat_id = row['repeater_form_object_id']
@@ -1879,7 +1886,7 @@ class PrintPdfsController < ApplicationController
 						@@tb_drug_test_result = @fdrs_pdf_var
 					end
 					
-					if index == @@resfdrs.num_tuples - 1
+					if index == @@sthfdrs.column_names().length - 1
 						evalRecord
 					end
 				end
@@ -1889,11 +1896,11 @@ class PrintPdfsController < ApplicationController
 			#Populate Tuberculin Skin Test at Diagnosis
 			@@sqlStr = "SELECT * FROM tb_qa_views where question_short_name IN ('DIAG_TST_PLACED_DATE') and event_id = " + @@event_id + " order by repeater_form_object_id, 
 			question_short_name, answer_text"
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 				@diag_test_placed_date = row['answer_text']
 					if @diag_test_placed_date != '' && @diag_test_placed_date != nil
-						@@lateDate = compareDates(@@lateDate, @diag_test_placed_date, 'late')
+						@@lateDate = compareDateStrings(@@lateDate, @diag_test_placed_date, 'late')
 					end
 
 			end
@@ -1910,8 +1917,8 @@ class PrintPdfsController < ApplicationController
 										END AS phin_var 
 										FROM tb_qa_views where question_short_name IN ('DIAG_TST_TEST', 'DIAG_TST_PLACED_DATE', 'DIAG_TST_INDURATION') and event_id = " + @@event_id + 
 										" and repeater_form_object_id = " + @@repeatID + " order by repeater_form_object_id, question_short_name, answer_text"
-				@@resrpt = @@conn.exec(@@sqlStr)
-				@@resrpt.each do |row|
+				@@sthrpt = @@dbh.execute(@@sqlStr)
+				@@sthrpt.each do |row|
 					@single_question_answer_r_orig = row['answer_text']
 					@single_question_answer_r = row['answer_text'].downcase
 					@phin_var_r = row['phin_var']
@@ -1929,7 +1936,7 @@ class PrintPdfsController < ApplicationController
 							end
 							
 							if @phin_var_r == 'tb248'
-								dateString = formatDate(@single_question_answer_r)
+								dateString = formatDateString(@single_question_answer_r)
 								@@indvChars = breakUp(dateString)
 								res_tb248 = PdfMapping('tb248')
 								populatePdfFields(res_tb248)
@@ -1961,8 +1968,8 @@ class PrintPdfsController < ApplicationController
 			#Populate Initial Chest Radiograph 
 			@@sqlStr = "SELECT * FROM tb_qa_views where question_short_name IN ('CHEST_RADIOGRAPH_DATE') and event_id = " + @@event_id + " order by repeater_form_object_id, 
 			question_short_name, answer_text"
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 				@chest_radiograph_date = row['answer_text']
 					if @chest_radiograph_date != '' && @chest_radiograph_date != nil
 						@@lateDate = compareDates(@@lateDate, @chest_radiograph_date, 'late')
@@ -1982,8 +1989,8 @@ class PrintPdfsController < ApplicationController
 									END AS phin_var 
 									FROM tb_qa_views where question_short_name IN ('CHEST_RADIOGRAPH_DATE', 'CHEST_RADIOGRAPH_RESULT', 'DIAG_CXR_CAVITY', 'DIAG_CXR_MILIARY') and event_id = " + @@event_id + 
 									" and repeater_form_object_id = " + @@repeatID + " order by repeater_form_object_id, question_short_name, answer_text"
-			@@resrpt = @@conn.exec(@@sqlStr)
-			@@resrpt.each do |row|
+			@@sthrpt = @@dbh.execute(@@sqlStr)
+			@@sthrpt.each do |row|
 				@single_question_answer_r_orig = row['answer_text']
 				@single_question_answer_r = row['answer_text'].downcase
 				@phin_var_r = row['phin_var']
@@ -2031,11 +2038,11 @@ class PrintPdfsController < ApplicationController
 			#Populate Other Chest Imaging Study
 			@@sqlStr = "SELECT * FROM tb_qa_views where question_short_name IN ('CHEST_CT_IMAGING_DATE') and event_id = " + @@event_id + " order by repeater_form_object_id, 
 			question_short_name, answer_text"
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 				@chest_ct_imaging_date = row['answer_text']
 					if @chest_ct_imaging_date != '' && @chest_ct_imaging_date != nil
-						@@lateDate = compareDates(@@lateDate, @chest_ct_imaging_date, 'late')
+						@@lateDate = compareDateStrings(@@lateDate, @chest_ct_imaging_date, 'late')
 					end
 			end
 
@@ -2051,8 +2058,8 @@ class PrintPdfsController < ApplicationController
 										END AS phin_var 
 										FROM tb_qa_views where question_short_name IN ('CHEST_CT_IMAGING_DATE', 'CHEST_CT_IMAGING_RESULT', 'DIAG_CT_IMAGING_CAVITY', 'DIAG_CT_IMAGING_MILIARY') and event_id = " + @@event_id + 
 										" and repeater_form_object_id = " + @@repeatID + " order by repeater_form_object_id, question_short_name, answer_text"
-				@@resrpt = @@conn.exec(@@sqlStr)
-				@@resrpt.each do |row|
+				@@sthrpt = @@dbh.execute(@@sqlStr)
+				@@sthrpt.each do |row|
 					@single_question_answer_r_orig = row['answer_text']
 					@single_question_answer_r = row['answer_text'].downcase
 					@phin_var_r = row['phin_var']
@@ -2100,11 +2107,11 @@ class PrintPdfsController < ApplicationController
 			#Populate Interferon Gamma Release Assay for Mycobacterium tuberculosis at Diagnosis
 			@@sqlStr = "SELECT * FROM tb_qa_views where question_short_name IN ('DIAG_IGRA_COLLECT_DATE') and event_id = " + @@event_id + " order by repeater_form_object_id, 
 			question_short_name, answer_text"
-			@@res = @@conn.exec(@@sqlStr)
-			@@res.each do |row|
+			@@sth = @@dbh.execute(@@sqlStr)
+			@@sth.each do |row|
 				@diag_igra_collect_date = row['answer_text']
 					if @diag_igra_collect_date != '' && @diag_igra_collect_date != nil
-						@@lateDate = compareDates(@@lateDate, @diag_igra_collect_date, 'late')
+						@@lateDate = compareDateStrings(@@lateDate, @diag_igra_collect_date, 'late')
 					end
 			end
 
@@ -2120,8 +2127,8 @@ class PrintPdfsController < ApplicationController
 										END AS phin_var
 										FROM tb_qa_views where question_short_name IN ('DIAG_IGRA_COLLECT_DATE', 'DIAG_IGRA_RESULT', 'DIAG_IGRA_TEST_TYPE') and event_id = " + @@event_id + 
 										" and repeater_form_object_id = " + @@repeatID + " order by repeater_form_object_id, question_short_name, answer_text"
-				@@resrpt = @@conn.exec(@@sqlStr)
-				@@resrpt.each do |row|
+				@@sthrpt = @@dbh.execute(@@sqlStr)
+				@@sthrpt.each do |row|
 					@single_question_answer_r_orig = row['answer_text']
 					@single_question_answer_r = row['answer_text'].downcase
 					@phin_var_r = row['phin_var']
@@ -2141,7 +2148,7 @@ class PrintPdfsController < ApplicationController
 							end
 							
 							if @phin_var_r == 'tb251'
-								dateString = formatDate(@single_question_answer_r)
+								dateString = formatDateString(@single_question_answer_r)
 								@@indvChars = breakUp(dateString)
 								res_tb251 = PdfMapping('tb251')
 								populatePdfFields(res_tb251)
@@ -2162,7 +2169,7 @@ class PrintPdfsController < ApplicationController
 			
 			reset
 			resetRpt
-			@@conn.close
+			@@dbh.disconnect
 
 			if @@hash_output.size > 0
 				fdf = PdfForms::Fdf.new @@hash_output
