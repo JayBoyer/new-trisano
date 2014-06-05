@@ -41,7 +41,8 @@ group :development do
   gem "rest-open-uri", "1.0.0"
   gem "ci_reporter", "1.6.2"
   gem "hirb", "0.3.4"
-  gem "capistrano", :git => "https://github.com/JayBoyer/capistrano", :branch => "snhd"
+# this gem has to be manually installed
+#  gem "capistrano", :git => "https://github.com/JayBoyer/capistrano", :branch => "snhd"
   gem "rvm-capistrano", "1.2.7"
   gem "capistrano-ext", "1.2.1"
 # the following two gems are needed to use the eclipse/aptana IDE
