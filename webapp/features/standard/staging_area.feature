@@ -1,4 +1,4 @@
- should see "Country: USA, Specimen ID: 23456" on the Laboratory tabFeature: Staging Electronic Messages
+Feature: Staging Electronic Messages
 
   To process electonically submitted messages
   A user needs to be able to view messages and assign them to CMRs

@@ -1,4 +1,4 @@
-Features: Managing jurisdictions
+Feature: Managing jurisdictions
 
   To allow for system configuration
   Jurisdictions can be created, edited, and viewed

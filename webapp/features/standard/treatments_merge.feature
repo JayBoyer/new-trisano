@@ -1,4 +1,4 @@
-Features: Merging treatments
+Feature: Merging treatments
 
   Background:
     Given I am logged in as a super user

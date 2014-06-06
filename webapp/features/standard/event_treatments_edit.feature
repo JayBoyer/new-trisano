@@ -1,4 +1,4 @@
-Features: Editing treatments on events
+Feature: Editing treatments on events
 
   Background:
     Given I am logged in as a super user

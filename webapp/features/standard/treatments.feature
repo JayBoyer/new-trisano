@@ -1,4 +1,4 @@
-Features: Adding and editing treatments
+Feature: Adding and editing treatments
 
   Background:
     Given I am logged in as a super user

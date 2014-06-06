@@ -1,4 +1,4 @@
-Features: Printing events with treatments
+Feature: Printing events with treatments
 
   Background:
     Given I am logged in as a super user

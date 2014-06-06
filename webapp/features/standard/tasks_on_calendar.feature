@@ -1,4 +1,4 @@
-Features: Viewing and working with tasks via the calendar
+Feature: Viewing and working with tasks via the calendar
 
   To provide better visibility into tasks
   Users can view and access tasks via the calendar

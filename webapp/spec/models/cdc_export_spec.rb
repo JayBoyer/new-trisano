@@ -39,8 +39,8 @@ describe CdcExport do
 
   def with_sent_events(event = nil)
     records = []
-    with_cdc_records(event) do |records|
-      samples = records.collect {|record| record[0]}
+    with_cdc_records(event) do |sent_events|
+      samples = sent_events.collect {|sent_event| sent_event[0]}
       CdcExport.reset_sent_status(samples)
       IbisExport.reset_ibis_status(samples)
       start_mmwr = Mmwr.new(Date.today - 7)
@@ -51,7 +51,7 @@ describe CdcExport do
     end
     yield records if block_given?
   end
-
+ 
   def delete_a_record(event_hash = @event_hash)
     with_sent_events do |events|
       events[0].disease_event.disease_id = diseases(:chicken_pox).id

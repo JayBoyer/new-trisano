@@ -1,4 +1,4 @@
-Features: Searching for treatments
+Feature: Searching for treatments
 
   Background:
     Given I am logged in as a super user

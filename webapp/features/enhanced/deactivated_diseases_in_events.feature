@@ -1,4 +1,4 @@
-Features: Working with events with a deactivated disease
+Feature: Working with events with a deactivated disease
 
   Scenario: Editing a disease with a deactivated disease
     Given I am logged in as a super user
