@@ -176,7 +176,7 @@ class EventsController < ApplicationController
     render :layout => false
   end
 
-  # This action is for development/testing purposes only.  This is not a "real" login action
+  # This action is for development    esting purposes only.  This is not a "real" login action
   def change_user
     auth_allow_user_switch = config_option(:auth_allow_user_switch)
 
@@ -476,6 +476,12 @@ class EventsController < ApplicationController
       render :text => t("too_many_cmrs"), :layout => 'application', :status => 400
       return false
     end
+	
+    event_types = params[:event_types];
+	if(!event_types.blank? && event_types.include?('ContactEvent') && params[:investigators].blank?)
+      render :text => "Contact event search must include investigator selection.", :layout => 'application', :status => 400
+      return false
+	end
 
     begin
       @export_options = params[:export_options]
