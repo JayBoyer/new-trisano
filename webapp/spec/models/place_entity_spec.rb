@@ -40,14 +40,14 @@ describe PlaceEntity do
           @event.hospitalization_facilities.build(:secondary_entity_id => @pool.id).save!
         end
 
-        it "should be found if a matching name is used" do
+        it "should not be found if a matching name is used" do
           psf = PlacesSearchForm.new(:name => "Davis", :place_type => "H")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 1
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
 
         it "should not be found if name doesn't match" do
           psf = PlacesSearchForm.new(:name => "xxx", :place_type => "H")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 0
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
       end
 
@@ -58,14 +58,14 @@ describe PlaceEntity do
           @event.diagnostic_facilities.build(:secondary_entity_id => @pool.id).save!
         end
 
-        it "should be found if matching name is used" do
+        it "should not be found if matching name is used" do
           psf = PlacesSearchForm.new(:name => "Diagnostic Facility", :place_type => "DiagnosticFacility")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 1
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
 
         it "should not find places that have been utilized as diagnostic facilities if a matching name is not used" do
           psf = PlacesSearchForm.new(:name => "xxx", :place_type => "DiagnosticFacility")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 0
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
       end
 
@@ -76,14 +76,14 @@ describe PlaceEntity do
           @event.labs.build(:secondary_entity_id => @pool.id).save!
         end
 
-        it "should be found if matching name is used" do
+        it "should not be found if matching name is used" do
           psf = PlacesSearchForm.new(:name => "Labby Lab", :place_type => "L")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 1
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
 
         it "should not be found if a matching name is not used" do
           psf = PlacesSearchForm.new(:name => "xxx", :place_type => "L")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 0
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
       end
 
@@ -96,14 +96,14 @@ describe PlaceEntity do
                       :name => "FallMart"}}}).save!
         end
 
-        it "should find places that have been utilized as place exposures if a matching name is used" do
+        it "should not find places that have been utilized as place exposures if a matching name is used" do
           psf = PlacesSearchForm.new({:name => "FallMart", :place_type => "InterestedPlace"})
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 1
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
 
         it "should not find places that have been utilized as place exposures if a matching name is not used" do
           psf = PlacesSearchForm.new({:name => "xxx", :place_type => "InterestedPlace"})
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 0
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
       end
 
@@ -114,19 +114,19 @@ describe PlaceEntity do
           @event.build_reporting_agency(:secondary_entity_id => @pool.id).save!
         end
 
-        it "should find places that have been utilized as labs if a matching name is used" do
+        it "should not find places that have been utilized as labs if a matching name is used" do
           psf = PlacesSearchForm.new({:name => "Reporters", :place_type => "ReportingAgency"})
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 1
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
 
         it "should not find places that have been utilized as labs if a matching name is not used" do
           psf = PlacesSearchForm.new(:name => "xxx", :place_type => "ReportingAgency")
-          PlaceEntity.by_name_and_participation_type(psf).size.should == 0
+          PlaceEntity.by_name_and_place_type(psf).size.should == 0
         end
 
         it "should be able to exclude an entity from a search result" do
           psf = PlacesSearchForm.new(:name => "Reporters", :place_type => "ReportingAgency")
-          PlaceEntity.by_name_and_participation_type(psf).exclude_entity(@event.reporting_agency.place_entity).size.should == 0
+          PlaceEntity.by_name_and_place_type(psf).exclude_entity(@event.reporting_agency.place_entity).size.should == 0
         end
       end
 
@@ -143,7 +143,7 @@ describe PlaceEntity do
       it "should find places by thier code type" do
         p = create_place_entity!('Dark Moor', :diagnostic)
         psf = PlacesSearchForm.new(:place_type => 'H')
-        PlaceEntity.by_name_and_participation_type(psf).should == [p]
+        PlaceEntity.by_name_and_place_type(psf).should == [p]
       end
 
     end

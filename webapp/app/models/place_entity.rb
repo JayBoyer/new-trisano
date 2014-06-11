@@ -56,36 +56,23 @@ class PlaceEntity < Entity
     }
   }
 
-  named_scope :join_participations, lambda { |participation_type|
-    { :joins => "LEFT JOIN participations ON entities.id = participations.#{participation_type == 'InterestedPlace' ? 'primary_entity_id' : 'secondary_entity_id'}" }
-  }
-
   named_scope :limit_by_place_types, lambda { |types|
     { :conditions => ["codes.the_code IN (?)", types] }
-  }
-
-  named_scope :limit_by_place_or_participation_types, lambda { |place_types, participation_type|
-    { :conditions => ["codes.the_code IN (?) OR participations.type = ?", place_types, participation_type] }
   }
 
   # Used to decrease number of queries executed when diplaying a place
   # listing. Should be combined with other place scopes.
   named_scope :optimize_for_index, {
-    :include => [{:place => :place_types}, {:canonical_address => [:county, :state]}],
+    :joins => [{:place => :place_types}],
     :select => "DISTINCT(entities.id), p.name",
     :order => "p.name ASC"
   }
 
   # builds a scoped object, like what is returned from named_scopes
-  def self.by_name_and_participation_type(search_data)
+  def self.by_name_and_place_type(search_data)
     scope = optimize_for_index
     if search_data.includes_place_type?
-      if search_data.includes_participation_type?
-        scope = scope.join_participations(search_data.participation_type)
-        scope = scope.limit_by_place_or_participation_types(search_data.place_types, search_data.participation_type)
-      else
-        scope = scope.limit_by_place_types(search_data.place_types)
-      end
+      scope = scope.limit_by_place_types(search_data.place_types)
     end
     scope = scope.with_place_names_like(search_data.name)
     scope

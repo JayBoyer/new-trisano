@@ -47,7 +47,7 @@ end
 Given /^a (.+) event with with a form with repeating core fields and hospitalizations$/ do |event_type|
   And "a #{event_type} event with with a form with repeating core fields"
   And   "I navigate to the #{event_type} event edit page"
-  hospital_name = PlaceEntity.by_name_and_participation_type(PlacesSearchForm.new({:place_type => "H"})).first.place.name
+  hospital_name = PlaceEntity.by_name_and_place_type(PlacesSearchForm.new({:place_type => "H"})).first.place.name
   add_hospital(@browser, {:name => hospital_name})
   And   "I save and exit"
 end

@@ -21,7 +21,7 @@ class PlacesController < ApplicationController
   before_filter :init_search_form, :only => [:index]
 
   def index
-    @place_entities = (params[:name] ? PlaceEntity.by_name_and_participation_type(@search_form) : [])
+    @place_entities = (params[:name].blank? ? [] : PlaceEntity.by_name_and_place_type(@search_form))
     respond_to do |format|
       format.html 
       format.xml { render :xml => @place_entities.to_xml(:include => :place) }

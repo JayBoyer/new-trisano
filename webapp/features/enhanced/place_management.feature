@@ -10,47 +10,50 @@ Feature: Managing places through the admin console
         | Planet     |
       And the following places:
         | name    | type      |
-        | Mars    | Planet    |
+        | Earth   | Planet    |
         | Jupiter | Planet    |
         | Neptune | Planet    |
       And places have these addresses:
         | place   | number | street       |
-        | Mars    | 12     | Happy Street |
+        | Earth   | 12     | Happy Street |
         | Jupiter | 214    | Main St.     |
         | Neptune | 3      | MLK Blvd.    |
 
 
   Scenario: Sorting places by name
     When I open the place management tool
+    When I fill in "Place name" with "e"
      And I click the "Search" button and wait for the page to load
     Then I should see the following in order:
+      | Earth   |
       | Jupiter |
-      | Mars    |
       | Neptune |
     When I click the "Place name" table header 2 times
     Then I should see the following in order:
       | Neptune |
-      | Mars    |
       | Jupiter |
+      | Earth   |
 
 
   Scenario: Sorting places by address
     When I open the place management tool
+    When I fill in "Place name" with "e"
      And I click the "Search" button and wait for the page to load
      And I click the "Address" table header
     Then I should see the following in order:
-      | Mars |
+      | Earth   |
       | Jupiter |
       | Neptune |
     When I click the "Address" table header
     Then I should see the following in order:
       | Neptune |
       | Jupiter |
-      | Mars |
+      | Earth   |
 
 
   Scenario: Sorting places by place type
     When I open the place management tool
+    When I fill in "Place name" with "e"
      And I click the "Search" button and wait for the page to load
      And I click the "Place type" table header
     Then I should see the following in order:
