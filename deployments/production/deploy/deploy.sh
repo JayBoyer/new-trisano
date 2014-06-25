@@ -98,6 +98,9 @@ case $response in
 
 ##    echo "Warming cache (process will run in background)"
 ##    ssh trisano_rails@$ssh_host "cd $remote_deployment_target_path/current; RAILS_ENV=production bundle exec rake cache:warm[$live_url,100] --trace" &
+
+    echo "removing unused gems"
+    ssh trisano_rails@$ssh_host "bundle clean --force"
     
     cd $original_path
     git tag -a -m "$USER deployed $target_tag to $target_name at `date -u`" "deployed-to-$ssh_host-`date -u +%Y-%m-%d_%H-%M`"
