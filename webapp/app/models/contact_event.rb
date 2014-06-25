@@ -134,6 +134,7 @@ class ContactEvent < HumanEvent
     end
     state :closed do
       assign_to_lhd
+      reopen_by_manager :reopen
     end
   end
 

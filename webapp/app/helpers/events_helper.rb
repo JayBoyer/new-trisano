@@ -221,7 +221,7 @@ module EventsHelper
   end
 
   def state_controls(event)
-    return "" if event.new? or event.closed? or event.rejected_by_lhd?
+    return "" if event.new? or event.rejected_by_lhd?
 
     routing_controls = assignment_controls(event)
     action_controls = action_controls(event)
