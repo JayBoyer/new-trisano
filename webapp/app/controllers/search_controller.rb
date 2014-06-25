@@ -185,6 +185,7 @@ class SearchController < ApplicationController
          :event_type,       params[:event_type],
          :record_number,    params[:record_number],
          :pregnant_id,      params[:pregnant_id],
+         :accession_no, params[:accession_no],
          :state_case_status_ids, params[:state_case_status_ids],
          :lhd_case_status_ids,   params[:lhd_case_status_ids],
          :sent_to_cdc,           params[:sent_to_cdc],

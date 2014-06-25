@@ -41,6 +41,7 @@ module EventSearch
        :area_code,
        :phone_number,
        :starts_with_aka_name,
+       :accession_no,
        :county,
        :jurisdiction_ids,
        :birth_date,
@@ -104,6 +105,7 @@ module EventSearch
         fields << "counties_addresses.code_description AS county"
         fields << "places.short_name AS jurisdiction"
         fields << "disease_events.disease_onset_date AS onset_date"
+        fields << "lab_results.accession_no AS accession_no"
         fields << "lab_results.collection_date AS collection_date"
         fields << "#{search_rank(options)} AS rank" unless name_and_date_blank?(options)
       end.flatten.compact
@@ -135,11 +137,18 @@ module EventSearch
           LEFT OUTER JOIN participations associated_jurisdictions_events ON associated_jurisdictions_events.event_id = events.id
             AND (associated_jurisdictions_events.type = 'AssociatedJurisdiction' )
         JOIN
-        joins << <<-JOIN
-          LEFT OUTER JOIN lab_results on lab_results.id = (SELECT lab_results.id FROM lab_results 
-            INNER JOIN participations ON participations.event_id = events.id AND participations.type = 'Lab' AND lab_results.participation_id = participations.id
-            ORDER BY lab_results.collection_date DESC LIMIT 1)
-        JOIN
+        if options[:accession_no].blank?
+          joins << <<-JOIN
+            LEFT OUTER JOIN lab_results on lab_results.id = (SELECT lab_results.id FROM lab_results 
+              INNER JOIN participations ON participations.event_id = events.id AND participations.type = 'Lab' AND lab_results.participation_id = participations.id
+              ORDER BY lab_results.collection_date DESC LIMIT 1)
+          JOIN
+        else
+          joins << <<-JOIN
+            INNER JOIN participations lab ON lab.event_id = events.id AND (lab.type = 'Lab')
+            INNER JOIN lab_results ON lab_results.participation_id = lab.id            
+          JOIN
+        end
         if(!aka_conditions(options).blank?)
           joins << <<-JOIN
             LEFT OUTER JOIN answers ON events.id = (SELECT answers.event_id FROM answers
@@ -174,6 +183,7 @@ module EventSearch
         where << area_code_conditions(options)
         where << phone_number_conditions(options)
         where << aka_conditions(options)
+        where << accession_conditions(options)
         where << county_conditions(options)
         where << jurisdiction_conditions(options)
         where << sensitive_disease_conditions(options)
@@ -350,6 +360,12 @@ module EventSearch
     def aka_conditions(options)
       unless options[:starts_with_aka_name].blank?
         sanitize_sql_for_conditions(["answers.text_answer ILIKE ?", options[:starts_with_aka_name] + "%"])
+      end
+    end
+
+    def accession_conditions(options)
+      unless options[:accession_no].blank?
+        sanitize_sql_for_conditions(["lab_results.accession_no ILIKE ?", "%" + options[:accession_no] + "%"])
       end
     end
 

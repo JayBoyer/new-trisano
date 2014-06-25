@@ -99,7 +99,7 @@
       %th
         =t 'onset_date'
       %th
-        =t 'collection_date'
+        =t(params['accession_no'].blank? ? 'collection_date' : 'accession_no')
       - for event in @events
         %tr{:class => search_result_class(event)}
           %td
@@ -125,7 +125,10 @@
           %td
             = ld(event['onset_date'])
           %td
-            = ld(event['collection_date'])
+            - if(params['accession_no'].blank?)
+              = ld(event['collection_date'])
+            - else
+              = h(event['accession_no'])
 
   %br
   %p

@@ -204,6 +204,12 @@ module SearchHelper
         html << yesno_select(:pregnant_id, params['pregnant_id'].to_i)
         html
       end
+      
+      fields << div_tag(:class => :horiz) do
+        html =  label_tag(:accession_no, t(:accession_no))
+        html << text_field_tag(:accession_no, params[:accession_no], :size => 20)
+        html
+      end
     end
   end
 
