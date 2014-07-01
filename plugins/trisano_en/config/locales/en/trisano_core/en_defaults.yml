@@ -229,7 +229,7 @@ en:
     contact_event_created: "Contact event created."
     contact_event_deleted: "Contact event deleted."
     event_promoted_from_to: "Event promoted from {{from}} to {{to}}."
-    event_promoted_from_to: "Event demoted from {{from}} to {{to}}."
+    event_demoted_from_to: "Event demoted from {{from}} to {{to}}."
 
     lab_result_created: "Lab result added.\nLab name: {{lab_name}}\nAccession number: {{accession_no}}"
     lab_result_deleted: "Lab result deleted.\nLab name: {{lab_name}}\nAccession number: {{accession_no}}"
