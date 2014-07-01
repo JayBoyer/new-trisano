@@ -70,9 +70,6 @@ end
 
 config.logger = DEFAULT_LOGGER
 
-#make translation fail loud
-#require 'trisano/i18n/fail_fast'
-
 require 'redis-store'
 config.gem 'redis-store'
 config.cache_store = :redis_store, { :host => "localhost" }

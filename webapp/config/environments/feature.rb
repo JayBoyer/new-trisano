@@ -42,7 +42,6 @@ require 'logging'
 Logging.init :debug, :info, :warn, :error, :fatal
 DEFAULT_LOGGER = Logging::Logger['server']
 
-
-#make translation fail loud
-require 'trisano/i18n/fail_fast'
+#make translation fail loud (for tests only!)
+require RAILS_ROOT + '/test/fail_fast'
 

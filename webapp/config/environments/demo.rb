@@ -66,6 +66,3 @@ else
 end
 
 config.logger = DEFAULT_LOGGER
-
-#make translation fail loud
-#require 'trisano/i18n/fail_fast'

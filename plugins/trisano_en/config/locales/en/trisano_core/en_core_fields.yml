@@ -129,15 +129,6 @@ en:
           specimen_sent_to_state: Lab results | Specimen sent to state lab
           lab_test_date: Lab results | Lab Test date
           specimen_source: Lab results | Specimen source
-        place_entity:
-          telephones:
-            area_code: Laboratory area code
-            country_code: Laboratory country code
-            phone_number: Laboratory phone number
-            extension: Laboratory extension
-          place:
-            name: Laboratory
-            place_type: Laboratory place type
       imported_from_id: Imported from
       hospitalization_facilities:
         name: Hospitalized health facilities
@@ -297,15 +288,6 @@ en:
           specimen_sent_to_state: Lab results | Specimen sent to state lab
           lab_test_date: Lab results | Lab Test date
           specimen_source: Lab results | Specimen source
-        place_entity:
-          telephones:
-            area_code: Laboratory area code
-            country_code: Laboratory country code
-            phone_number: Laboratory phone number
-            extension: Laboratory extension
-          place:
-            name: Laboratory
-            place_type: Laboratory place type
       imported_from_id: Imported from
       hospitalization_facilities:
         name: Hospitalized health facilities
@@ -538,15 +520,6 @@ en:
           specimen_sent_to_state: Lab results | Specimen sent to state lab
           lab_test_date: Lab results | Lab Test date
           specimen_source: Lab results | Specimen source
-        place_entity:
-          telephones:
-            area_code: Laboratory area code
-            country_code: Laboratory country code
-            phone_number: Laboratory phone number
-            extension: Laboratory extension
-          place:
-            name: Laboratory
-            place_type: Laboratory place type
       imported_from_id: Imported from
       hospitalization_facilities:
         name: Hospitalized health facilities
@@ -785,15 +758,6 @@ en:
           specimen_sent_to_state: Lab results | Specimen sent to state lab
           lab_test_date: Lab results | Lab Test date
           specimen_source: Lab results | Specimen source
-        place_entity:
-          telephones:
-            area_code: Laboratory area code
-            country_code: Laboratory country code
-            phone_number: Laboratory phone number
-            extension: Laboratory extension
-          place:
-            name: Laboratory
-            place_type: Laboratory place type
       imported_from_id: Imported from
       hospitalization_facilities:
         name: Hospitalized health facilities

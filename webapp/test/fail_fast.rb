@@ -14,7 +14,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
+
 # We raise our own exceptions to fool rails
+# THIS IS FOR USE WITH TESTS ONLY
 module Trisano
   class MissingTranslation < I18n::ArgumentError; end
 end
