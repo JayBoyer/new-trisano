@@ -8,7 +8,7 @@ class PrintOojFrController < ApplicationController
   def pdfoojfr
     if params[:evnt_id] != '' && params[:evnt_id] != nil
       @@event_id = params[:evnt_id]
-      #@@event_id = '46286'
+      #@@event_id = '59067'
       @@hash_pdf_fields_ooj = {"aka" => "ooj_aka",
                   "complexion"  => "ooj_complexion",
                   "current_gender" => "ooj_current_gender",
@@ -42,10 +42,6 @@ class PrintOojFrController < ApplicationController
                   "gc_condition" => "generic",
                   "syph_condition" => "generic",
                   "hiv_condition" => "generic",
-                  "contact_size" => "ooj_size",
-                  "contact_hair" => "ooj_hair",
-                  "contact_height" => "ooj_height",
-                  "contact_complexion"  => "ooj_complexion",
                   "contact_info" => "ooj_other_phys",
                   "initiating_agency" => "ooj_initiating_agency"
                   }
@@ -58,10 +54,6 @@ class PrintOojFrController < ApplicationController
                   "marital_status" => "fr_marital_status",
                   "other_physical_desc" => "fr_other_phys",
                   "size" => "fr_size",
-                  "contact_size" => "fr_size",
-                  "contact_hair" => "fr_hair",
-                  "contact_height" => "fr_height",
-                  "contact_complexion"  => "fr_complexion",
                   "contact_info" => "fr_other_phys",
                   "ref_basis" => "ct_to"
                   }
@@ -88,7 +80,6 @@ class PrintOojFrController < ApplicationController
       @@sqlStr = ''
       out_filename = ''
  
- 
       pdftk_path = '/usr/bin/pdftk'
       
       if Rails.env.production? || Rails.env.uat?
@@ -103,7 +94,7 @@ class PrintOojFrController < ApplicationController
         pdf_path = '~/code/trisano/webapp/app/pdfs/'
         template = '~/code/trisano/webapp/app/pdfs/template/ooj_fr_template.pdf'
       end
-      
+
       #pdf_path = 'C:/pdfs/'
       #pdftk_path = "C:/Program Files (x86)/PDF Labs/PDFtk Server/bin/pdftk.exe"
       #template = 'C:/pdfs/template/tb_fields_template.pdf'
@@ -193,6 +184,7 @@ class PrintOojFrController < ApplicationController
       
       @time = Time.new
       @time = @time.strftime("%m/%d/%Y")
+      rtndata = false
       
       if @time != '' && @time != nil
         @@hash_output['letter_date'] = @time
@@ -349,25 +341,29 @@ class PrintOojFrController < ApplicationController
             
       @@sth = @@dbh.execute(@@sqlStr)
         @phonenumbs = ''
-        if @@sth.column_names().length > 0
-          @@sth.each_with_index do |row, index|
-            @areacode = row['area_code']
-            @phonenum = row['phone_number']
-            @extension = row['extension']
-            
-            if @areacode != '' && @areacode != nil
-              @phonenumbs = @phonenumbs + @areacode + "-"
+        if @@sth.fetchable?
+          rows = @@sth.fetch_all
+            if(rows != nil && rows.size > 0)
+                numrows = rows.size
+                rows.each_with_index do |row, index|
+                    @areacode = row['area_code']
+                    @phonenum = row['phone_number']
+                    @extension = row['extension']
+                     
+                    if @areacode != '' && @areacode != nil
+                      @phonenumbs = @phonenumbs + @areacode + "-"
+                    end
+                    if @phonenum != '' && @phonenum != nil
+                      @phonenumbs = @phonenumbs + @phonenum
+                    end
+                    if @extension != '' && @extension != nil
+                      @phonenumbs = @phonenumbs + "x" + @extension
+                    end
+                    if index != numrows - 1
+                        @phonenumbs = @phonenumbs + ", "
+                    end
+                end
             end
-            if @phonenum != '' && @phonenum != nil
-              @phonenumbs = @phonenumbs + @phonenum
-            end
-            if @extension != '' && @extension != nil
-              @phonenumbs = @phonenumbs + "x" + @extension
-            end
-            if index != @@sth.column_names.length - 1
-              @phonenumbs = @phonenumbs + ", "
-            end
-          end
         end
         
         @@hash_output['ooj_phone'] = @phonenumbs
@@ -385,54 +381,58 @@ class PrintOojFrController < ApplicationController
             
       @@sth = @@dbh.execute(@@sqlStr)
         @labs = ''
-        if @@sth.column_names.length > 0
-          @@sth.each_with_index do |row, index|
-            @test_type = row['test_type']
-            @organism = row['organism_name']
-            @testresult = row['test_result']
-            @resultvalue = row['result_value']
-            @units = row['units']
-            @collectiondate = row['collection_date']
-            @labtestdate = row['lab_test_date']
-            
-            if @organism != '' && @organism != nil
-              if @organism.downcase.include? 'neisseria'
-                @organism = 'GC'
-              end
-              if @organism.downcase.include? 'chlamydia'
-                @organism = 'CT'
-              end
-              if @organism.downcase.include? 'treponema'
-                @organism = 'Syphilis'
-              end
-              if @organism.downcase.include? 'human immunodeficiency virus'
-                @organism = 'HIV'
-              end
-              @labs = @labs + @organism + "-"
+        if @@sth.fetchable?
+            rows = @@sth.fetch_all
+            if(rows != nil && rows.size > 0)
+                    numrows = rows.size
+                  rows.each_with_index do |row, index|
+                    @test_type = row['test_type']
+                    @organism = row['organism_name']
+                    @testresult = row['test_result']
+                    @resultvalue = row['result_value']
+                    @units = row['units']
+                    @collectiondate = row['collection_date']
+                    @labtestdate = row['lab_test_date']
+                    
+                    if @organism != '' && @organism != nil
+                      if @organism.downcase.include? 'neisseria'
+                        @organism = 'GC'
+                      end
+                      if @organism.downcase.include? 'chlamydia'
+                        @organism = 'CT'
+                      end
+                      if @organism.downcase.include? 'treponema'
+                        @organism = 'Syphilis'
+                      end
+                      if @organism.downcase.include? 'human immunodeficiency virus'
+                        @organism = 'HIV'
+                      end
+                      @labs = @labs + @organism + "-"
+                    end
+                    if @test_type != '' && @test_type != nil
+                      @labs = @labs + @test_type + "-"
+                    end
+                    if @testresult != '' && @testresult != nil
+                      if @testresult.include? ' / '
+                        @testresult = @testresult.gsub(/ \/ /,'\/')
+                      end
+                      
+                      @labs = @labs + @testresult + "-"
+                    end
+                    if @resultvalue != '' && @resultvalue != nil
+                      @labs = @labs + @resultvalue + "-"
+                    end
+                    if @units != '' && @units != nil
+                      @labs = @labs + @units + "-"
+                    end
+                    if @collectiondate != '' && @collectiondate != nil
+                      @labs = @labs + 'CollectDate:' + formatDate(@collectiondate)
+                    end
+                    if index != numrows - 1
+                      @labs = @labs + "; "
+                    end
+                  end
             end
-            if @test_type != '' && @test_type != nil
-              @labs = @labs + @test_type + "-"
-            end
-            if @testresult != '' && @testresult != nil
-              if @testresult.include? ' / '
-                @testresult = @testresult.gsub(/ \/ /,'\/')
-              end
-              
-              @labs = @labs + @testresult + "-"
-            end
-            if @resultvalue != '' && @resultvalue != nil
-              @labs = @labs + @resultvalue + "-"
-            end
-            if @units != '' && @units != nil
-              @labs = @labs + @units + "-"
-            end
-            if @collectiondate != '' && @collectiondate != nil
-              @labs = @labs + 'CollectDate:' + formatDate(@collectiondate)
-            end
-            if index != @@sth.column_names.length - 1
-              @labs = @labs + "; "
-            end
-          end
         end
         
         @@hash_output['ooj_labs'] = @labs
@@ -453,154 +453,160 @@ class PrintOojFrController < ApplicationController
             ORDER BY q.short_name"
             
       @@sth = @@dbh.execute(@@sqlStr)
-        if @@sth.column_names.length > 0
-          @@sth = @@sth
-        else
-          reset
-          @@sqlStr = "SELECT a.event_id, a.question_id, q.short_name AS question_short_name, q.question_text, a.id AS answer_id, a.text_answer AS answer_text, s.name AS section_name, a.repeater_form_object_id, 
-            a.repeater_form_object_type, s.repeater AS s_repeater, f.short_name AS form_short_name, q.data_type AS question_data_type, e.investigation_started_date, a.code AS answer_code, de.disease_id, d.disease_name
-            FROM answers a
-            LEFT JOIN questions q ON q.id = a.question_id
-            LEFT JOIN form_elements fe ON q.form_element_id = fe.id
-            LEFT JOIN form_elements s ON s.id = fe.parent_id
-            LEFT JOIN forms f ON f.id = fe.form_id
-            LEFT JOIN events e ON e.id = a.event_id
-            LEFT JOIN disease_events de on de.event_id = e.id
-            LEFT JOIN diseases d on d.id = de.disease_id
-            WHERE e.id=" + @@event_id + "and lower(f.short_name) in ('std_contact_field_record', 'std_physical_desc', 'std_coinfection', 'std_new_interview_record')
-            ORDER BY q.short_name"
-            
-          @@sth = @@dbh.execute(@@sqlStr)
-        end 
-        
-        
-      @@sth.each do |row|
-        @question_short_name = row['question_short_name']
-        @answer_text = row['answer_text']
-        @disease_name = row['disease_name']
-        @data_type = row['question_data_type']
-        
-        pdf_field = ''
-                
-        if @@hash_pdf_fields_ooj.key?(@question_short_name)
-          pdf_field = @@hash_pdf_fields_ooj[@question_short_name]
-          
-          if @answer_text != '' && @answer_text != nil
-          
-            @answer_text = @answer_text.gsub(/\'/,'')
-            @answer_text = @answer_text.gsub(/\"/,'')
-            
-            if @data_type == "date"
-              @answer_text = formatDateString(@answer_text)
-            end
-          
-            if !@@hash_dispo_fields.key?(@question_short_name)
-                            
-              if @question_short_name != "fr_notes"
-                @@hash_output[pdf_field] = @answer_text
-              
-                  if @@hash_pdf_fields_fr.key?(@question_short_name)
-                    pdf_field = @@hash_pdf_fields_fr[@question_short_name]
-                    @@hash_output[pdf_field] = @answer_text
-                  end
-              else
-                if @answer_text.length > 115
-                  @@hash_output['ooj_notes_1'] = @answer_text[0,115]
-                  @@hash_output['ooj_notes_2'] = @answer_text[115..-1]
-                else
-                  @@hash_output['ooj_notes_1'] = @answer_text[0,115]
-                end
-              end
+        if @@sth.fetchable?
+           rows = @@sth.fetch_all
+            if(rows != nil && rows.size > 0)
+                rtndata = true
             else
-              if @disease_name.downcase != "std/hiv co-infection"
-                if @question_short_name == "dispo"
-                  if @disease_name.downcase.include? "chlamydia"
-                    @@hash_output['ooj_200_dispo'] = @answer_text[0,1]
-                    @@note_fields.push('200')
-                  end
-                  if @disease_name.downcase.include? "gonococcal"
-                    @@hash_output['ooj_300_dispo'] = @answer_text[0,1]
-                    @@note_fields.push('300')
-                  end
-                  if @disease_name.downcase.include? "syphilis"
-                    @@hash_output['ooj_700_dispo'] = @answer_text[0,1]
-                    @@note_fields.push('700')
-                  end
-                  if @disease_name.downcase.include? "hiv" or @disease_name.downcase.include? "aids"
-                    @@hash_output['ooj_900_dispo'] = @answer_text[0,1]
-                    @@note_fields.push('900')
-                  end
-                end
-                if @question_short_name == "dispo_dt"
-                  if @disease_name.downcase.include? "chlamydia"
-                    @@hash_output['ooj_200_date'] = @answer_text
-                  end
-                  if @disease_name.downcase.include? "gonococcal"
-                    @@hash_output['ooj_300_date'] = @answer_text
-                  end
-                  if @disease_name.downcase.include? "syphilis"
-                    @@hash_output['ooj_700_date'] = @answer_text
-                  end
-                  if @disease_name.downcase.include? "hiv" or @disease_name.downcase.include? "aids"
-                    @@hash_output['ooj_900_date'] = @answer_text
-                  end
-                end
-              else
-                if @question_short_name == "ct_condition"
-                  if @answer_text.downcase.include? "yes"
-                    @@note_fields.push('200')
-                  end
-                end
-                if @question_short_name == "ct_dispo"
-                  @@hash_output['ooj_200_dispo'] = @answer_text[0,1]
-                end
-                if @question_short_name == "ct_dispo_dt"
-                  @@hash_output['ooj_200_date'] = @answer_text
-                end
+                reset
+                  @@sqlStr = "SELECT a.event_id, a.question_id, q.short_name AS question_short_name, q.question_text, a.id AS answer_id, a.text_answer AS answer_text, s.name AS section_name, a.repeater_form_object_id, 
+                    a.repeater_form_object_type, s.repeater AS s_repeater, f.short_name AS form_short_name, q.data_type AS question_data_type, e.investigation_started_date, a.code AS answer_code, de.disease_id, d.disease_name
+                    FROM answers a
+                    LEFT JOIN questions q ON q.id = a.question_id
+                    LEFT JOIN form_elements fe ON q.form_element_id = fe.id
+                    LEFT JOIN form_elements s ON s.id = fe.parent_id
+                    LEFT JOIN forms f ON f.id = fe.form_id
+                    LEFT JOIN events e ON e.id = a.event_id
+                    LEFT JOIN disease_events de on de.event_id = e.id
+                    LEFT JOIN diseases d on d.id = de.disease_id
+                    WHERE e.id=" + @@event_id + "and lower(f.short_name) in ('std_contact_field_record', 'std_physical_desc', 'std_coinfection', 'std_new_interview_record')
+                    ORDER BY q.short_name"
                 
-                if @question_short_name == "gc_condition"
-                  if @answer_text.downcase.include? "yes"
-                    @@note_fields.push('300')
-                  end
-                end
-                if @question_short_name == "gc_dispo"
-                  @@hash_output['ooj_300_dispo'] = @answer_text[0,1]
-                end
-                if @question_short_name == "gc_dispo_dt"
-                  @@hash_output['ooj_300_date'] = @answer_text
-                end
-                
-                if @question_short_name == "syph_condition"
-                  if @answer_text.downcase.include? "7"
-                    @@note_fields.push('700')
-                  end
-                end
-                if @question_short_name == "syph_dispo"
-                  @@hash_output['ooj_700_dispo'] = @answer_text[0,1]
-                end
-                if @question_short_name == "syph_dispo_dt"
-                  @@hash_output['ooj_700_date'] = @answer_text
-                end
-                
-                if @question_short_name == "hiv_condition"
-                  if @answer_text.downcase.include? "9"
-                    @@note_fields.push('900')
-                  end
-                end
-                if @question_short_name == "hiv_dispo"
-                  @@hash_output['ooj_900_dispo'] = @answer_text[0,1]
-                end
-                if @question_short_name == "hiv_dispo_dt"
-                  @@hash_output['ooj_900_date'] = @answer_text
-                end
-                
-              end
-            
+                    @@sth = @@dbh.execute(@@sqlStr)
+                    rows = @@sth.fetch_all
+                        if(rows != nil && rows.size > 0)
+                            rtndata = true
+                        end
             end
-          end
         end 
-      end 
 
+      
+      if rtndata 
+              rows.each do |row|
+                @question_short_name = row['question_short_name']
+                @answer_text = row['answer_text']
+                @disease_name = row['disease_name']
+                @data_type = row['question_data_type']
+                
+                pdf_field = ''
+
+                if @@hash_pdf_fields_ooj.key?(@question_short_name)
+                  pdf_field = @@hash_pdf_fields_ooj[@question_short_name]
+                 
+                  if @answer_text != '' && @answer_text != nil
+                  
+                    @answer_text = @answer_text.gsub(/\'/,'')
+                    @answer_text = @answer_text.gsub(/\"/,'')
+                    
+                    if @data_type == "date"
+                      @answer_text = formatDateString(@answer_text)
+                    end
+                  
+                    if !@@hash_dispo_fields.key?(@question_short_name)
+                      if @question_short_name != "fr_notes"
+                        @@hash_output[pdf_field] = @answer_text
+                          if @@hash_pdf_fields_fr.key?(@question_short_name)
+                            pdf_field = @@hash_pdf_fields_fr[@question_short_name]
+                            @@hash_output[pdf_field] = @answer_text
+                          end
+                      else
+                        if @answer_text.length > 115
+                          @@hash_output['ooj_notes_1'] = @answer_text[0,115]
+                          @@hash_output['ooj_notes_2'] = @answer_text[115..-1]
+                        else
+                          @@hash_output['ooj_notes_1'] = @answer_text[0,115]
+                        end
+                      end
+                    else
+                      if @disease_name.downcase != "std/hiv co-infection"
+                        if @question_short_name == "dispo"
+                          if @disease_name.downcase.include? "chlamydia"
+                            @@hash_output['ooj_200_dispo'] = @answer_text[0,1]
+                            @@note_fields.push('200')
+                          end
+                          if @disease_name.downcase.include? "gonococcal"
+                            @@hash_output['ooj_300_dispo'] = @answer_text[0,1]
+                            @@note_fields.push('300')
+                          end
+                          if @disease_name.downcase.include? "syphilis"
+                            @@hash_output['ooj_700_dispo'] = @answer_text[0,1]
+                            @@note_fields.push('700')
+                          end
+                          if @disease_name.downcase.include? "hiv" or @disease_name.downcase.include? "aids"
+                            @@hash_output['ooj_900_dispo'] = @answer_text[0,1]
+                            @@note_fields.push('900')
+                          end
+                        end
+                        if @question_short_name == "dispo_dt"
+                          if @disease_name.downcase.include? "chlamydia"
+                            @@hash_output['ooj_200_date'] = @answer_text
+                          end
+                          if @disease_name.downcase.include? "gonococcal"
+                            @@hash_output['ooj_300_date'] = @answer_text
+                          end
+                          if @disease_name.downcase.include? "syphilis"
+                            @@hash_output['ooj_700_date'] = @answer_text
+                          end
+                          if @disease_name.downcase.include? "hiv" or @disease_name.downcase.include? "aids"
+                            @@hash_output['ooj_900_date'] = @answer_text
+                          end
+                        end
+                      else
+                        if @question_short_name == "ct_condition"
+                          if @answer_text.downcase.include? "yes"
+                            @@note_fields.push('200')
+                          end
+                        end
+                        if @question_short_name == "ct_dispo"
+                          @@hash_output['ooj_200_dispo'] = @answer_text[0,1]
+                        end
+                        if @question_short_name == "ct_dispo_dt"
+                          @@hash_output['ooj_200_date'] = @answer_text
+                        end
+                        
+                        if @question_short_name == "gc_condition"
+                          if @answer_text.downcase.include? "yes"
+                            @@note_fields.push('300')
+                          end
+                        end
+                        if @question_short_name == "gc_dispo"
+                          @@hash_output['ooj_300_dispo'] = @answer_text[0,1]
+                        end
+                        if @question_short_name == "gc_dispo_dt"
+                          @@hash_output['ooj_300_date'] = @answer_text
+                        end
+                        
+                        if @question_short_name == "syph_condition"
+                          if @answer_text.downcase.include? "7"
+                            @@note_fields.push('700')
+                          end
+                        end
+                        if @question_short_name == "syph_dispo"
+                          @@hash_output['ooj_700_dispo'] = @answer_text[0,1]
+                        end
+                        if @question_short_name == "syph_dispo_dt"
+                          @@hash_output['ooj_700_date'] = @answer_text
+                        end
+                        
+                        if @question_short_name == "hiv_condition"
+                          if @answer_text.downcase.include? "9"
+                            @@note_fields.push('900')
+                          end
+                        end
+                        if @question_short_name == "hiv_dispo"
+                          @@hash_output['ooj_900_dispo'] = @answer_text[0,1]
+                        end
+                        if @question_short_name == "hiv_dispo_dt"
+                          @@hash_output['ooj_900_date'] = @answer_text
+                        end
+                        
+                      end
+                    
+                    end
+                  end
+                end 
+              end 
+        end
       
       for i in 0..@@note_fields.length
         field_name = ''
@@ -616,6 +622,14 @@ class PrintOojFrController < ApplicationController
         fdf.save_to fdf_filename
         pdf_filename = pdf_path + 'oojfr_' + @@event_id + '.pdf'
         
+        if(File.exists?(pdf_filename))
+            begin
+                File.delete(pdf_filename)
+            rescue Exception => e
+                logger.info(e.backtrace.inspect)
+            end
+        end
+        
         # run the task in background, otherwise the jruby system call hangs
         system (pdftk_path + ' ' + template + ' fill_form ' + fdf_filename + ' output ' + pdf_filename + ' dont_ask' + ' &')
       end
@@ -630,4 +644,5 @@ class PrintOojFrController < ApplicationController
   end
     
 end
+
   
