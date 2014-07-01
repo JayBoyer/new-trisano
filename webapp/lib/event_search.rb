@@ -249,6 +249,14 @@ module EventSearch
     def phone_number_conditions(options)
       in_condition(:telephones, :phone_number, options)
     end
+    def phone_number_conditions(options)
+      unless options[:phone_number].blank?
+        phone_number_no_dash = options[:phone_number].strip.gsub(/\-/, "")
+        unless phone_number_no_dash.blank?
+          sanitize_sql_for_conditions(["telephones.phone_number IN (?)", phone_number_no_dash])
+        end
+      end
+    end
 
     def county_conditions(options)
       unless options[:county].blank?
