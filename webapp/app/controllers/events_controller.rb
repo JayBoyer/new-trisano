@@ -26,7 +26,7 @@ class EventsController < ApplicationController
   before_filter :set_tab_index
   before_filter :update_last_modified_date, :only => [:update]
   before_filter :find_or_build_event, :only => [ :reporters_search_selection, :reporting_agencies_search, :reporting_agency_search_selection ]
-  before_filter :can_promote?, :only => :event_type
+  before_filter :can_promote_demote?, :only => :event_type
   before_filter :load_event_queues, :only => [:index, :export]
   before_filter :reject_if_wrong_type, :only => [:show, :export_single, :edit, :update, :destroy, :soft_delete, :event_type]
 
@@ -176,7 +176,7 @@ class EventsController < ApplicationController
     render :layout => false
   end
 
-  # This action is for development    esting purposes only.  This is not a "real" login action
+  # This action is for development/testing purposes only.  This is not a "real" login action
   def change_user
     auth_allow_user_switch = config_option(:auth_allow_user_switch)
 
@@ -363,11 +363,17 @@ class EventsController < ApplicationController
   end
 
   def event_type
-    if promoted_event = @event.promote_to(params[:type])
-      flash[:notice] = t(:promoted_to, :type => params[:type].humanize.downcase)
-      redirect_to @template.event_path(promoted_event)
+    # figure out of this is a promotion or demotion
+    promote = true
+    if(params[:type] == 'contact_event' || 
+      (params[:type] == 'assessment_event' && @event.type == 'MorbidityEvent'))
+      promote = false
+    end
+    if changed_event = (promote ? @event.promote_to(params[:type]) : @event.demote_to(params[:type]))
+      flash[:notice] = t(:promoted_demoted_to, :type => params[:type].humanize.downcase)
+      redirect_to @template.event_path(changed_event)
     else
-      flash.now[:error] = t("could_not_promote_event")
+      flash.now[:error] = t("could_not_promote_demote_event")
       render :action => :edit, :status => :bad_request
     end
   end
@@ -478,8 +484,9 @@ class EventsController < ApplicationController
     end
 	
     event_types = params[:event_types];
-	if(!event_types.blank? && event_types.include?('ContactEvent') && params[:investigators].blank?)
-      render :text => "Contact event search must include investigator selection.", :layout => 'application', :status => 400
+	if(!event_types.blank? && event_types.include?('ContactEvent') && params[:investigators].blank? &&
+      params[:states].blank? && params[:queues].blank? && params[:diseases].blank?)
+      render :text => "Contact event search must include some filtering criteria.", :layout => 'application', :status => 400
       return false
 	end
 
@@ -510,6 +517,15 @@ class EventsController < ApplicationController
       return false
     end
     return true
+  end
+
+  def can_promote_demote?
+    unless User.current_user.can_create?(@event)
+      render(:partial => 'events/permission_denied',
+             :layout => true,
+             :locals => { :reason => t("no_event_create_privs") },
+             :status => 403) and return
+    end
   end
 
 end

@@ -781,6 +781,8 @@ es:
   unassigned: "Sin asignación"
   promote_to_cmr: Traspasar a CMR
   promote_to_ae: Traspasar a AE
+  demote_to_ae: Demote to AE
+  demote_to_contact: Demote to Contact
   assign_to_queue: Asignar a la cola
   assign_to_investigator: Asignar a investigador/a
   insufficient_privs_transition: Privilegios insuficientes para alterar este evento

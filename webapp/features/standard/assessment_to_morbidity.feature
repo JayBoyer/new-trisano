@@ -16,7 +16,7 @@ Feature: Promoting Assessment Events to Morbidity Events
       And I am logged in as a super user
      When I promote the assessment to a morbidity event
      Then I should be viewing the show morbidity event for the assessment page
-      And I should see "Successfully promoted to morbidity event."
+      And I should see "Successfully changed to morbidity event."
 
   Scenario: Promoted morbidity event displays disease forms
     Given a published disease form called MA1 for morbidity events with Mumps
@@ -39,5 +39,5 @@ Feature: Promoting Assessment Events to Morbidity Events
       And the event disease diagnosed date is invalid
       And I am logged in as a super user
      When I promote the assessment to a morbidity event
-     Then I should see "Could not promote event."
+     Then I should see "Could not promote/demote event."
       And I should see "Date diagnosed must be on or after"

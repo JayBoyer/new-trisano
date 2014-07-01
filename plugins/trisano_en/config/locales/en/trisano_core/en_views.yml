@@ -817,6 +817,8 @@ en:
   unassigned: "Unassigned"
   promote_to_cmr: Promote to CMR
   promote_to_ae: Promote to AE
+  demote_to_ae: Demote to AE
+  demote_to_contact: Demote to Contact
   assign_to_queue: Assign to queue
   assign_to_investigator: Assign to investigator
   insufficient_privs_transition: Insufficient privileges to transition this event

@@ -68,6 +68,10 @@ module HumanEventsHelper
         
         if event.is_a?(AssessmentEvent)
          controls << " | " << link_to(t(:promote_to_cmr), event_type_ae_path(event, :type => "morbidity_event"), :method => :post, :confirm => t(:are_you_sure), :id => 'event-type')
+         controls << " | " << link_to(t(:demote_to_contact), event_type_ae_path(event, :type => "contact_event"), :method => :post, :confirm => t(:are_you_sure), :id => 'event-type')
+        end
+        if event.is_a?(MorbidityEvent)
+          controls << " | " << link_to(t(:demote_to_ae), event_type_cmr_path(event, :type => "assessment_event"), :method => :post, :confirm => t(:are_you_sure), :id => 'event-type')
         end
       end
       if can_view

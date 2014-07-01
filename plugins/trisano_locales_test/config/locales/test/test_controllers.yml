@@ -40,8 +40,8 @@ test:
   contact_event_no_create: "xContacts can only be created from within a morbidity event."
   contact_saved: "xContact saved."
   contact_not_saved: "xContact event not saved: {{messages}}"
-  could_not_promote_to_morbidity: "xCould not promote to morbidity event."
-  promoted_to: "xSuccessfully promoted to {{type}}."
+  could_not_promote_to_morbidity: "xCould not promote/demote to morbidity event."
+  promoted_demoted_to: "xSuccessfully changed to {{type}}."
 
   # Core field configurations
   core_field_configuration_successfully_created: "xCore field configuration was successfully created."

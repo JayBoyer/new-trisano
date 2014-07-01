@@ -593,12 +593,11 @@ class Event < ActiveRecord::Base
       return false
     end    
   end
-  
-  def promote_to_morbidity_event
-    raise(I18n.t("cannot_promote_unsaved_event")) if self.new_record?
-
-    # In case the event is in a state that doesn't exist for a morbidity evnet.
-    # Also check that the event type supports the not_routed state. (Assessment Events do not.)
+ 
+  def ensure_valid_ae_cmr_state
+    # Change event state if the event is in a state that doesn't exist for the target event type.
+    # right not this happens when promoting a ContactEvent in the not_routed state
+    # to an assessment_event or morbidity_event
     if self.respond_to?(:not_routed?) && self.not_routed?
       if self.jurisdiction.place.is_unassigned_jurisdiction?
         self.promote_as_new
@@ -606,10 +605,25 @@ class Event < ActiveRecord::Base
         self.promote_as_accepted
       end
     end
-
+  end
+  
+  def demote_to(event_type)
+    method_name = "demote_to_#{event_type}"
+    supports_method_name = "supports_#{method_name}?"
+    if self.send(supports_method_name)
+      return self.send(method_name)
+    else
+      return false
+    end    
+  end
+  
+  def promote_to_morbidity_event
+    raise(I18n.t("cannot_promote_demote_unsaved_event")) if self.new_record?
     type_old = self.type
     self['type'] = MorbidityEvent.to_s
-    # Pull morb forms
+    ensure_valid_ae_cmr_state
+    
+    # Attach morb forms
     if self.disease_event && self.disease_event.disease
       jurisdiction = self.jurisdiction ? self.jurisdiction.secondary_entity_id : nil
       self.add_forms(Form.get_published_investigation_forms(self.disease_event.disease_id, jurisdiction, 'morbidity_event'))
@@ -628,22 +642,31 @@ class Event < ActiveRecord::Base
     end
   end
   
-  def promote_to_assessment_event
-    raise(I18n.t("cannot_promote_unsaved_event")) if self.new_record?
-
-    # In case the event is in a state that doesn't exist for a morbidity event.
-    # Also check that the event type supports the not_routed state. (Assessment Events do not.)
-    if self.respond_to?(:not_routed?) && self.not_routed?
-      if self.jurisdiction.place.is_unassigned_jurisdiction?
-        self.promote_as_new
-      else
-        self.promote_as_accepted
-      end
-    end
-
+  def demote_to_assessment_event
+    raise(I18n.t("cannot_promote_demote_unsaved_event")) if self.new_record?
     type_old = self.type
     self['type'] = AssessmentEvent.to_s
-    # Pull assessment event forms
+    self.add_note(I18n.translate("system_notes.event_demoted_from_to", :locale => I18n.default_locale, :from => type_old, :to => "assessment event"))
+    self.created_at = Time.now
+
+    if self.save
+      EventTypeTransition.create(:event => self, :was => self.class, :became => AssessmentEvent, :by => User.current_user)
+      self.freeze
+      expire_parent_record_contacts_cache
+      # Return a fresh copy from the db
+      AssessmentEvent.find(self.id)
+    else
+      false
+    end
+  end
+  
+  def promote_to_assessment_event
+    raise(I18n.t("cannot_promote_demote_unsaved_event")) if self.new_record?
+    type_old = self.type
+    self['type'] = AssessmentEvent.to_s
+    ensure_valid_ae_cmr_state
+    
+    # Attach assessment event forms
     if self.disease_event && self.disease_event.disease
       jurisdiction = self.jurisdiction ? self.jurisdiction.secondary_entity_id : nil
       self.add_forms(Form.get_published_investigation_forms(self.disease_event.disease_id, jurisdiction, 'assessment_event'))
@@ -662,6 +685,26 @@ class Event < ActiveRecord::Base
     end
   end
 
+  def demote_to_contact_event
+    raise(I18n.t("cannot_promote_demote_unsaved_event")) if self.new_record?
+    type_old = self.type
+    self['type'] = ContactEvent.to_s
+    self.add_note(I18n.translate("system_notes.event_demoted_from_to", :locale => I18n.default_locale, :from => type_old, :to => "assessment event"))
+    self.created_at = Time.now
+    self.workflow_state = 'not_routed'
+
+    if self.save
+      EventTypeTransition.create(:event => self, :was => self.class, :became => ContactEvent, :by => User.current_user)
+      self.freeze
+      expire_parent_record_contacts_cache
+      # Return a fresh copy from the db
+      ContactEvent.find(self.id)
+    else
+      false
+    end
+  end
+
+  
   def patient
     if self.respond_to?(:interested_party) &&
        self.interested_party.present? &&
@@ -801,11 +844,15 @@ class Event < ActiveRecord::Base
         attachments
         promote_to_morbidity_event
         promote_to_assessment_event
+        demote_to_assessment_event
+        demote_to_contact_event
         child_events
       )
   end
 
-
+  def expire_parent_record_contacts_cache
+    redis.delete_matched("views/events/#{self.id}*")
+  end
 
   # Sub-classes can either override these method to return true or use a declarative option:
   # supports :something

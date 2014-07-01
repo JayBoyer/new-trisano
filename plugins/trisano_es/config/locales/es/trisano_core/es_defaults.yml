@@ -221,6 +221,7 @@ es:
     contact_event_created: "Se creó el evento de contacto."
     contact_event_deleted: "Caso de contacto borrado."
     event_promoted_from_to: "Evento promovido desde {{from}} hasta {{to}}."
+    event_demoted_from_to: "Evento demoted desde {{from}} hasta {{to}}."
 
     lab_and_results_deleted: "Se eliminaron el laboratorio junto con sus resultados."
     lab_result_created: "Resultado de laboratorio añadido."
@@ -253,7 +254,7 @@ es:
 
   common_test_type_associated_with_lab_results: "{{name}} ya corresponde a los resultados de laboratorio"
   investigator_already_assigned: "Investigador ya asignado"
-  cannot_promote_unsaved_event: "No se puede promocionar un evento no son salvos."
+  cannot_promote_demote_unsaved_event: "No se puede promocionar o demote un evento no son salvos."
   loading_disease_group: "Cargando el grupo de enfermedad {{disease_group}}"
   could_not_remove_form_from_event: "No se pudo remover un formulario de este event: {{message}}"
   unable_to_process_new_forms: "No se pudo procesar formularios nuevos"

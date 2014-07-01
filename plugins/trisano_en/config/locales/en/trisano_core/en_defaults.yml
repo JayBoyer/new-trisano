@@ -229,6 +229,7 @@ en:
     contact_event_created: "Contact event created."
     contact_event_deleted: "Contact event deleted."
     event_promoted_from_to: "Event promoted from {{from}} to {{to}}."
+    event_promoted_from_to: "Event demoted from {{from}} to {{to}}."
 
     lab_result_created: "Lab result added.\nLab name: {{lab_name}}\nAccession number: {{accession_no}}"
     lab_result_deleted: "Lab result deleted.\nLab name: {{lab_name}}\nAccession number: {{accession_no}}"
@@ -260,7 +261,7 @@ en:
 
   common_test_type_associated_with_lab_results: "{{name}} already associated with lab results"
   investigator_already_assigned: "Investigator already assigned"
-  cannot_promote_unsaved_event: "Cannot promote an unsaved event."
+  cannot_promote_demote_unsaved_event: "Cannot promote or demote an unsaved event."
   loading_disease_group: "Loading disease group {{disease_group}}"
   could_not_remove_form_from_event: "Could not remove a form from an event: {{message}}"
   unable_to_process_new_forms: "Unable to process new forms"

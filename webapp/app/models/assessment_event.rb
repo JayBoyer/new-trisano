@@ -24,6 +24,7 @@ class AssessmentEvent < HumanEvent
   supports :encounter_specific_labs
   supports :encounter_specific_treatments
   supports :promote_to_morbidity_event
+  supports :demote_to_contact_event
   supports :child_events
 
   before_save :generate_mmwr
@@ -229,11 +230,6 @@ class AssessmentEvent < HumanEvent
 
   private
   
-  def expire_parent_record_contacts_cache
-    redis.delete_matched("views/events/#{self.id}*")
-  end
-
-
   def generate_mmwr
     mmwr = Mmwr.new({
         :onsetdate => disease.try(:disease_onset_date),

@@ -196,12 +196,4 @@ class AssessmentEventsController < EventsController
     @event.interested_party.person_entity.person.birth_date = params[:birth_date]
   end
   
-  def can_promote?
-    unless User.current_user.can_create?(@event)
-      render(:partial => 'events/permission_denied',
-             :layout => true,
-             :locals => { :reason => t("no_event_create_privs") },
-             :status => 403) and return
-    end
-  end
 end
