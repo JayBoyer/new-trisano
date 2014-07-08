@@ -149,6 +149,7 @@ class MorbidityEvent < HumanEvent
       approve_by_lhd :approve
     end
     state :closed, :meta => {:description => I18n.translate('workflow.approved_by_state')} do
+      reopen_by_manager :reopen
       assign_to_lhd
     end
   end

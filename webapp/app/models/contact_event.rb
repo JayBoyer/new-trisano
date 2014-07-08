@@ -133,8 +133,8 @@ class ContactEvent < HumanEvent
       complete_and_close_investigation :complete_and_close
     end
     state :closed do
-      assign_to_lhd
       reopen_by_manager :reopen
+      assign_to_lhd
     end
   end
 
