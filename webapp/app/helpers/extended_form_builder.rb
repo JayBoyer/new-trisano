@@ -319,27 +319,10 @@ class ExtendedFormBuilder < ActionView::Helpers::FormBuilder
     return [] unless core_path && event.try(:form_references)
     returning [] do |follow_ups|
       event.form_references.each do |fr|
-        #setup follow ups for current event type
-        path = core_path << attribute
-        follow_ups << fr.form.form_element_cache.all_follow_ups_by_core_path("#{path.to_s}")
-
-        if event.type == "MorbidityEvent" || event.type == "AssessmentEvent"
-          alternate_forms_core_path_prefix = core_path.clone
-          # replace root of core path with previous event type
-          alternate_forms_core_path_prefix[0] = "morbidity_and_assessment_event"
-
-          alternate_forms_core_path = (alternate_forms_core_path_prefix << attribute).to_s
-          follow_ups << fr.form.form_element_cache.all_follow_ups_by_core_path("#{alternate_forms_core_path}")
-        end
-
-        #setup follow ups for previous event types
-        event.event_type_transitions.each do |transition|
-          historical_core_path_prefix = core_path.clone
-          historical_core_path_prefix[0] = transition.was.underscore
-          historical_core_path = historical_core_path_prefix << attribute
-          follow_ups << fr.form.form_element_cache.all_follow_ups_by_core_path("#{historical_core_path.to_s}")
-        end
-        follow_ups #must end with follow_ups for returning
+        alternate_forms_core_path_prefix = core_path.clone
+        alternate_forms_core_path_prefix[0] = fr.form.event_type
+        alternate_forms_core_path = (alternate_forms_core_path_prefix << attribute).to_s
+        follow_ups << fr.form.form_element_cache.all_follow_ups_by_core_path("#{alternate_forms_core_path.to_s}")
       end
     end.flatten
   end

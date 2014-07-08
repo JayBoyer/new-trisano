@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
+require 'set'
+
 class Event < ActiveRecord::Base
   include Blankable
   include TaskFilter
@@ -330,7 +332,27 @@ class Event < ActiveRecord::Base
 
   def add_forms(forms_to_add)
     return if forms_to_add.blank?
-    forms = forms_to_add.is_a?(Array) ? forms_to_add : [forms_to_add]
+
+    # only add forms to an event if that form is not already attached
+    forms_temp = forms_to_add.is_a?(Array) ? forms_to_add : [forms_to_add]
+    forms = []
+    ids_in_use = Set.new()
+    self.form_references.each do |form_reference|
+      ids_in_use.add(form_reference.form.id)
+    end
+
+    forms_temp.each do |form|
+      if(form.is_a?(Form))
+        id = form.id
+      else
+        id = form
+      end
+      if(!ids_in_use.include?(id))
+        forms.push(form)
+      end
+    end
+    return if forms.blank?
+
     forms.map! { |f| f.is_a?(Form) ? f : Form.find(f.to_i) }
     existing_template_ids = self.form_references.map(&:template_id)
     forms_to_add = forms.select {|f| !existing_template_ids.include?(f.template_id) }
@@ -347,11 +369,13 @@ class Event < ActiveRecord::Base
     form_ids = [form_ids] unless form_ids.is_a? Array
     transaction do
       form_ids.each do |form_id|
-        form_reference = FormReference.find_by_event_id_and_form_id(self.id, form_id)
-        if form_reference.nil?
+        form_references = FormReference.find_all_by_event_id_and_form_id(self.id, form_id)
+        if form_references.empty?
           raise I18n.translate('missing_form_reference')
         else
-          form_reference.destroy
+          form_references.each do |form_reference|
+            form_reference.destroy
+          end
         end
       end
       return true
@@ -413,7 +437,7 @@ class Event < ActiveRecord::Base
   end
 
   def get_or_initialize_answer(answer_attributes)
-    Answer.find(:first, :conditions => answer_attributes) || Answer.new(answer_attributes)
+  Answer.find(:first, :conditions => answer_attributes) || Answer.new(answer_attributes)
   end
 
   def clone_event(event_components=[])
@@ -790,6 +814,7 @@ class Event < ActiveRecord::Base
 
   private
   def create_form_references
+ 
     return [] if self.disease_event.nil? || self.disease_event.disease_id.blank? || self.jurisdiction.nil?
 
     # In the case of a deep copy it's possible for an event to have forms associated with it even if it hasn't undergone form assigment formally.
