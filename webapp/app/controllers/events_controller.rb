@@ -50,9 +50,11 @@ class EventsController < ApplicationController
 
   def contacts_search
     begin
-      @results = HumanEvent.find_by_name_and_bdate(
-        :fulltext_terms => params[:name]
-      )
+	  unless params[:name].blank? 
+        @results = HumanEvent.find_by_name_and_bdate(
+          :fulltext_terms => params[:name]
+        )
+      end
     rescue
       flash.now[:error] = t(:invalid_search_criteria)
     end

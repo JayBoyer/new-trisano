@@ -40,9 +40,9 @@ When /^in a (.+) event, I search for a reporting agency named "([^\"]*)"$/ do |e
                   :event_type => 'morbidity_event' })
 end
 
-When /^I search for a contact named "([^\"]*)"$/ do |arg1|
+When /^I search for a contact named "([^\"]*)"$/ do |name|
   visit url_for({ :controller => :events,
                   :action => :contacts_search,
-                  :contact_search_name => name })
+                  :name => name })
 end
 
