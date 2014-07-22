@@ -1503,11 +1503,13 @@ describe Event, 'cloning an event' do
       @new_event.interested_party.secondary_entity_id.should == @org_event.interested_party.secondary_entity_id
       @new_event.jurisdiction.name.should == @jurisdiction_place.name
       @new_event.should be_new
-      lambda {@new_event.save!}.should change(Participation, :count).by(1)
+      
+      # Only interested party and jurisdiction, nothing else
+      lambda {@new_event.save!}.should change(Participation, :count).by(2)
     end
 
     it "should create a new address instance and link it up" do
-      lambda {@new_event.save!}.should_not change(Address, :count)
+      lambda {@new_event.save!}.should change(Address, :count)
       @new_event.address.id.should_not == @org_event.address.id
       @new_event.address.street_name.should == 'Example Lane'
     end
@@ -1630,8 +1632,8 @@ describe Event, 'cloning an event' do
         [
         {
           :treatment_given_yn_id => external_codes(:yesno_no).id,
-          :treatment_date => Date.today,
-          :stop_treatment_date => Date.today + 1,
+          :treatment_date => Date.today - 1,
+          :stop_treatment_date => Date.today,
           :treatment_id => @leeches_treatment.id
         },
         {
@@ -1649,8 +1651,8 @@ describe Event, 'cloning an event' do
       @new_event.interested_party.treatments.each do |pt|
         if pt.treatment.treatment_name == "Leeches"
           pt.treatment_given_yn_id.should == external_codes(:yesno_no).id
-          pt.treatment_date.should == Date.today
-          pt.stop_treatment_date.should == Date.today + 1
+          pt.treatment_date.should == Date.today - 1
+          pt.stop_treatment_date.should == Date.today
         elsif pt.treatment.treatment_name == "Maggots"
           pt.treatment_given_yn_id.should == external_codes(:yesno_yes).id
           pt.treatment_date.should == Date.today - 2

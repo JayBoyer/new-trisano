@@ -194,18 +194,14 @@ class MorbidityEvent < HumanEvent
   def copy_event(new_event, event_components)
     super(new_event, event_components)
 
-    if event_components.include?("contacts")
-      # Deferred for now, due to lack of clarity.  Should the cloned event point at the very same contacts (can't do this right now because
-      # a contact can currently have only one parent -- surgery required to allow events to have more than one parent) or should it create
-      # independent clones of the contact events?  Prolly, the former.
-    end
-
     if event_components.include?("reporting")
       new_event.build_reporting_agency(:secondary_entity_id => self.reporting_agency.secondary_entity_id) if self.reporting_agency
       new_event.build_reporter(:secondary_entity_id => self.reporter.secondary_entity_id) if self.reporter
       new_event.first_reported_PH_date = self.first_reported_PH_date
       new_event.results_reported_to_clinician_date = self.results_reported_to_clinician_date
     end
+    
+    copy_child_events_and_forms(new_event, event_components)
   end
 
   def xml_fields

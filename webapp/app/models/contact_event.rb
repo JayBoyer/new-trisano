@@ -165,6 +165,7 @@ class ContactEvent < HumanEvent
 
   def copy_event(new_event, event_components)
     super
+    copy_child_events_and_forms(new_event, event_components)
   end
 
   def validate

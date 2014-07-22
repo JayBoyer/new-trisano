@@ -454,7 +454,6 @@ class Event < ActiveRecord::Base
     new_event.jurisdiction.secondary_entity = (User.current_user.jurisdictions_for_privilege(:create_event).first || Place.unassigned_jurisdiction).entity
     new_event.workflow_state = 'accepted_by_lhd' unless new_event.jurisdiction.place.is_unassigned_jurisdiction?
     new_event.acuity = self.acuity
-    new_event.save!
     
     if event_components.include?("clinical")
       if self.disease_event
@@ -464,49 +463,57 @@ class Event < ActiveRecord::Base
           :date_diagnosed => self.disease_event.date_diagnosed)
       end
     end
-
-    if event_components.include?("disease_specific")
-      copy_forms(self, new_event)
-    end
-
-    if event_components.include?("contacts")
-      contact_events = Event.find(:all, :conditions => ["type = 'ContactEvent' AND parent_id = ?", self.id])
-      copy_child_events(new_event, contact_events, true)
-      
-      # create contact events with basic data for child events promoted to AEs or CMRs
-      promoted_events = Event.find(:all, :conditions => ["(type = 'AssessmentEvent' OR type = 'MorbidityEvent') AND parent_id = ?", self.id])
-      promoted_events.each do |promoted_event|
-        contact_event = ContactEvent.new()
-
-        participation = Participation.find(:first, :conditions => ["type = 'InterestedParty' and event_id = ?", promoted_event.id])
-        contact_event.build_interested_party(:primary_entity_id => participation.primary_entity_id)
-        if(promoted_event.participations_contact_id != nil)
-          participation_contact = ParticipationsContact.find(:first, :conditions => ["id = ?", promoted_event.participations_contact_id])
-          new_participation_contact = participation_contact.clone()
-          new_participation_contact.save(false)
-          contact_event.participations_contact_id = new_participation_contact.id
-        end
-        contact_event.workflow_state = 'not_routed'
-        contact_event.parent_id = new_event.id
-        parent_jurisdiction = Jurisdiction.new
-        parent_jurisdiction.secondary_entity_id = new_event.jurisdiction.secondary_entity_id
-        contact_event.build_jurisdiction(parent_jurisdiction.attributes)
-        contact_event.save(false)
-      end
-    end
-   
-    if event_components.include?("encounters")
-      encounter_events = Event.find(:all, :conditions => ["type = 'EncounterEvent' AND parent_id = ?", self.id])
-      copy_child_events(new_event, encounter_events, false)
-    end
-   
-   if event_components.include?("notes")
+    if event_components.include?("notes")
       self.notes.each do |note|
         if note.note_type == "clinical"
           attrs = note.attributes
           attrs.delete('event_id')
           new_event.notes.build(attrs)
         end
+      end
+    end
+  end
+  
+  def copy_child_events_and_forms(new_event, event_components)
+    if (event_components.include?("disease_specific") || event_components.include?("contacts") || event_components.include?("encounters"))
+      new_event.suppress_validation(:first_reported_PH_date)
+
+      # we have to save the event so it has an event_id that can be referenced
+      # by child events and forms
+      new_event.save!
+      if event_components.include?("disease_specific")
+        copy_forms(self, new_event)
+      end
+
+      if event_components.include?("contacts")
+        contact_events = Event.find(:all, :conditions => ["type = 'ContactEvent' AND parent_id = ?", self.id])
+        copy_child_events(new_event, contact_events, true)
+      
+        # create contact events with basic data for child events promoted to AEs or CMRs
+        promoted_events = Event.find(:all, :conditions => ["(type = 'AssessmentEvent' OR type = 'MorbidityEvent') AND parent_id = ?", self.id])
+        promoted_events.each do |promoted_event|
+          contact_event = ContactEvent.new()
+
+          participation = Participation.find(:first, :conditions => ["type = 'InterestedParty' and event_id = ?", promoted_event.id])
+          contact_event.build_interested_party(:primary_entity_id => participation.primary_entity_id)
+          if(promoted_event.participations_contact_id != nil)
+            participation_contact = ParticipationsContact.find(:first, :conditions => ["id = ?", promoted_event.participations_contact_id])
+            new_participation_contact = participation_contact.clone()
+            new_participation_contact.save(false)
+            contact_event.participations_contact_id = new_participation_contact.id
+          end
+          contact_event.workflow_state = 'not_routed'
+          contact_event.parent_id = new_event.id
+          parent_jurisdiction = Jurisdiction.new
+          parent_jurisdiction.secondary_entity_id = new_event.jurisdiction.secondary_entity_id
+          contact_event.build_jurisdiction(parent_jurisdiction.attributes)
+          contact_event.save(false)
+        end
+      end
+   
+      if event_components.include?("encounters")
+        encounter_events = Event.find(:all, :conditions => ["type = 'EncounterEvent' AND parent_id = ?", self.id])
+        copy_child_events(new_event, encounter_events, false)
       end
     end
   end
@@ -529,13 +536,16 @@ class Event < ActiveRecord::Base
   
   def copy_forms(old_event, new_event)
     new_event.add_forms(old_event.forms)
-
+    
     old_event.answers.each do |answer|
-      new_event.answers.create(:question_id => answer.question_id,
+      # note:  We use new() rather than create() here because answers for repeating form sections will 
+      # not be valid until the Investigator Form section components are created below
+      answerT = Answer.new(:question_id => answer.question_id,
         :text_answer => answer.text_answer,
         :export_conversion_value_id => answer.export_conversion_value_id)
+      new_event.answers.push(answerT)
     end
-
+    
     new_event.form_references.each do |reference|
       # for answers in repeating sections, need to create corresponding investigator_form_sections
       # and link them to the answers
@@ -560,8 +570,6 @@ class Event < ActiveRecord::Base
       end
     end  
   end
-
-  
   
   def events_quick_list(reload=false)
     if reload or @events_quick_list.nil?
