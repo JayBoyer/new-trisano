@@ -25,9 +25,10 @@ When /^I promote Jones to a assessment event$/ do
   
   # we want to make available the promoted event at a later time
   # but only if the promotion was successful
-  if current_url == ae_url(@contact_event)
+  if current_url == ae_url(@contact_event) + "/edit"
     #Then reload the event to make it available for other steps
     @promoted_event = AssessmentEvent.find(@contact_event.id)
+    visit ae_url(@promoted_event)
   end
 end
 

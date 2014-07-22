@@ -18,7 +18,7 @@ Feature: Promoting Contact Events to Assessment Events
       And I am logged in as a super user
      When I promote Jones to a assessment event
      Then I should be viewing the show assessment event for Jones page
-      And I should see "Successfully changed to assessment event."
+      And I should see "View Assessment Event"
 
   Scenario: Promoted assessment event displays parent and disease forms
     Given a published disease form called MA1 for assessment events with Mumps

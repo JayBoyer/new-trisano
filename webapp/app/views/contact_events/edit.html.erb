@@ -22,6 +22,10 @@
   <%= link_to_function(t('show'), "send_url_with_tab_index('#{contact_event_path(@event)}')") %>
   |
   <%= link_to(t('new_contact_for_event'), '#', :id => 'new-contact-for-event') %>
+  |
+  <%= link_to(t('promote_to_cmr'), event_type_contact_event_path(@event, :type => "morbidity_event"), :method => :get, :confirm => t(:are_you_sure), :id => 'event-type') %>
+  |
+  <%= link_to(t('promote_to_ae'), event_type_contact_event_path(@event, :type => "assessment_event"), :method => :get, :confirm => t(:are_you_sure), :id => 'event-type') %>
 <% end %>
 
 <%= render :partial => 'contact_events/search', :locals => { :event => @event } %>

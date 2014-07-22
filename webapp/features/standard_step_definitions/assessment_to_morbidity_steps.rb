@@ -25,9 +25,10 @@ When /^I promote the assessment to a morbidity event$/ do
 
   # we want to make available the promoted event at a later time
   # but only if the promotion was successful
-  if current_url == cmr_url(@event)
+  if current_url == cmr_url(@event) + "/edit"
     #Then reload the event to make it available for other steps
     @promoted_event = MorbidityEvent.find(@event.id)
+    visit cmr_url(@promoted_event)
   end
 end
 

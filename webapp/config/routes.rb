@@ -154,7 +154,7 @@ ActionController::Routing::Routes.draw do |map|
       :jurisdiction => :post,
       :soft_delete => :post,
       :export_single => :post,
-      :event_type => :post
+      :event_type => :get
     },
     :new => {
       :lab_form => :get,
@@ -175,7 +175,7 @@ ActionController::Routing::Routes.draw do |map|
       :jurisdiction => :post,
       :soft_delete => :post,
       :export_single => :post,
-      :event_type => :post
+      :event_type => :get
     },
     :new => {
       :lab_form => :get,
@@ -194,7 +194,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :contact_events,
     :member => {
       :soft_delete => :post,
-      :event_type => :post,
+      :event_type => :get,
       :copy_address => :get,
       :edit_jurisdiction => :get,
       :jurisdiction => :post,

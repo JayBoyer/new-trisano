@@ -308,7 +308,7 @@ describe ContactEventsController do
     it "should redirect to a cmr path and present a success message" do
       User.current_user.stubs(:can_create?).with(@event).returns(true)
       post :event_type, :type => "morbidity_event", :id => @event.id
-      response.should redirect_to("/cmrs/#{@event.id}")
+      response.should redirect_to("/cmrs/#{@event.id}/edit")
       flash[:notice].should == "Successfully changed to morbidity event."
     end
   end

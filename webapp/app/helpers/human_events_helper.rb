@@ -63,15 +63,16 @@ module HumanEventsHelper
           controls << link_to_remote(t('add_task'), :url => { :controller => 'event_tasks', :action => 'new', :event_id => event.id }, :method => :get )
         else
           controls << link_to(t('add_task'), new_event_task_path(event))
-        end
+        end  
         controls << " | " << link_to(t('add_attachment'), new_event_attachment_path(event))
-        
         if event.is_a?(AssessmentEvent)
-         controls << " | " << link_to(t(:promote_to_cmr), event_type_ae_path(event, :type => "morbidity_event"), :method => :post, :confirm => t(:are_you_sure), :id => 'event-type')
-         controls << " | " << link_to(t(:demote_to_contact), event_type_ae_path(event, :type => "contact_event"), :method => :post, :confirm => t(:are_you_sure), :id => 'event-type')
+          controls << " | " << link_to(t(:promote_to_cmr), event_type_ae_path(event, :type => "morbidity_event"), :confirm => t(:are_you_sure), :id => 'event-type')
+          unless (event.parent_event.blank?)
+            controls << " | " << link_to(t(:demote_to_contact), event_type_ae_path(event, :type => "contact_event"), :confirm => t(:are_you_sure), :id => 'event-type')
+          end
         end
         if event.is_a?(MorbidityEvent)
-          controls << " | " << link_to(t(:demote_to_ae), event_type_cmr_path(event, :type => "assessment_event"), :method => :post, :confirm => t(:are_you_sure), :id => 'event-type')
+          controls << " | " << link_to(t(:demote_to_ae), event_type_cmr_path(event, :type => "assessment_event"), :confirm => t(:are_you_sure), :id => 'event-type')
         end
       end
       if can_view

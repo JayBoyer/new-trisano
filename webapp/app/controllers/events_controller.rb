@@ -373,7 +373,7 @@ class EventsController < ApplicationController
     end
     if changed_event = (promote ? @event.promote_to(params[:type]) : @event.demote_to(params[:type]))
       flash[:notice] = t(:promoted_demoted_to, :type => params[:type].humanize.downcase)
-      redirect_to @template.event_path(changed_event)
+      redirect_to @template.event_path(changed_event) + (promote ? "/edit" : "")
     else
       flash.now[:error] = t("could_not_promote_demote_event")
       render :action => :edit, :status => :bad_request
