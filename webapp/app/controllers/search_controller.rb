@@ -85,7 +85,10 @@ class SearchController < ApplicationController
 
         raise if (!error_details.empty?)
 
+        # limit event search to 10 mins, then timeout
+        ActiveRecord::Base.connection.execute("SET statement_timeout TO 600000")
         @events = Event.find_by_criteria(convert_to_search_criteria(params))
+        ActiveRecord::Base.connection.execute("RESET statement_timeout")
 
         #only paginate if results are found
         @events = @events.paginate(:page => params[:page], :per_page => params[:per_page] || 25) if @events.present?
@@ -99,7 +102,12 @@ class SearchController < ApplicationController
 
       end
     rescue Exception => ex
-      flash.now[:error] = t("problem_with_search_criteria")
+      error_message = t("problem_with_search_criteria")
+      if(ex.inspect.include?("due to statement timeout"))
+        error_message = t("event_search_timeout")
+      end
+
+      flash.now[:error] = error_message
 
       # Debt: Error display details are pretty weak. Good enough for now.
       if (!error_details.empty?)
