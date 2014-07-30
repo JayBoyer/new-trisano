@@ -241,6 +241,7 @@ test:
   invalid_entered_on_start_date_format: "xInvalid entered-on start date format"
   invalid_entered_on_end_date_format: "xInvalid entered-on end date format"
   problem_with_search_criteria: "xThere was a problem with your search criteria"
+  event_search_timeout: "xThe search timed out, please use more restrictive criteria"
   event_search_type_morb: xMorbidity Event (CMR)
   event_search_type_assessment: xAssessment Event (AE)
   event_search_type_contact: xContact Event

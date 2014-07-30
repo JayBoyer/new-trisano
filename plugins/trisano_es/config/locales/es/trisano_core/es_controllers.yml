@@ -234,6 +234,7 @@ es:
   invalid_entered_on_start_date_format: "Formato inválido para la fecha de inicio que indica su ingreso"
   invalid_entered_on_end_date_format: "Formato inválido para la fecha final que indica su ingreso"
   problem_with_search_criteria: "Se produjo un problema con los criterios de búsqueda "
+  event_search_timeout: "The search timed out, please use more restrictive criteria"
   event_search_type_morb: Evento de Morbilidad (CMR)
   event_search_type_contact: Evento de Contacto
 

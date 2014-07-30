@@ -242,6 +242,7 @@ en:
   invalid_entered_on_start_date_format: "Invalid entered-on start date format"
   invalid_entered_on_end_date_format: "Invalid entered-on end date format"
   problem_with_search_criteria: "There was a problem with your search criteria"
+  event_search_timeout: "The search timed out, please use more restrictive criteria"
   event_search_type_morb: Morbidity Event (CMR)
   event_search_type_assessment: Assessment Event (AE)
   event_search_type_contact: Contact Event
