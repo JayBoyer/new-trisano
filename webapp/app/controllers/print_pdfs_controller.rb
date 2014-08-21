@@ -24,6 +24,7 @@ class PrintPdfsController < ApplicationController
       @@tb_drug_test_result = ''
       @@setOther = false
       @@lateDate = '1900-01-01'
+      @@earlyDate = '2099-01-01'
       @@smallx = 'x'
       @@bigX = 'X'
       out_filename = ''
@@ -51,6 +52,9 @@ class PrintPdfsController < ApplicationController
       @@dbh = DBI.connect("DBI:Jdbc:postgresql:" + "//" + host + ":" + port.to_s + "/" + database, username, pass, 'driver' => 'org.postgresql.Driver')
          
       def limits(inputString, length)
+        logger.info(">>>>>inputString" + inputString)
+        logger.info(">>>>>length" + length.to_s)
+        logger.info(">>>>>output" + @@hash_output.inspect)
         limit = 0
         if inputString != '' && inputString != nil
           if inputString.length > length  
@@ -69,6 +73,16 @@ class PrintPdfsController < ApplicationController
         end
       end
 
+      def trimDashes(inputString)
+        if inputString.include? '-'
+            inputString = inputString.gsub!(/-/,'')
+        end
+        if inputString.include? '/'
+            inputString = inputString.gsub!(/\//,'')
+        end
+            return inputString
+      end
+            
       def compareDateStrings(date1, date2, comparison)
         if (date1 && date2) != '' && (date1 && date2) != nil
           date1 = Date.strptime date1, '%Y-%m-%d'
@@ -111,6 +125,7 @@ class PrintPdfsController < ApplicationController
         @@tb_drug_test_result = ''
         @@setOther = false
         @@lateDate = '1900-01-01'
+        @@earlyDate = '2099-01-01'
         begin
           if @@sth.fetchable?
            rows = @@sth.fetch_all
@@ -161,6 +176,7 @@ class PrintPdfsController < ApplicationController
       end
 
       def populateOutputHash(bound)
+        logger.info(">>>>>bound" + bound.to_s)
         if bound > 0
           for i in 0..bound - 1
             pdf_field_key = ''
@@ -206,7 +222,81 @@ class PrintPdfsController < ApplicationController
         end
         return rpt_id
       end
+      
+        def checkResultHrchy(rsltArray, qshortname)
+            rvctRslt = ''
+            rsltArray.each do |rslt|
+                sqlStr = "SELECT * FROM tb_qa_views where lower(question_short_name) = '" + qshortname + "' and lower(answer_text) = '" + rslt + "' and event_id = " + @@event_id + " order by repeater_form_object_id, question_short_name, answer_text"
+                @@sth = @@dbh.execute(sqlStr)
+                if @@sth.fetchable?
+                    rows = @@sth.fetch_all
+                        if(rows != nil && rows.size > 0)
+                            rows.each do |row|
+                                rvctRslt = rslt
+                            end
+                        end
+                end
+            break
+                
+            end
+            
+            return rvctRslt 
+        end
 
+            @@state_abv = {}
+            @@state_abv['alabama']='AL'
+            @@state_abv['alaska']='AK'
+            @@state_abv['arizona']='AZ'
+            @@state_abv['arkansas']='AR'
+            @@state_abv['california']='CA'
+            @@state_abv['colorado']='CO'
+            @@state_abv['connecticut']='CT'
+            @@state_abv['delaware']='DE'
+            @@state_abv['district of columbia']='DC'
+            @@state_abv['florida']='FL'
+            @@state_abv['georgia']='GA'
+            @@state_abv['hawaii']='HI'
+            @@state_abv['idaho']='ID'
+            @@state_abv['illinois']='IL'
+            @@state_abv['indiana']='IN'
+            @@state_abv['iowa']='IA'
+            @@state_abv['kansas']='KS'
+            @@state_abv['kentucky']='KY'
+            @@state_abv['louisiana']='LA'
+            @@state_abv['maine']='ME'
+            @@state_abv['maryland']='MD'
+            @@state_abv['massachusetts']='MA'
+            @@state_abv['michigan']='MI'
+            @@state_abv['minnesota']='MN'
+            @@state_abv['mississippi']='MS'
+            @@state_abv['missouri']='MO'
+            @@state_abv['montana']='MT'
+            @@state_abv['nebraska']='NE'
+            @@state_abv['nevada']='NV'
+            @@state_abv['new hampshire']='NH'
+            @@state_abv['new jersey']='NJ'
+            @@state_abv['new mexico']='NM'
+            @@state_abv['new york']='NY'
+            @@state_abv['north carolina']='NC'
+            @@state_abv['north dakota']='ND'
+            @@state_abv['ohio']='OH'
+            @@state_abv['oklahoma']='OK'
+            @@state_abv['oregon']='OR'
+            @@state_abv['pennsylvania']='PA'
+            @@state_abv['puerto rico']='PR'
+            @@state_abv['rhode island']='RI'
+            @@state_abv['south carolina']='SC'
+            @@state_abv['south dakota']='SD'
+            @@state_abv['tennessee']='TN'
+            @@state_abv['texas']='TX'
+            @@state_abv['utah']='UT'
+            @@state_abv['vermont']='VT'
+            @@state_abv['virginia']='VA'
+            @@state_abv['washington']='WA'
+            @@state_abv['west virginia']='WV'
+            @@state_abv['wisconsin']='WI'
+            @@state_abv['wyoming']='WY'
+      
       #INV111 and INV177
       @@sqlStr = "SELECT * FROM public.events where id =" + @@event_id
             
@@ -444,6 +534,7 @@ class PrintPdfsController < ApplicationController
       end
 
       if @city_case_num != '' && @city_case_num != nil
+        @city_case_num = @city_case_num.reverse[0...9].reverse
         @@indvChars = breakUp(@city_case_num)
         res_inv172 = PdfMapping('pg1_inv172_l')
         populatePdfFields(res_inv172)
@@ -510,6 +601,7 @@ class PrintPdfsController < ApplicationController
       end
 
       if @state_case_num != '' && @state_case_num != nil
+        @state_case_num = @state_case_num.reverse[0...9].reverse
         @@indvChars = breakUp(@state_case_num)
         res_inv173 = PdfMapping('pg1_inv173_l')
         populatePdfFields(res_inv173)
@@ -620,7 +712,10 @@ class PrintPdfsController < ApplicationController
                     if @single_question_answer.include? '-'
                       @single_question_answer = trimDashes(@single_question_answer)
                     end
-                    @single_question_answer = @single_question_answer.rjust(6, '0')
+                    @single_question_answer_temp_yr = @single_question_answer[0,4]
+                    @single_question_answer_temp_mo = @single_question_answer[4,2]
+                    @single_question_answer = @single_question_answer_temp_mo + @single_question_answer_temp_yr
+                    #@single_question_answer = @single_question_answer.rjust(6, '0')
                     @@indvChars = breakUp(@single_question_answer)
                     res_dem2005 = PdfMapping('dem2005')
                     populatePdfFields(res_dem2005)
@@ -1174,15 +1269,18 @@ class PrintPdfsController < ApplicationController
                   end
                   
                   if @phin_var == 'tb207_s' 
-                    @@indvChars = breakUp(@single_question_answer_code)
+                    @single_question_answer = @single_question_answer.strip.gsub(/\s+/, " ")
+                    @single_question_answer = @@state_abv[@single_question_answer]
+                    @@indvChars = breakUp(@single_question_answer)
                     res_tb207_s = PdfMapping('tb207_s')
                     populatePdfFields(res_tb207_s)
-                    @@boundary = limits(@single_question_answer_code, @@count)
+                   @@boundary = limits(@single_question_answer, @@count)
                     populateOutputHash(@@boundary)
                     reset
                   end
                   
                   if @phin_var == 'tb207_l' 
+                    @single_question_answer_orig = @single_question_answer_orig.reverse[0...9].reverse
                     @@indvChars = breakUp(@single_question_answer_orig)
                     res_tb207_l = PdfMapping('tb207_l')
                     populatePdfFields(res_tb207_l)
@@ -1210,15 +1308,18 @@ class PrintPdfsController < ApplicationController
                   end
                   
                   if @phin_var == 'tb209_s' 
-                    @@indvChars = breakUp(@single_question_answer_code)
+                    @single_question_answer = @single_question_answer.strip.gsub(/\s+/, " ")
+                    @single_question_answer = @@state_abv[@single_question_answer]
+                    @@indvChars = breakUp(@single_question_answer)
                     res_tb209_s = PdfMapping('tb209_s')
                     populatePdfFields(res_tb209_s)
-                    @@boundary = limits(@single_question_answer_code, @@count)
+                    @@boundary = limits(@single_question_answer, @@count)
                     populateOutputHash(@@boundary)
                     reset
                   end
                   
                   if @phin_var == 'tb209_l' 
+                    @single_question_answer_orig = @single_question_answer_orig.reverse[0...9].reverse
                     @@indvChars = breakUp(@single_question_answer_orig)
                     res_tb209_l = PdfMapping('tb209_l')
                     populatePdfFields(res_tb209_l)
@@ -2272,27 +2373,222 @@ class PrintPdfsController < ApplicationController
 
       end
       
-      reset
       resetRpt
-      @@dbh.disconnect
 
-      if @@hash_output.size > 0
-        fdf = PdfForms::Fdf.new @@hash_output
-        fdf_filename = pdf_path + 'rvct_' + @@event_id + '.fdf'
-        fdf.save_to fdf_filename
-        pdf_filename = pdf_path + 'rvct_' + @@event_id + '.pdf'
-        
-      if(File.exists?(pdf_filename))
-            begin
-                File.delete(pdf_filename)
-            rescue Exception => e
-                logger.info(e.backtrace.inspect)
+            #Populate Sputum Smear
+            #Array of Result hierarchy
+            sputumSmearArray = ["positive", "negative", "unknown", "not done"]
+            rvctResult = checkResultHrchy(sputumSmearArray, 'sputum_smear_test')
+            
+            if rvctResult != '' && rvctResult != nil
+                @@sqlStr = "SELECT * FROM tb_qa_views where lower(question_short_name) = 'sputum_smear_test' and lower(answer_text) = '" + rvctResult + "' and event_id = " + @@event_id + " order by repeater_form_object_id, 
+                question_short_name, answer_text"
+                @@sth = @@dbh.execute(@@sqlStr)
+                    if @@sth.fetchable?
+                        rows = @@sth.fetch_all
+                            if(rows != nil && rows.size > 0)
+                                    rows.each do |row|
+                                        @rptID = row['repeater_form_object_id']
+                                            @@sqlStrInner = "SELECT * FROM tb_qa_views where lower(question_short_name)  = 'sputum_collect_date' and event_id = " + @@event_id + "and repeater_form_object_id = " + @rptID + " order by repeater_form_object_id, question_short_name, answer_text"
+                                            @@sthInner = @@dbh.exec(@@sqlStrInner)
+                                            #Find date of earliest Positive
+                                            if @@sthInner.fetchable?
+                                                rowsInner = @@sthInner.fetch_all
+                                                if(rowsInner != nil && rowsInner.size > 0)
+                                                    rowsInner.each do |rowInner|
+                                                        @sputum_collect_date = rowInner['answer_text']
+                                                        if @sputum_collect_date != '' && @sputum_collect_date != nil
+                                                           @@earlyDate = compareDates(@@earlyDate, @sputum_collect_date, 'early')
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                    end
+                            end
+                    end
+            
+                @@targetDate = @@earlyDate
+                @@repeatID = repeatID(@@targetDate, @@event_id, 'sputum_collect_date')
+                reset
+
+                if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
+                    @@repeatID = @@repeatID.to_s
+                    @@sqlStr = "SELECT *, CASE
+                                            WHEN lower(question_short_name) = 'sputum_smear_test' THEN 'tb108'
+                                            WHEN lower(question_short_name) = 'sputum_collect_date' THEN 'tb221'
+                                            END AS phin_var
+                                            FROM tb_qa_views where lower(question_short_name) IN ('sputum_smear_test', 'sputum_collect_date') and event_id = " + @@event_id + 
+                                            " and repeater_form_object_id = " + @@repeatID + " order by repeater_form_object_id, question_short_name, answer_text"
+                    @@sthrpt = @@dbh.execute(@@sqlStr)
+                    if @@sthrpt.fetchable?
+                        rowsrpt = @@sthrpt.fetch_all
+                            if(rowsrpt != nil && rowsrpt.size > 0)
+                                rowsrpt.each do |row|
+                                    @single_question_answer_r_orig = row['answer_text']
+                                    @single_question_answer_r = row['answer_text'].downcase
+                                    @phin_var_r = row['phin_var']
+                                        if @single_question_answer_r != '' && @single_question_answer_r != nil
+                                            if @phin_var_r == 'tb108' 
+                                                if @single_question_answer_r == 'positive'
+                                                    @@hash_output['tb108_p'] = @@smallx
+                                                elsif @single_question_answer_r == 'negative'
+                                                    @@hash_output['tb108_n'] = @@smallx
+                                                elsif @single_question_answer_r == 'not done'
+                                                    @@hash_output['tb108_nd'] = @@smallx
+                                                elsif @single_question_answer_r == 'unknown'
+                                                    @@hash_output['tb108_u'] = @@smallx
+                                                end
+                                            end
+                                            
+                                            if @phin_var_r == 'tb221'
+                                                dateString = formatDateString(@single_question_answer_r)
+                                                @@indvChars = breakUp(dateString)
+                                                res_tb221 = PdfMapping('tb221')
+                                                populatePdfFields(res_tb221)
+                                                @@boundary = limits(dateString, @@count)
+                                                populateOutputHash(@@boundary)
+                                                reset
+                                            end	
+                                            
+                                        end
+                                end
+                            end
+                    end
+
+                end
             end
-      end  
+            
+            resetRpt
+            
+            #Populate Sputum Culture
+            #Array of Result hierarchy
+            sputumCulArray = ["positive", "negative", "unknown", "not done"]
+            rvctResult = checkResultHrchy(sputumCulArray, 'sputum_test')
+                        
+            if rvctResult != '' && rvctResult != nil
+                @@sqlStr = "SELECT * FROM tb_qa_views where lower(question_short_name) = 'sputum_test' and lower(answer_text) = '" + rvctResult + "' and event_id = " + @@event_id + " order by repeater_form_object_id, 
+                question_short_name, answer_text"
+                @@sth = @@dbh.execute(@@sqlStr)
+                if @@sth.fetchable?
+                    rows = @@sth.fetch_all
+                        if(rows != nil && rows.size > 0)
+                                rows.each do |row|
+                                    @rptID = row['repeater_form_object_id']
+                                    @rptID = @rptID.inspect
+                                    logger.info(">>>>>rptID" + @rptID)
+                                    @@sqlStrInner = "SELECT * FROM tb_qa_views where lower(question_short_name)  = 'sputum_collection_date' and event_id = " + @@event_id + "and repeater_form_object_id = " + @rptID + " order by repeater_form_object_id, question_short_name, answer_text"
+                                    @@sthInner = @@dbh.execute(@@sqlStrInner)
+                                            #Find date of earliest Positive
+                                            if @@sthInner.fetchable?
+                                                rowsInner = @@sthInner.fetch_all
+                                                if(rowsInner != nil && rowsInner.size > 0)
+                                                    rowsInner.each do |rowInner|
+                                                        @sputum_collection_date = rowInner['answer_text']
+                                                        if @sputum_collection_date != '' && @sputum_collection_date != nil
+                                                            @@earlyDate = compareDates(@@earlyDate, @sputum_collection_date, 'early')
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                end
+                        end
+                end
+                
+                @@targetDate = @@earlyDate
+                @@repeatID = repeatID(@@targetDate, @@event_id, 'sputum_collection_date')
+                reset
 
-     # run the task in background, otherwise the jruby system call hangs
-        system (pdftk_path + ' ' + template + ' fill_form ' + fdf_filename + ' output ' + pdf_filename + ' dont_ask' + ' &')
-      end
+                if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
+                    @@repeatID = @@repeatID.to_s
+                    @@sqlStr = "SELECT *, CASE
+                                            WHEN lower(question_short_name) = 'sputum_test' THEN 'tb109'
+                                            WHEN lower(question_short_name) = 'sputum_collection_date' THEN 'tb223'
+                                            WHEN lower(question_short_name) = 'sputum_report_date' THEN 'tb225'
+                                             WHEN lower(question_short_name) = 'sputum_lab_type' THEN 'tb227'
+                                            END AS phin_var
+                                            FROM tb_qa_views where lower(question_short_name) IN ('sputum_test', 'sputum_collection_date', 'sputum_report_date', 'sputum_lab_type') and event_id = " + @@event_id + 
+                                            " and repeater_form_object_id = " + @@repeatID + " order by repeater_form_object_id, question_short_name, answer_text"
+                    @@sthrpt = @@dbh.execute(@@sqlStr)
+                    if @@sthrpt.fetchable?
+                        rowsrpt = @@sthrpt.fetch_all
+                            if(rowsrpt != nil && rowsrpt.size > 0)
+                                rowsrpt.each do |row|
+                                        @single_question_answer_r_orig = row['answer_text']
+                                        @single_question_answer_r = row['answer_text'].downcase
+                                        @phin_var_r = row['phin_var']
+                                        if @single_question_answer_r != '' && @single_question_answer_r != nil
+                                            if @phin_var_r == 'tb109' 
+                                                if @single_question_answer_r == 'positive'
+                                                    @@hash_output['tb109_p'] = @@smallx
+                                                elsif @single_question_answer_r == 'negative'
+                                                    @@hash_output['tb109_n'] = @@smallx
+                                                elsif @single_question_answer_r == 'not done'
+                                                    @@hash_output['tb109_nd'] = @@smallx
+                                                elsif @single_question_answer_r == 'unknown'
+                                                    @@hash_output['tb109_u'] = @@smallx
+                                                end
+                                            end
+                                            
+                                            if @phin_var_r == 'tb223'
+                                                dateString = formatDateString(@single_question_answer_r)
+                                                @@indvChars = breakUp(dateString)
+                                                res_tb223 = PdfMapping('tb223')
+                                                populatePdfFields(res_tb223)
+                                                @@boundary = limits(dateString, @@count)
+                                                populateOutputHash(@@boundary)
+                                                reset
+                                            end	
+                                            
+                                            if @phin_var_r == 'tb225'
+                                                dateString = formatDateString(@single_question_answer_r)
+                                                @@indvChars = breakUp(dateString)
+                                                res_tb225 = PdfMapping('tb225')
+                                                populatePdfFields(res_tb225)
+                                                @@boundary = limits(dateString, @@count)
+                                                populateOutputHash(@@boundary)
+                                                reset
+                                            end	
+                                            
+                                            if @phin_var_r == 'tb227' 
+                                                if @single_question_answer_r == 'public health lab'
+                                                    @@hash_output['tb227_p'] = @@smallx
+                                                elsif @single_question_answer_r == 'commercial lab'
+                                                    @@hash_output['tb227_c'] = @@smallx
+                                                elsif @single_question_answer_r == 'other'
+                                                    @@hash_output['tb227_ot'] = @@smallx
+                                                end
+                                            end
+                                            
+                                        end
+                                end
+                            end
+                    end
+
+                end
+            end
+            
+      
+          reset
+          resetRpt
+          @@dbh.disconnect
+
+        if @@hash_output.size > 0
+            fdf = PdfForms::Fdf.new @@hash_output
+            fdf_filename = pdf_path + 'rvct_' + @@event_id + '.fdf'
+            fdf.save_to fdf_filename
+            pdf_filename = pdf_path + 'rvct_' + @@event_id + '.pdf'
+        
+          if(File.exists?(pdf_filename))
+                begin
+                    File.delete(pdf_filename)
+                rescue Exception => e
+                    logger.info(e.backtrace.inspect)
+                end
+          end  
+
+         # run the task in background, otherwise the jruby system call hangs
+            system (pdftk_path + ' ' + template + ' fill_form ' + fdf_filename + ' output ' + pdf_filename + ' dont_ask' + ' &')
+        end
 
       if(!File.exists?(pdf_filename))
         sleep(3)
@@ -2302,7 +2598,7 @@ class PrintPdfsController < ApplicationController
       end
  
     end
-  end
+    end
     
 end
   
