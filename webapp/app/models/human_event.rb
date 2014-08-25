@@ -728,7 +728,7 @@ class HumanEvent < Event
     # place
     # do we already have this?
     place_entity = PlaceEntity.find(:first, 
-                                    :conditions => [ "entities.deleted_at IS NULL AND LOWER(places.name) = ?", place_name.downcase ],
+                                    :conditions => [ "entities.deleted_at IS NULL AND LOWER(places.name) = ?", place_name.titleize.downcase ],
                                     :include => :place)
 
     # no? create it
