@@ -331,16 +331,15 @@ class StagedMessage < ActiveRecord::Base
 
   MASK_OOE = 0x01
   MASK_STD = 0x02
-  MASK_TB  = 0x04
 
   # get the jurisdiction bit mask
   def self.get_mask_jurisdiction
     mask_jurisdiction = 0;
-    mask_from_jurisdiction = { 'SNHDOOE' => MASK_OOE, 'SNHDSTD' => MASK_STD, 'SNHDTB' => MASK_TB }
+    mask_from_jurisdiction = { 'SNHDOOE' => MASK_OOE, 'SNHD-HIV-STD-TB' => MASK_STD }
 
     # if a super-user, they can see everything
     if User.current_user.is_admin?
-      return MASK_OOE | MASK_STD | MASK_HIV
+      return MASK_OOE | MASK_STD
     end
 
     # get the list of jurisdictions for the current user
@@ -355,9 +354,8 @@ class StagedMessage < ActiveRecord::Base
   # build an SQL string to filter by disease group
   def self.build_filter_condition
     conditions = [
-      "(hl7_message LIKE '%SNHDOOE%' OR ((hl7_message NOT LIKE '%SNHDSTD%') AND (hl7_message NOT LIKE '%SNHDTB%')))",
-      "(hl7_message LIKE '%SNHDSTD%')",
-      "(hl7_message LIKE '%SNHDTB%')" ]
+      "(hl7_message LIKE '%SNHDOOE%' OR (hl7_message NOT LIKE '%SNHD-HIV-STD-TB%'))",
+      "(hl7_message LIKE '%SNHD-HIV-STD-TB%')" ]
     add_or = false
     condition = ""
 
@@ -395,14 +393,12 @@ class StagedMessage < ActiveRecord::Base
     # build the list of filtered messages
     staged_messages.each do |message|
        hl7 = message.hl7.to_s
-       if hl7.include?('SNHDSTD') && ((mask & MASK_STD)!=0)
-          staged_messages_ret.push(message)
-       elsif hl7.include?('SNHDTB') && ((mask & MASK_TB)!= 0)
+       if hl7.include?('SNHD-HIV-STD-TB') && ((mask & MASK_STD)!=0)
           staged_messages_ret.push(message)
        elsif hl7.include?('SNHDOOE') && ((mask & MASK_OOE)!= 0)
           staged_messages_ret.push(message)
        # all messages not designated for STD or TB go to OOE (this displays messages with no designitation to OOE)
-       elsif !hl7.include?('SNHDSTD') && !hl7.include?('SNHDTB') && ((mask & MASK_OOE)!= 0)
+       elsif !hl7.include?('SNHD-HIV-STD-TB') && ((mask & MASK_OOE)!= 0)
          staged_messages_ret.push(message)
        end
     end
