@@ -94,6 +94,15 @@ class AssessmentEventsController < EventsController
         format.xml  { render :xml => @event.errors, :status => :unprocessable_entity }
       end
     end
+	
+    ## if an AE was successfully created
+	event_id = @event.id
+    if (event_id != nil)
+      if (response.body == nil)
+        response.body = ""
+      end	  
+      response.body += "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><ae>" + event_id.to_s + "</ae></response>"
+    end
   end
 
   def edit
