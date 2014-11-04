@@ -1,17 +1,9 @@
 # Implement the DB changes that Utah has added to their version
 #
 
-=begin
-require "#{RAILS_ROOT}/db/migrate/20130715161612_create_tb_qa_views"
-require "#{RAILS_ROOT}/db/migrate/20130715163651_create_tb_phin_qa_single_views"
-require "#{RAILS_ROOT}/db/migrate/20130715164906_create_tb_initial_drug_susceptibility_results_views"
-require "#{RAILS_ROOT}/db/migrate/20130715170626_create_tb_initial_drug_regimen_other_views"
-require "#{RAILS_ROOT}/db/migrate/20130715171132_create_tb_final_drug_susceptibility_results_views"
-=end
-
 class Utah352Changes < ActiveRecord::Migration
   def self.up
-#TODO    drop_dependent_views
+    drop_dependent_views
     change_table(:addresses) do |t|
       t.decimal :latitude, :precision => 9, :scale => 6
       t.decimal :longitude, :precision => 9, :scale => 6
@@ -41,7 +33,7 @@ class Utah352Changes < ActiveRecord::Migration
     change_table(:answers) do |t|
       t.integer :outbreak_id
     end
-    upgrade_col_string_unlimited("answers", "text_answer", "Answer")
+    upgrade_col_string_unlimited("answers", "text_answer")
     change_table(:attachments) do |t|
       t.integer :master_id, :outbreak_id, :outbreak_update_id
     end
@@ -89,7 +81,7 @@ class Utah352Changes < ActiveRecord::Migration
       t.text :qry_name, :qry_name_select, :qry_name_where
       t.timestamps
     end
-    upgrade_col_string_unlimited("form_elements", "description", "FormElement")
+    upgrade_col_string_unlimited("form_elements", "description")
     change_table(:form_references) do |t|
       t.integer :outbreak_id
     end
@@ -141,8 +133,8 @@ class Utah352Changes < ActiveRecord::Migration
     change_table(:places) do |t|
       t.boolean :primary
     end
-    upgrade_col_string_unlimited("questions", "help_text", "Question")
-    upgrade_col_string_unlimited("questions", "question_text", "Question")
+    upgrade_col_string_unlimited("questions", "help_text")
+    upgrade_col_string_unlimited("questions", "question_text")
     create_table(:report_sections) do |t|
       t.text :description
     end
@@ -203,7 +195,7 @@ class Utah352Changes < ActiveRecord::Migration
     change_table(:answers) do |t|
       t.remove :outbreak_id
     end
-    downgrade_col_to_string_fixed("answers", "text_answer", "Answer", 10485760)
+    downgrade_col_to_string_fixed("answers", "text_answer", 10485760)
     change_table(:attachments) do |t|
       t.remove :master_id, :outbreak_id, :outbreak_update_id
     end
@@ -222,7 +214,7 @@ class Utah352Changes < ActiveRecord::Migration
         :outbreak_id, :disposition_id, :outbreak_description
     end
     drop_table(:export_fields)
-    downgrade_col_to_string_fixed("form_elements", "description", "FormElement", 10485760)
+    downgrade_col_to_string_fixed("form_elements", "description", 10485760)
     change_table(:form_references) do |t|
       t.remove :outbreak_id
     end
@@ -243,8 +235,8 @@ class Utah352Changes < ActiveRecord::Migration
     change_table(:places) do |t|
       t.remove :primary
     end
-    downgrade_col_to_string_fixed("questions", "help_text", "Question", 10485760)
-    downgrade_col_to_string_fixed("questions", "question_text", "Question", 10485760)
+    downgrade_col_to_string_fixed("questions", "help_text", 10485760)
+    downgrade_col_to_string_fixed("questions", "question_text", 10485760)
     drop_table(:report_sections)
     drop_table(:system_messages)
     drop_table(:user_export_columns)
@@ -255,18 +247,17 @@ class Utah352Changes < ActiveRecord::Migration
     change_table(:users) do |t|
       t.remove :dashboard_settings, :events_view_settings, :task_settings, :last_login
     end
-#TODO    create_dependent_views
   end
   
-  def self.upgrade_col_string_unlimited(table, column, class_name)
-    upgrade_downgrade_col(true, table, column, class_name)
+  def self.upgrade_col_string_unlimited(table, column)
+    upgrade_downgrade_col(true, table, column)
   end
   
-  def self.downgrade_col_to_string_fixed(table, column, class_name, length)
-    upgrade_downgrade_col(false, table, column, class_name, length)
+  def self.downgrade_col_to_string_fixed(table, column, length)
+    upgrade_downgrade_col(false, table, column, length)
   end
   
-  def self.upgrade_downgrade_col(upgrade, table, column, class_name, length=0)
+  def self.upgrade_downgrade_col(upgrade, table, column, length=0)
     col_tmp = column+"_tmp"
     change_table(table) do |t|
       if(upgrade)
@@ -275,29 +266,24 @@ class Utah352Changes < ActiveRecord::Migration
         t.string col_tmp, :limit => length
       end
     end
-    klass = Object.const_get(class_name)
-    klass.update_all(col_tmp + '=' + column)
+	execute "UPDATE #{table} SET #{col_tmp} = #{column}"
     change_table(table) do |t|
       t.remove column
     end
     rename_column table, col_tmp, column
   end
-  # TODO
-=begin  
-  def self.drop_dependent_views
-    CreateTbFinalDrugSusceptibilityResultsViews.down
-    CreateTbInitialDrugRegimenOtherViews.down
-    CreateTbInitialDrugSusceptibilityResultsViews.down
-    CreateTbPhinQaSingleViews.down
-    CreateTbQaViews.down
-  end
   
-  def self.create_dependent_views
-    CreateTbQaViews.up
-    CreateTbPhinQaSingleViews.up
-    CreateTbInitialDrugSusceptibilityResultsViews.up
-    CreateTbInitialDrugRegimenOtherViews.up
-    CreateTbFinalDrugSusceptibilityResultsViews.up
+  def self.drop_dependent_views
+	execute "DROP VIEW IF EXISTS clinician "
+	execute "DROP VIEW IF EXISTS hepatitis"
+	execute "DROP VIEW IF EXISTS interested_parties"
+	execute "DROP VIEW IF EXISTS table_link"
+	execute "DROP VIEW IF EXISTS vw_recent_flu"
+	execute "DROP VIEW IF EXISTS tb_final_drug_susceptibility_results_views"
+	execute "DROP VIEW IF EXISTS tb_initial_drug_regimen_other_views;"
+	execute "DROP VIEW IF EXISTS tb_initial_drug_regimen_views;"
+	execute "DROP VIEW IF EXISTS tb_initial_drug_susceptibility_results_views;"
+	execute "DROP VIEW IF EXISTS tb_phin_qa_single_views;"
+	execute "DROP VIEW IF EXISTS tb_qa_views;"
   end
-=end
 end
