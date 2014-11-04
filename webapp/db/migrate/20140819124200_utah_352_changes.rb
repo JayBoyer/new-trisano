@@ -93,7 +93,7 @@ class Utah352Changes < ActiveRecord::Migration
     change_table(:lab_results) do |t|
       t.boolean :primary_lab_result, :default => false
     end
-    LabResult.update_all('primary_lab_result = false')
+	execute "UPDATE lab_results SET primary_lab_result = false"
     create_table(:outbreak_access) do |t|
       t.integer :jurisdiction_id, :outbreak_id, :null => false
       t.integer :type, :null => false, :default => 1
@@ -177,7 +177,7 @@ class Utah352Changes < ActiveRecord::Migration
     end
     execute "ALTER TABLE users ADD COLUMN dashboard_settings character varying"
     execute "ALTER TABLE users ADD COLUMN task_settings character varying"
-    User.update_all("status = ''", "status is NULL")
+	execute "UPDATE users SET status = '' WHERE status is NULL"
 #TODO    create_dependent_views
   end
 
