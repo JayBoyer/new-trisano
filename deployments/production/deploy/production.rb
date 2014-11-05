@@ -60,7 +60,7 @@ set :extension, '^(\d{1,6})$'
 set :form_builder_phone, '^\d{3}-\d{3}-\d{4}$'
 set :form_builder_numeric, "^([0-9]*|\d*\.\d*|-[0-9]*|-\d*\.\d*)$" #Accept only positive or negative (0-9) integers and one optional decimal point.
 
-set :session_secret_token, ""
+set :session_secret_token, "put a new secret token here, this field can't be blank during deployment (prevents data migration from working)"
 
 ## Locale configuration
 set :locale_switching, false
