@@ -588,6 +588,11 @@ class StagedMessage < ActiveRecord::Base
       true
     end
   end
+  
+  # this is a HACK to work around a jruby bug
+  def hl7_message_before_type_cast
+    hl7_message
+  end
 
   class << self
     def next_sequence_number
