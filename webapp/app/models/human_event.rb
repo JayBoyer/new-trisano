@@ -203,7 +203,7 @@ class HumanEvent < Event
         "jurisdiction_short_name #{order_direction}, last_name, first_name, disease_name, workflow_state"
       when 'status'
         # Fortunately the event status code stored in the DB and the text the user sees mostly correspond to the same alphabetical ordering"
-        "workflow_state #{order_direction}, last_name, first_name, disease_name, jurisdiction_short_name"
+        "status_order #{order_direction}, last_name, first_name, disease_name, jurisdiction_short_name"
       when 'event_created'
         "events.created_at #{order_direction}, last_name, first_name, disease_name, jurisdiction_short_name, workflow_state"
       else
@@ -238,6 +238,10 @@ class HumanEvent < Event
                ELSE users.uid
             END AS investigator_name,
             event_queues.queue_name as queue_name,
+            CASE
+              WHEN events.workflow_state = 'assigned_to_queue' THEN 'Queue - ' || event_queues.queue_name
+              ELSE events.workflow_state
+            END AS status_order,
             people.middle_name as middle_name
         FROM events
             INNER JOIN participations ON participations.event_id = events.id
@@ -488,7 +492,13 @@ class HumanEvent < Event
   end
 
   def state_description
-    I18n.t(state, :scope => [:workflow])
+    if(state.to_s == 'assigned_to_queue')
+      queue = EventQueue.find(:first, :conditions => ["id = ?", self.event_queue_id])
+      description = 'Queue - ' + queue.queue_name
+    else
+      description = I18n.translate(state, :scope => [:workflow])
+    end
+    description
   end
 
   # Debt: some stuff here gets written to the database, and some still
