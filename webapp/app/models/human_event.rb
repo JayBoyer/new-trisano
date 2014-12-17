@@ -492,11 +492,12 @@ class HumanEvent < Event
   end
 
   def state_description
+    description = I18n.translate(state, :scope => [:workflow])
     if(state.to_s == 'assigned_to_queue')
       queue = EventQueue.find(:first, :conditions => ["id = ?", self.event_queue_id])
-      description = 'Queue - ' + queue.queue_name
-    else
-      description = I18n.translate(state, :scope => [:workflow])
+      if(queue != nil && queue.queue_name != nil)  
+        description = 'Queue - ' + queue.queue_name
+      end
     end
     description
   end
