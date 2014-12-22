@@ -352,7 +352,11 @@ class EventsController < ApplicationController
 
     if @event.save
       flash[:notice] = t("event_successfully_routed")
-      redirect_to :back
+      if(!request.env["HTTP_REFERER"].blank?) 
+        redirect_to :back
+      else
+        redirect_to events_path
+      end
     else
       if User.current_user.can_update?(@event)
         flash.now[:error] = t("unable_to_change_cmr_state")
