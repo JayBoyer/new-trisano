@@ -211,7 +211,7 @@ class ExtendedFormBuilder < ActionView::Helpers::FormBuilder
       radio_buttons += @template.hidden_field_tag(field_name + "[" + field_index + "][code]", selected_code)
     when :date
       html_options[:onchange] = text_answer_event if follow_ups
-      html_options[:year_range] = 100.years.ago..0.years.from_now
+      html_options[:year_range] = 100.years.ago..1.years.from_now
       html_options[:value] = @object.date_answer.strftime(I18n.t("date.formats.long")) unless @object.date_answer.nil?
       calendar_date_select(:text_answer, html_options)
     when :phone
