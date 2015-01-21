@@ -41,12 +41,10 @@ module HumanEventsHelper
         page["printing_controls_#{event.id}"].visual_effect :appear, :duration => 0.0
       end
         if !event.nil? && event.disease_name != "" && event.disease_name != nil
-            if event.disease_name.downcase.include? 'tuberculosis'
+            if event.disease_name.downcase.include? "tuberculosis" or event.disease_name.downcase.include? "tb co-infection"
                 controls << " | " << link_to(t('generate_rvct'), pdf_print_pdfs_path(:evnt_id => event.id), :method => :get)
             end
-        end
-        if !event.nil? && event.disease_name != "" && event.disease_name != nil
-            disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std/hiv", "syphilis"]
+            disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std", "syphilis", "tb co-infection"]
             if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
                 controls << " | " << link_to(t('generate_oojfr'), pdfoojfr_print_ooj_fr_path(:evnt_id => event.id), :method => :get)
             end
