@@ -43,7 +43,7 @@ class LabResult < ActiveRecord::Base
   end
 
   validates_presence_of :test_type_id
-  validates_length_of :result_value, :maximum => 255, :allow_blank => true
+  validates_length_of :result_value, :maximum => 10485760, :allow_blank => true
   validates_length_of :units, :maximum => 50, :allow_blank => true
   validates_length_of :reference_range, :maximum => 255, :allow_blank => true
 
