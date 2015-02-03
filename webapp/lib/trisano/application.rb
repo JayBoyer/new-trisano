@@ -35,7 +35,7 @@ module Trisano
     end
 
     def actual_name
-      @actual_name ||= "#{I18n.t(actual_name_key)} #{version_number}"
+      @actual_name ||= "TriSano" + " #{version_number}"
     end
 
     def version_number

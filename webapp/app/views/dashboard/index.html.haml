@@ -14,7 +14,10 @@
 -# If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
 - content_for :title do
-  =t('welcome_message')
+  - if RAILS_ENV == "demo"
+    =t('welcome_message_dpbh')
+  - else
+    =t('welcome_message')
 
 #rot
   %script

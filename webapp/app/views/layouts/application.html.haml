@@ -24,7 +24,11 @@
 
     = stylesheet_link_tag 'trisano-theme/jquery-ui-1.8.4.custom'
     = stylesheet_link_tag 'grid'
-    = stylesheet_link_tag 'structure_ipad'
+    - if RAILS_ENV == "demo"
+      = stylesheet_link_tag 'structure_dpbh' 
+    - else      
+      = stylesheet_link_tag 'structure_ipad'
+
     = stylesheet_link_tag 'typography'
     = stylesheet_link_tag 'action'
     = stylesheet_link_tag 'tabview'

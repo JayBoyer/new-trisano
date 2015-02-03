@@ -31,7 +31,7 @@ set :mailer_enable_starttls_auto , true
 set :cdc_state                   , '32'
 
 ##  hl7 configuration
-set :recv_facility, "SNHD Trisano ProductionTest"
+set :recv_facility, "SNHD Trisano Production"
 set :processing_id, "P^"
 
 ## User auth configurations

@@ -39,22 +39,9 @@ module LayoutHelper
     result << "</div>"
     result << "<div class='foottext'>"
     result << "<div class='top'>"
-    result << link_to_release_notes(application.actual_name)
+    result << "<strong>" + application.actual_name + "</strong>" 
     result << "</div>"
     result << "<div class='bottom'>"
-    result << "<a href='http://www.trisano.org/collaborate/'>#{t('collaborate')}</a>"
-    result << "&nbsp;|&nbsp;"
-    result << "#{t('user_feedback')} (<a href='http://groups.google.com/group/trisano-user'>#{t('web')}</a>, <a href='mailto:#{application.bug_report_address}'>#{t 'email'}</a>)"
-    result << "&nbsp;|&nbsp;"
-    result << "<a href='http://www.trisano.org'>#{t('about')}</a>"
-    result << "&nbsp;|&nbsp;"
-    result << "<a href='http://www.trisano.org/collaborate/licenses/'>#{t('license')}</a>"
-    result << "&nbsp;|&nbsp;"
-    result << "<a href='http://github.com/csinitiative/trisano/tree/master'>#{t('source')}</a>"
-    result << "</div>"
-    result << "<div class='bottom'>"
-    result << t('copyright')
-    result << "</div>"
     result << "</div>"
 
     result
@@ -93,7 +80,11 @@ module LayoutHelper
   end
 
   def render_small_logo
-    image_tag(small_logo_path, :border => 0, :id => 'logo', :height => "45px")
+    if RAILS_ENV == "demo"
+      image_tag('logo_dpbh.gif', :border => 0, :id => 'logo', :height => "48px")
+    else
+      image_tag(small_logo_path, :border => 0, :id => 'logo', :height => "45px")
+    end
   end
   
   def render_main_logo

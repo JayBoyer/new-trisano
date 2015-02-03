@@ -6,6 +6,8 @@ plugins:
 - trisano_locales
 - trisano_en
 - trisano_perinatal_hep_b
+- trisano_auth
+- authlogic
 
 # This is the path which will be symlinked
 # into webapp/config/deploy and should contain

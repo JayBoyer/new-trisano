@@ -105,7 +105,7 @@ module TrisanoAuth
             password_length_constraints = c.validates_length_of_password_field_options.reject { |k,v| [:minimum, :maximum].include?(k) }
             c.validates_length_of_password_field_options = password_length_constraints.merge :within => 0..64
 
-            c.validates_format_of :password, :with => /^(?!.*(.)\1)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^0-9a-zA-Z])([\x20-\x7E]){7,}$/, :if => :require_password_changed?, :message => "must be at least 7 characters.  It must include a number, a lower case letter, an upper case character, and a non-alphanumeric character.  No two characters may be repeated sequentially."
+            c.validates_format_of :password, :with => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([\x20-\x7E]){7,}$/, :if => :require_password_changed?, :message => "must be at least 7 characters.  It must include a number, a lower case letter, an upper case character."
             c.validate :password_repeated?, :if => :require_password_changed?
             c.validate :current_password?, :if => :require_current_password_changed?
           end
