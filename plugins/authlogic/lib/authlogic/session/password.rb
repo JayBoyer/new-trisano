@@ -230,12 +230,15 @@ module Authlogic
               return
             end
 
-            ## TODO Jay
             # check LDAP for AD credential validation, if the username is not an AD name continue with authentication
             # verses data stored in database
-            ad = ad_valid(self.user_name, send("protected_#{password_field}"))
-            if (ad == AD_SUCCESS)
-              return
+            # skip ldap authentication on demo machine
+            ad = AD_BAD_NAME
+            if RAILS_ENV != 'demo'
+              ad = ad_valid(self.user_name, send("protected_#{password_field}"))
+              if (ad == AD_SUCCESS)
+                return
+              end
             end
 
             if ((ad == AD_BAD_PASSWORD) || !attempted_record.send(verify_password_method, send("protected_#{password_field}")))

@@ -30,7 +30,7 @@ class PrintPdfsController < ApplicationController
       out_filename = ''
       pdftk_path = '/usr/bin/pdftk'
       
-      if Rails.env.production? || Rails.env.uat?
+      if Rails.env.production? || Rails.env.uat? || Rails.env.demo?
         pdf_path = '/opt/TriSano/current/app/pdfs/'
         template = '/opt/TriSano/current/app/pdfs/template/tb_fields_template.pdf'
       end

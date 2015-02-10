@@ -20,15 +20,6 @@ include ApplicationHelper
 
 describe LayoutHelper do
   
-  context "rendering the footer" do
-    include Trisano
-
-    it "includes a link to the release notes" do
-      helper.expects(:link_to_release_notes).with(application.actual_name).returns("")
-      helper.render_footer
-    end
-  end
-
   context "release notes link" do
     it "uses the release notes url" do
       helper.expects(:release_notes_url).returns("http://bogus_notes.com")

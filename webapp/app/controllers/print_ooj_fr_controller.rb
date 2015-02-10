@@ -82,17 +82,13 @@ class PrintOojFrController < ApplicationController
  
       pdftk_path = '/usr/bin/pdftk'
       
-      if Rails.env.production? || Rails.env.uat?
+      if Rails.env.production? || Rails.env.uat? || Rails.env.demo?
         pdf_path = '/opt/TriSano/current/app/pdfs/'
         template = '/opt/TriSano/current/app/pdfs/template/ooj_fr_template.pdf'
       end
       if Rails.env.development?
         pdf_path = File.expand_path('~/code/trisano/webapp/app/pdfs/')
         template = File.expand_path('~/code/trisano/webapp/app/pdfs/template/ooj_fr_template.pdf')
-      end
-      if Rails.env.demo?
-        pdf_path = '~/code/trisano/webapp/app/pdfs/'
-        template = '~/code/trisano/webapp/app/pdfs/template/ooj_fr_template.pdf'
       end
 
       #pdf_path = 'C:/pdfs/'
