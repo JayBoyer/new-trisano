@@ -279,6 +279,32 @@ class Person < ActiveRecord::Base
           ["Reporter", "Reporter"]
       ]
     end
+    
+    def find_exact_match(options)
+      check_conditions = [[:last_name, 'last_name'],
+                          [:first_name, 'first_name'], 
+                          [:middle_name, 'middle_name'],
+                          [:birth_date, 'birth_date']]
+      conditions = ""
+      multi = false
+      check_conditions.each do |condition|
+        unless(options[condition[0]].blank?)
+          if multi
+            conditions += "AND "
+          end
+          conditions += condition[1] + " = '" + options[condition[0]] + "' "
+          multi = true
+        end
+      end
+      unless conditions.blank?
+        sql = "SELECT * FROM people WHERE " + conditions + " ORDER BY id LIMIT 1"
+        persons = Person.find_by_sql(sql)
+        unless(persons.blank?)
+          return persons[0]
+        end
+      end
+      return nil
+    end
   end
 
 end

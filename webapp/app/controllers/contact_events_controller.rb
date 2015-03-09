@@ -155,7 +155,20 @@ class ContactEventsController < EventsController
       person_entity = PersonEntity.find(params[:from_person])
       @event.build_interested_party(:primary_entity_id => person_entity.id)
     else
-      @event = ContactEvent.new(params[:contact_event])
+      # if the specified person is an exact match on an existing person, use that existing person
+      unless(params[:contact_event][:interested_party_attributes].blank?)
+        entity_id = PersonEntity.find_exact_match(params[:contact_event][:interested_party_attributes][:person_entity_attributes][:person_attributes])
+        unless(entity_id.blank?)
+          person_entity = PersonEntity.find(entity_id)
+          params[:contact_event].delete(:interested_party_attributes)
+          params[:contact_event].delete(:address_attributes)
+          @event = ContactEvent.new(params[:contact_event])
+          @event.build_interested_party(:primary_entity_id => person_entity.id)
+        end
+      end
+      if(@event.blank?)
+        @event = ContactEvent.new(params[:contact_event])
+      end
     end
   end
 end

@@ -55,11 +55,20 @@ class MorbidityEventsController < EventsController
       org_event = Event.find(params[:from_event])
       components = params[:event_components]
       org_event.copy_event(@event, components || []) # Copy instead of clone to make sure contacts become morbs
-
     elsif params[:from_person]
-      person = PersonEntity.find(params[:from_person])
-      @event.copy_from_person(person)
+      person_entity = PersonEntity.find(params[:from_person])
+      @event.copy_from_person(person_entity)
     else
+      # if the specified person is an exact match on an existing person, use that existing person
+      unless(params[:morbidity_event][:interested_party_attributes].blank?)
+        entity_id = PersonEntity.find_exact_match(params[:morbidity_event][:interested_party_attributes][:person_entity_attributes][:person_attributes])
+        unless(entity_id.blank?)
+          person_entity = PersonEntity.find(entity_id)
+          @event.copy_from_person(person_entity)
+          params[:morbidity_event].delete(:interested_party_attributes)
+          params[:morbidity_event].delete(:address_attributes)
+        end
+      end
       @event.attributes = params[:morbidity_event]
     end
     unless can_create?
@@ -92,13 +101,13 @@ class MorbidityEventsController < EventsController
         format.xml  { render :xml => @event.errors, :status => :unprocessable_entity }
       end
     end
-	
+    
     ## if a cmr was successfully created
-	event_id = @event.id
+    event_id = @event.id
     if (event_id != nil)
       if (response.body == nil)
         response.body = ""
-      end	  
+      end      
       response.body += "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><cmr>" + event_id.to_s + "</cmr></response>"
     end
   end

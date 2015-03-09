@@ -34,4 +34,20 @@ class PersonEntity < Entity
   def xml_fields
     [[:race_ids, {:rel => 'https://wiki.csinitiative.com/display/tri/Relationship+-+Race'}]]
   end
+  
+  class << self
+    def find_exact_match(person_attributes)
+      options = {}
+      options[:last_name] = person_attributes[:last_name]
+      options[:middle_name] = person_attributes[:middle_name]
+      options[:first_name] = person_attributes[:first_name]
+      options[:birth_date] = person_attributes[:birth_date]
+      person = Person.find_exact_match(options)
+      unless(person.blank?)
+        return person.entity_id
+      end
+      return nil
+    end
+  end  
+  
 end

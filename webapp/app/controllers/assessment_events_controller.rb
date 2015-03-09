@@ -56,11 +56,20 @@ class AssessmentEventsController < EventsController
       org_event = Event.find(params[:from_event])
       components = params[:event_components]
       org_event.copy_event(@event, components || []) # Copy instead of clone to make sure contacts become assessment
-
     elsif params[:from_person]
       person = PersonEntity.find(params[:from_person])
       @event.copy_from_person(person)
     else
+      # if the specified person is an exact match on an existing person, use that existing person
+      unless(params[:assessment_event][:interested_party_attributes].blank?)
+        entity_id = PersonEntity.find_exact_match(params[:assessment_event][:interested_party_attributes][:person_entity_attributes][:person_attributes])
+        unless(entity_id.blank?)
+          person_entity = PersonEntity.find(entity_id)
+          @event.copy_from_person(person_entity)
+          params[:assessment_event].delete(:interested_party_attributes)
+          params[:assessment_event].delete(:address_attributes)
+        end
+      end
       @event.attributes = params[:assessment_event]
     end
 
