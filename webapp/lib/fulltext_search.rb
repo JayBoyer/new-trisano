@@ -108,10 +108,8 @@ module FulltextSearch
           ((!names.nil? && !date_conditions.blank?) ? "AND "  : "") +
           (date_conditions.blank?  ? "" : date_conditions )
         sql = "SELECT * FROM people WHERE " + conditions + " LIMIT 1" 
-logger.error(">>>>>>>>>>>> Checking for exact match");
         # if an exact match not found
         if(Person.find_by_sql(sql).size < 1)
-logger.error(">>>>>>>>>>>> No exact match found");
 #         commented out a soundex search, it is very similar speed but search results are not as good
 #         results = " (soundex(last_name) = soundex('#{last_name}') #{operator} soundex(first_name) = soundex('#{first_name}')) " +
           # set conditions for a fuzzy search
