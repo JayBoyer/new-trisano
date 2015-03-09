@@ -169,7 +169,12 @@ module StagedMessages
     end
 
     def death_date
-      Date.parse(pid_segment.death_date)
+puts "death date dead flag: " + dead_flag
+	  if(dead_flag.to_s.upcase == 'Y')
+        Date.parse(pid_segment.death_date)
+      else
+	    nil
+	  end
     rescue
     end
 
