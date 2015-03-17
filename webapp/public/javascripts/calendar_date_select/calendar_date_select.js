@@ -31,7 +31,7 @@ Date.prototype.getPaddedMinutes = function() { return Date.padded2(this.getMinut
 Date.prototype.getAMPMHour = function() { var hour = this.getHours(); return (hour == 0) ? 12 : (hour > 12 ? hour - 12 : hour ) }
 Date.prototype.getAMPM = function() { return (this.getHours() < 12) ? "AM" : "PM"; }
 Date.prototype.stripTime = function() { return new Date(this.getFullYear(), this.getMonth(), this.getDate());};
-Date.prototype.daysDistance = function(compare_date) { return Math.round((compare_date - this) / Date.one_day); };
+Date.prototype.daysDistance = function(compare_date) { return Math.ceil((compare_date - this) / Date.one_day); };
 Date.prototype.toFormattedString = function(include_time){
   var hour, str;
   str = Date.months[this.getMonth()] + " " + this.getDate() + ", " + this.getFullYear();
