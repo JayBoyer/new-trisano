@@ -77,11 +77,13 @@ case $response in
     echo "Deploying"
     cap $cap_deploy_prefix deploy
 
-    echo "Backing up DB"
-    cap $cap_deploy_prefix deploy:dump_db
+	echo "Database will need to be manually migrated"
+##  backuping up database will fail for a large database and halt the migration
+##    echo "Backing up DB"
+##    cap $cap_deploy_prefix deploy:dump_db
 
-    echo "Migrating DB"
-    cap $cap_deploy_prefix deploy:migrate
+##    echo "Migrating DB"
+##    cap $cap_deploy_prefix deploy:migrate
 
     echo "Clean up old releases"
     cap $cap_deploy_prefix deploy:cleanup
