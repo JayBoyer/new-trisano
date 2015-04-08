@@ -61,7 +61,8 @@ class AssessmentEventsController < EventsController
       @event.copy_from_person(person)
     else
       # if the specified person is an exact match on an existing person, use that existing person
-      unless(params[:assessment_event][:interested_party_attributes].blank?)
+      if(!params[:assessment_event][:interested_party_attributes].blank? && 
+            params[:assessment_event][:interested_party_attributes][:primary_entity_id].blank?)
         entity_id = PersonEntity.find_exact_match(params[:assessment_event][:interested_party_attributes][:person_entity_attributes][:person_attributes])
         unless(entity_id.blank?)
           person_entity = PersonEntity.find(entity_id)
@@ -103,13 +104,13 @@ class AssessmentEventsController < EventsController
         format.xml  { render :xml => @event.errors, :status => :unprocessable_entity }
       end
     end
-	
+
     ## if an AE was successfully created
-	event_id = @event.id
+    event_id = @event.id
     if (event_id != nil)
       if (response.body == nil)
         response.body = ""
-      end	  
+      end
       response.body += "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><ae>" + event_id.to_s + "</ae></response>"
     end
   end

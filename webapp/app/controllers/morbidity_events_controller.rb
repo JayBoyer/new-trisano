@@ -60,7 +60,8 @@ class MorbidityEventsController < EventsController
       @event.copy_from_person(person_entity)
     else
       # if the specified person is an exact match on an existing person, use that existing person
-      unless(params[:morbidity_event][:interested_party_attributes].blank?)
+      if(!params[:morbidity_event][:interested_party_attributes].blank? && 
+            params[:morbidity_event][:interested_party_attributes][:primary_entity_id].blank?)
         entity_id = PersonEntity.find_exact_match(params[:morbidity_event][:interested_party_attributes][:person_entity_attributes][:person_attributes])
         unless(entity_id.blank?)
           person_entity = PersonEntity.find(entity_id)
