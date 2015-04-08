@@ -15,7 +15,7 @@ DAEMON=/opt/nginx/sbin/nginx
 NAME=nginx
 DESC=nginx
 
-JRUBY_OPTS="--1.8 --server -J-Xmn512m -J-Xms4g -J-Xmx4g -J-XX:ReservedCodeCacheSize=256M -J-XX:+UseCodeCacheFlushing -J-XX:MaxPermSize=128M -J-XX:+CMSClassUnloadingEnabled"
+JRUBY_OPTS="--1.8 --server -J-Xmn512m -J-Xms4g -J-Xmx8g -J-XX:ReservedCodeCacheSize=512M -J-XX:+UseCodeCacheFlushing -J-XX:MaxPermSize=128M -J-XX:+CMSClassUnloadingEnabled -J-XX:+HeapDumpOnOutOfMemoryError"
 JAVA_HOME=/usr/lib/jvm/jdk1.7.0_25
 
 # The following two lines are uncommented to dump out the jruby and java environment settings to files
