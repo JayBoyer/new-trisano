@@ -16,7 +16,7 @@
     .three-valued-row
       .left
         %span.print-label=ct 'user'
-        %span.print-value= h(note.user.best_name)
+        %span.print-value= h(note.user.best_name) unless note.user.blank?
       .left
         %span.print-label= ct 'note_type'
         %span.print-value= h(note.note_type.humanize) unless note.note_type.blank?
