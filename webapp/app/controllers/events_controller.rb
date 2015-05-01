@@ -328,15 +328,16 @@ class EventsController < ApplicationController
 
   def state
     @event = Event.find(params[:id])
-    workflow_action = params[:morbidity_event].delete(:workflow_action)
+    params_t = params[:morbidity_event].nil? ? params[:assessment_event] : params[:morbidity_event]
+    workflow_action = params_t.delete(:workflow_action)
 
     # Squirrel any notes away
-    note = params[:morbidity_event].delete(:note)
+    note = params_t.delete(:note)
 
     begin
       # A status change may be accompanied by other values such as an
       # event queue, set them
-      @event.attributes = params[:morbidity_event]
+      @event.attributes = params_t
       @event.send(workflow_action, note)
     rescue Exception => e
       # grr. workflow halt exception doesn't work as documented
