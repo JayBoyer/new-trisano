@@ -109,6 +109,7 @@ class PrintPdfsController < ApplicationController
       
       def formatDateString(date_string)
         date = Date.strptime(date_string, '%Y-%m-%d')
+        #date = date.to_s
         date_string = formatDate(date)
       end
 
@@ -534,6 +535,88 @@ class PrintPdfsController < ApplicationController
       end
 
       if @city_case_num != '' && @city_case_num != nil
+                if @city_case_num.include? '-'
+                   splitArr =  @city_case_num.split(/-/)
+                   
+                   if splitArr.length > 0
+                        if splitArr[0].length <= 4
+                                @@indvChars = breakUp(splitArr[0])
+                                res_inv172_y = PdfMapping('pg1_inv172_y')
+                                populatePdfFields(res_inv172_y)
+                                @@boundary = limits(splitArr[0], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+
+                                @@indvChars = breakUp(splitArr[0])
+                                res_inv172_y = PdfMapping('pg4_inv172_y')
+                                populatePdfFields(res_inv172_y)
+                                @@boundary = limits(splitArr[0], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+					
+                                @@indvChars = breakUp(splitArr[0])
+                                res_inv172_y = PdfMapping('pg5_inv172_y')
+                                populatePdfFields(res_inv172_y)
+                                @@boundary = limits(splitArr[0], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+                        end
+                   end
+                   if splitArr.length >= 2
+                        if splitArr[1].length <= 2
+                                @@indvChars = breakUp(splitArr[1])
+                                res_inv172_s = PdfMapping('pg1_inv172_s')
+                                populatePdfFields(res_inv172_s)
+                                @@boundary = limits(splitArr[1], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+
+                                @@indvChars = breakUp(splitArr[1])
+                                res_inv172_s = PdfMapping('pg4_inv172_s')
+                                populatePdfFields(res_inv172_s)
+                                @@boundary = limits(splitArr[1], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+					
+                                @@indvChars = breakUp(splitArr[1])
+                                res_inv172_s = PdfMapping('pg4_inv172_s')
+                                populatePdfFields(res_inv172_s)
+                                @@boundary = limits(splitArr[1], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+                        end
+                   end
+                   if splitArr.length >= 3
+                        if splitArr[2].length <= 9
+                                @@indvChars = breakUp(splitArr[2])
+                                res_inv172_l = PdfMapping('pg1_inv172_l')
+                                populatePdfFields(res_inv172_l)
+                                @@boundary = limits(splitArr[2], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+
+                                @@indvChars = breakUp(splitArr[2])
+                                res_inv172_l = PdfMapping('pg4_inv172_l')
+                                populatePdfFields(res_inv172_l)
+                                @@boundary = limits(splitArr[2], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+					
+                                @@indvChars = breakUp(splitArr[2])
+                                res_inv172_l = PdfMapping('pg4_inv172_l')
+                                populatePdfFields(res_inv172_l)
+                                @@boundary = limits(splitArr[2], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+                        end
+                   end
+                   
+                end
+            
+            
+            end
+=begin      
+      if @city_case_num != '' && @city_case_num != nil
         @city_case_num = @city_case_num.reverse[0...9].reverse
         @@indvChars = breakUp(@city_case_num)
         res_inv172 = PdfMapping('pg1_inv172_l')
@@ -587,7 +670,7 @@ class PrintPdfsController < ApplicationController
         @@hash_output['pg5_inv172_s1'] = 'N'
         @@hash_output['pg5_inv172_s2'] = 'V'
       end
-
+=end
       @@sqlStr = "SELECT answer_text FROM tb_phin_qa_single_views WHERE phin_var = 'inv173_l' and event_id =" + @@event_id
 
       @@sth = @@dbh.execute(@@sqlStr)
@@ -599,7 +682,89 @@ class PrintPdfsController < ApplicationController
               end 
             end
       end
+    
+      if @state_case_num != '' && @state_case_num != nil
+                if @state_case_num.include? '-'
+                   splitArr =  @state_case_num.split(/-/)
+                   
+                   if splitArr.length > 0
+                        if splitArr[0].length <= 4
+                                @@indvChars = breakUp(splitArr[0])
+                                res_inv173_y = PdfMapping('pg1_inv173_y')
+                                populatePdfFields(res_inv173_y)
+                                @@boundary = limits(splitArr[0], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
 
+                                @@indvChars = breakUp(splitArr[0])
+                                res_inv173_y = PdfMapping('pg4_inv173_y')
+                                populatePdfFields(res_inv173_y)
+                                @@boundary = limits(splitArr[0], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+					
+                                @@indvChars = breakUp(splitArr[0])
+                                res_inv173_y = PdfMapping('pg5_inv173_y')
+                                populatePdfFields(res_inv173_y)
+                                @@boundary = limits(splitArr[0], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+                        end
+                   end
+                   if splitArr.length >= 2
+                        if splitArr[1].length <= 2
+                                @@indvChars = breakUp(splitArr[1])
+                                res_inv173_s = PdfMapping('pg1_inv173_s')
+                                populatePdfFields(res_inv173_s)
+                                @@boundary = limits(splitArr[1], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+
+                                @@indvChars = breakUp(splitArr[1])
+                                res_inv173_s = PdfMapping('pg4_inv173_s')
+                                populatePdfFields(res_inv173_s)
+                                @@boundary = limits(splitArr[1], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+					
+                                @@indvChars = breakUp(splitArr[1])
+                                res_inv173_s = PdfMapping('pg4_inv173_s')
+                                populatePdfFields(res_inv173_s)
+                                @@boundary = limits(splitArr[1], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+                        end
+                   end
+                   if splitArr.length >= 3
+                        if splitArr[2].length <= 9
+                                @@indvChars = breakUp(splitArr[2])
+                                res_inv173_l = PdfMapping('pg1_inv173_l')
+                                populatePdfFields(res_inv173_l)
+                                @@boundary = limits(splitArr[2], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+
+                                @@indvChars = breakUp(splitArr[2])
+                                res_inv173_l = PdfMapping('pg4_inv173_l')
+                                populatePdfFields(res_inv173_l)
+                                @@boundary = limits(splitArr[2], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+					
+                                @@indvChars = breakUp(splitArr[2])
+                                res_inv173_l = PdfMapping('pg4_inv173_l')
+                                populatePdfFields(res_inv173_l)
+                                @@boundary = limits(splitArr[2], @@count)
+                                populateOutputHash(@@boundary)
+                                reset
+                        end
+                   end
+                   
+                end
+                        
+            end  
+
+=begin            
       if @state_case_num != '' && @state_case_num != nil
         @state_case_num = @state_case_num.reverse[0...9].reverse
         @@indvChars = breakUp(@state_case_num)
@@ -653,7 +818,8 @@ class PrintPdfsController < ApplicationController
         @@hash_output['pg5_inv173_s1'] = 'N'
         @@hash_output['pg5_inv173_s2'] = 'V'
       end  
-
+=end
+      
       #Process non-repeating questions
       @@sqlStr = "SELECT * FROM  tb_phin_qa_single_views where phin_var is not null and event_id =" + @@event_id + " order by phin_var"
 
@@ -946,6 +1112,16 @@ class PrintPdfsController < ApplicationController
                     elsif @single_question_answer == 'unknown'
                       @@hash_output['tb131_u'] = @@smallx
                     end
+                  end
+                  
+                  if @phin_var == 'tb147' 
+                    dateString = formatDateString(@single_question_answer)
+                    @@indvChars = breakUp(dateString)
+                    res_tb147 = PdfMapping('tb147')
+                    populatePdfFields(res_tb147)
+                    @@boundary = limits(dateString, @@count)
+                    populateOutputHash(@@boundary)
+                    reset
                   end
                   
                   if @phin_var == 'tb148' 
@@ -1909,26 +2085,27 @@ class PrintPdfsController < ApplicationController
       end
       
       #Populate tb147
-      treat_date_final = ''
       
-      if treat_date_initial != '' && treat_date_initial != nil && treat_date_initial_o != '' && treat_date_initial_o != nil
-            treat_date_final = compareDateStrings(treat_date_initial, treat_date_initial_o, 'early')
-      end
-      if (treat_date_initial == '' || treat_date_initial == nil) && (treat_date_initial_o != '' && treat_date_initial_o != nil)
-            treat_date_final = treat_date_initial_o
-      end
-      if (treat_date_initial != '' && treat_date_initial != nil) && (treat_date_initial_o == '' || treat_date_initial_o == nil)
-            treat_date_final = treat_date_initial
-      end
-      if treat_date_final != '' && treat_date_final != nil
-        dateString = formatDate(treat_date_final)
-        @@indvChars = breakUp(dateString)
-        res_tb147 = PdfMapping('tb147')
-        populatePdfFields(res_tb147)
-        @@boundary = limits(dateString, @@count)
-        populateOutputHash(@@boundary)
-        reset
-      end
+      #treat_date_final = ''
+      
+      #if treat_date_initial != '' && treat_date_initial != nil && treat_date_initial_o != '' && treat_date_initial_o != nil
+      #      treat_date_final = compareDateStrings(treat_date_initial, treat_date_initial_o, 'early')
+      #end
+      #if (treat_date_initial == '' || treat_date_initial == nil) && (treat_date_initial_o != '' && treat_date_initial_o != nil)
+      #      treat_date_final = treat_date_initial_o
+      #end
+      #if (treat_date_initial != '' && treat_date_initial != nil) && (treat_date_initial_o == '' || treat_date_initial_o == nil)
+      #      treat_date_final = treat_date_initial
+      #end
+      #if treat_date_final != '' && treat_date_final != nil
+      #  dateString = formatDate(treat_date_final)
+      #  @@indvChars = breakUp(dateString)
+      #  res_tb147 = PdfMapping('tb147')
+      #  populatePdfFields(res_tb147)
+      #  @@boundary = limits(dateString, @@count)
+      #  populateOutputHash(@@boundary)
+      #  reset
+      #end
             
       #Populate Initial Drug Susceptibility Results
       @@repeat_id = 0
@@ -2218,7 +2395,7 @@ class PrintPdfsController < ApplicationController
       end
 
       resetRpt
-
+    
       #Populate Other Chest Imaging Study
       @@sqlStr = "SELECT * FROM tb_qa_views where question_short_name IN ('CHEST_CT_IMAGING_DATE') and event_id = " + @@event_id + " order by repeater_form_object_id, 
       question_short_name, answer_text"
@@ -2389,8 +2566,11 @@ class PrintPdfsController < ApplicationController
                             if(rows != nil && rows.size > 0)
                                     rows.each do |row|
                                         @rptID = row['repeater_form_object_id']
+                                        if @rptID > 0
+                                            @rptID = @rptID.to_s
+                                        end
                                             @@sqlStrInner = "SELECT * FROM tb_qa_views where lower(question_short_name)  = 'sputum_collect_date' and event_id = " + @@event_id + "and repeater_form_object_id = " + @rptID + " order by repeater_form_object_id, question_short_name, answer_text"
-                                            @@sthInner = @@dbh.exec(@@sqlStrInner)
+                                            @@sthInner = @@dbh.execute(@@sqlStrInner)
                                             #Find date of earliest Positive
                                             if @@sthInner.fetchable?
                                                 rowsInner = @@sthInner.fetch_all

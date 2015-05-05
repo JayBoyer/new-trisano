@@ -30,6 +30,7 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'facility'::text THEN 'tb129'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'ltc_resident'::text THEN 'tb130'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'ltc_type'::text THEN 'tb131'::text
+            WHEN lower(tb_qa_views.question_short_name::text) = 'therapy_start_date'::text THEN 'tb147'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'ivdu_past_year'::text THEN 'tb148'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'non_ivdu_past_year'::text THEN 'tb149'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'alcohol_use_past_year'::text THEN 'tb150'::text
@@ -41,7 +42,7 @@ class CreateTbPhinQaSingleViews < ActiveRecord::Migration
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_first_isolate_collect'::text THEN 'tb157'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'sputum_conversion'::text THEN 'tb173'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'date_first_neg_sputum'::text THEN 'tb175'::text
-            WHEN lower(tb_qa_views.question_short_name::text) = 'date_therapy_stop'::text THEN 'tb176'::text
+            WHEN lower(tb_qa_views.question_short_name::text) = 'therapy_end_date'::text THEN 'tb176'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'reason_therapy_stop'::text THEN 'tb177'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'outpatient_provider_type'::text THEN 'tb178'::text
             WHEN lower(tb_qa_views.question_short_name::text) = 'dot'::text THEN 'tb179'::text
