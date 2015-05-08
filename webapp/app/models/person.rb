@@ -281,9 +281,9 @@ class Person < ActiveRecord::Base
     end
     
     def find_exact_match(options)
-      check_conditions = [[:last_name, 'last_name'],
-                          [:first_name, 'first_name'], 
-                          [:middle_name, 'middle_name'],
+      check_conditions = [[:last_name, 'lower(last_name)'],
+                          [:first_name, 'lower(first_name)'], 
+                          [:middle_name, 'lower(middle_name)'],
                           [:birth_date, 'birth_date']]
       conditions = ""
       multi = false
@@ -292,10 +292,11 @@ class Person < ActiveRecord::Base
           if multi
             conditions += "AND "
           end
-          conditions += condition[1] + " = '" + options[condition[0]] + "' "
+          conditions += condition[1] + " = '" + options[condition[0]].downcase + "' "
           multi = true
         end
       end
+
       unless conditions.blank?
         sql = "SELECT * FROM people WHERE " + conditions + " ORDER BY id LIMIT 1"
         persons = Person.find_by_sql(sql)
