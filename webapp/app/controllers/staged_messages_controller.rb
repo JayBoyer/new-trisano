@@ -26,7 +26,7 @@ class StagedMessagesController < ApplicationController
   def index
     @selected = StagedMessage.states.has_value?(params[:message_state]) ? @selected = params[:message_state] : @selected = StagedMessage.states[:pending]
     condition = StagedMessage.build_filter_condition()
-    conditions = "((state = '" + @selected + "')" + (condition.length > 0 ? " AND " + condition : "" ) + ")"
+    conditions = "((state = '" + @selected + "')" + (condition.length > 0 ? " AND (" + condition + ")" : "" ) + ")"
     @staged_messages = StagedMessage.paginate(:conditions => conditions, :order => "created_at DESC", :page => params[:page], :per_page => 10)
   end
 
