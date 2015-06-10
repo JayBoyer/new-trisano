@@ -34,7 +34,7 @@
     %span.horiz
       = f.label :_destroy
       = f.check_box :_destroy
-
+      
   %ul{ :id => "lab-list-#{lab_id}" }
     - lab_form.fields_for(:lab_results, :builder => ExtendedFormBuilder) do |lab_result_fields|
       = render :partial => "events/lab_result", :locals => { :f => lab_result_fields, :lab_id => lab_id }

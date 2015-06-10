@@ -416,6 +416,64 @@ class StagedMessage < ActiveRecord::Base
     end
   end
 
+  # un-assign a staged message and change it's status to PENDING
+  def un_assign
+    event_ids = Set.new
+    participation_ids = Set.new
+    lab_result_ids = Set.new
+    lab_results = LabResult.find(:all, :conditions => ["staged_message_id = ?", self.id])
+    lab_results.each do |lab_result|
+      lab_result_ids.add(lab_result.id)
+      participations = Participation.find(:all, :conditions => ["id = ?", lab_result.participation_id])
+      participations.each do |participation|
+        event_ids.add(participation.event_id)
+        participation_ids.add(participation.id)
+        lab_results_t = LabResult.find(:all, :conditions => ["participation_id = ? and staged_message_id is NULL", participation.id])
+        lab_results_t.each do |result|
+          lab_result_ids.add(result.id)
+        end
+      end
+    end
+    LabResult.delete(lab_result_ids.to_a)
+    Participation.delete(participation_ids.to_a)
+    event_ids.each do |id|
+      redis.delete_matched("views/events/#{id}/*")  
+    end
+    self.state = 'PENDING'
+    self.save(false)
+    return "success_unassign"
+  end
+  
+  # move a staged message assigned to an event to a new event
+  def move_to_event(record_number)
+    if(record_number.length == 0)
+      return "invalid_event"
+    else
+      event = Event.find(:first, :conditions => ["record_number = ?", record_number])
+      if(event.nil?)
+        return "invalid_event"
+      end
+      if(event.type != 'MorbidityEvent' && event.type != 'AssessmentEvent' && event.type != 'ContactEvent')
+        return "ae_cmr_contact_event"
+      end
+      event_id = event.id
+      lab_results = LabResult.find(:all, :conditions => ["staged_message_id =?", self.id])
+      event_ids = Set.new([event_id])
+      lab_results.each do |lab_result|
+        participation = Participation.find(:first, :conditions => ["id = ?", lab_result.participation_id])
+        if(participation.event_id != event_id)
+          event_ids.add(participation.event_id)
+          participation.event_id = event_id
+          participation.save(false)
+        end
+      end
+      event_ids.each do |id|
+        redis.delete_matched("views/events/#{id}/*")  
+      end
+    end
+    return "success_reassign"
+  end
+
   private
 
   def set_state
@@ -593,7 +651,7 @@ class StagedMessage < ActiveRecord::Base
   def hl7_message_before_type_cast
     hl7_message
   end
-
+  
   class << self
     def next_sequence_number
       @last_sequence_number += 1

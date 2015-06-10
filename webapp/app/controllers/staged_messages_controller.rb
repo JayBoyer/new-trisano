@@ -138,6 +138,21 @@ class StagedMessagesController < ApplicationController
         :birth_date => dob)
     end
   end
+  
+  def move_lab
+    @staged_message = StagedMessage.find(params[:id])
+    if(params[:commit] == "un-assign")
+      result = @staged_message.un_assign
+    else
+      result = @staged_message.move_to_event(params[:destination_event])
+    end
+    if(result[0,7] == "success")
+      flash[:notice] = t(result)
+    else
+      flash[:error] = t(result)
+    end
+    redirect_to request.env["HTTP_REFERER"]
+  end
 
   def event
     begin

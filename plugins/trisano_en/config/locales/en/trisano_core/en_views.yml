@@ -832,6 +832,7 @@ en:
   route_event: Route event
   routing_disabled: Routing disabled
   more_choices: More choices...
+  set_parent_event: Set parent event
 
   
   #Assessment events

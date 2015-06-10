@@ -19,4 +19,4 @@
 - content_for :utility do
   = select_tag("message_state", options_for_select(StagedMessage.states.values.collect {|v| [I18n.t("staging_area_states.#{v.downcase}"), v]}, @selected), :id => 'message_state', :onchange => "this.form.submit();", :style => "position: absolute; right: 0px")
 
-=render :partial => 'shared/staged_messages'
+=render :partial => 'shared/staged_messages', :view_mode => :index

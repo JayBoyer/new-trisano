@@ -243,6 +243,20 @@ module EventsHelper
     end
   end
 
+  def parent_controls(event)
+    if(User.current_user.can_update?(event))
+      returning "" do |controls|
+        controls << routing_form_tag(:set_parent, event, :id => "set_parent") do
+          returning "" do |form|
+            form << hidden_field_tag("set_parent", '')
+            form << "<div style=\"text-align: right\">#{text_field_tag("parent_event", '')}"
+            form << "<br/> " + submit_tag(t(:set_parent_event)) + " <br/></div>"
+          end
+        end
+      end
+    end
+  end
+
   def jurisdiction_routing_control(event)
     returning "" do |controls|
       if User.current_user.can_route_to_any_lhd?(event)
@@ -504,6 +518,11 @@ module EventsHelper
        Person.last_comma_first_middle(event) :
        event.interested_party.person_entity.person.last_comma_first_middle
     h text
+  end
+  
+  def record_number_for_event(event)
+    core_event = Event.find(:first, :conditions => ["id = ?", event.id])
+    core_event.record_number
   end
 
   # Debt: Name methods could be dried up. Waiting for feedback on soft-delete UI changes.

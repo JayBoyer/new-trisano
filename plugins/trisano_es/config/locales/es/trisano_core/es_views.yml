@@ -795,6 +795,7 @@ es:
   route_event: Enrutar evento
   routing_disabled: Enrutamiento desactivado
   more_choices: Más opciones...
+  set_parent_event: Set parent event
 
   #Organisms
   show_an_organism: "Mostrar Organismo"

@@ -391,6 +391,39 @@ class Event < ActiveRecord::Base
     end
   end
 
+  def set_parent(params)
+    new_parent = params[:parent_event].strip
+    parent_id=nil
+    if(new_parent.blank?)
+      if(self.parent_id.blank?)
+        return "successfully_set_parent"
+      end
+    else
+      parent_event = Event.find(:first, :conditions => ["record_number = ?", new_parent])
+      if(parent_event.nil?)
+        return "invalid_event"
+      end
+      if(parent_event.type != 'MorbidityEvent' && parent_event.type != 'AssessmentEvent')
+        return "ae_cmr_parent"
+      end
+      parent_id = parent_event.id
+      next_id = parent_id
+      next_event = parent_event
+      while (next_id != nil)
+        if(next_id == self.id)
+          return "circular_reference"
+        end
+        next_id = next_event.parent_id
+        if(!next_id.blank?)
+          next_event = Event.find(next_id)
+        end
+      end
+    end 
+    self.parent_id = parent_id
+    self.save(false)
+    return "successfully_set_parent"
+  end
+  
   def transactional_soft_delete
     if self.deleted_at.nil?
       self.deleted_at = Time.new

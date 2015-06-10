@@ -109,6 +109,15 @@ es:
   no_update_privs_for_jurisdiction: "Sin privilegios para actualizar esta jurisdicción."
   no_event_create_privs: "Sin privilegios para crear un evento."
   no_event_view_privs: "Sin privilegios para ver los eventos."
+  successfully_set_parent: "Parent for this event was set."
+  circular_reference: "Circular references are not allowed."
+  invalid_event:  "The event id is invalid."
+  ae_cmr_parent:  "The parent event must be a morbidity or assessment event."
+  move_lab_to_event:  "Move lab to event:"
+  un_assign:  "un-assign"
+  success_reassign:  "Staged message successfully re-assigned"
+  success_unassign:  "Staged message successfully un-assigned"
+  ae_cmr_contact_event:  "Staged message can only be assigned to an AE, CMR or Contact Event"
 
   # Export columns
   export_column_ created: "Se creó la columna de exportación con éxito."

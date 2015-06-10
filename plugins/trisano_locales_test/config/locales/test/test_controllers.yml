@@ -112,6 +112,15 @@ test:
   no_update_privs_for_jurisdiction: "xYou do not have update privileges for this jurisdiction."
   no_event_create_privs: "xYou do not have privileges to create an event."
   no_event_view_privs: "xYou do not have privileges to view events."
+  successfully_set_parent: "xParent for this event was set."
+  circular_reference: "xCircular references are not allowed."
+  invalid_event:  "xThe event id is invalid."
+  ae_cmr_parent:  "xThe parent event must be a morbidity or assessment event."
+  move_lab_to_event:  "xMove lab to event:"
+  un_assign:  "xun-assign"
+  success_reassign:  "xStaged message successfully re-assigned"
+  success_unassign:  "xStaged message successfully un-assigned"
+  ae_cmr_contact_event:  "xStaged message can only be assigned to an AE, CMR or Contact Event"
 
   # Export columns
   export_column_created: "xExport Column was successfully created."

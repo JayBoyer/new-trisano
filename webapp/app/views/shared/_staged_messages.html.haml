@@ -29,7 +29,7 @@
 - unless @staged_messages.empty?
   #rot
     %table.list
-      = render @staged_messages
+      = render @staged_messages, :view_mode => :index
 
   %p{:style => 'clear: both'}
   %br

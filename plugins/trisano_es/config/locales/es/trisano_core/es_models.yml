@@ -163,6 +163,7 @@ es:
         _delete: Eliminar laboratorio (y resultados)
         _destroy: Eliminar laboratorio (y resultados)
 
+
       lab_result:
         test_type: Tipo de prueba
         organism: Organismo

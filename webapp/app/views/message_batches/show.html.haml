@@ -19,4 +19,4 @@
 - content_for :utility do
   =link_to t(:back_to, :name => t(:staged_messages)), staged_messages_path, :id => 'return-link', :title => t(:staged_messages)
 
-=render :partial => 'shared/staged_messages'
+=render :partial => 'shared/staged_messages', :view_mode => :index

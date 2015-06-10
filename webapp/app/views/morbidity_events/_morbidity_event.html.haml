@@ -25,6 +25,8 @@
       %br
       %span{ :style => 'font-style: italic; font-size: small;'}
         ="#{t 'morbidity_event'}"
+        - if (view_mode == :index)
+          = record_number_for_event(morbidity_event)
     .tools
       = basic_human_event_controls(morbidity_event, view_mode)
       = render :partial => 'morbidity_events/print_options', :locals => { :event => morbidity_event }
@@ -57,3 +59,5 @@
       = state_controls(morbidity_event)
   %td
     = ld(morbidity_event.created_at.to_date)
+    .tools
+      = parent_controls(morbidity_event)

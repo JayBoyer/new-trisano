@@ -154,7 +154,8 @@ ActionController::Routing::Routes.draw do |map|
       :jurisdiction => :post,
       :soft_delete => :post,
       :export_single => :post,
-      :event_type => :get
+      :event_type => :get,
+      :set_parent => :post
     },
     :new => {
       :lab_form => :get,
@@ -175,7 +176,8 @@ ActionController::Routing::Routes.draw do |map|
       :jurisdiction => :post,
       :soft_delete => :post,
       :export_single => :post,
-      :event_type => :get
+      :event_type => :get,
+      :set_parent => :post
     },
     :new => {
       :lab_form => :get,
@@ -195,6 +197,7 @@ ActionController::Routing::Routes.draw do |map|
     :member => {
       :soft_delete => :post,
       :event_type => :get,
+      :set_parent => :post,
       :copy_address => :get,
       :edit_jurisdiction => :get,
       :jurisdiction => :post,
@@ -260,7 +263,8 @@ ActionController::Routing::Routes.draw do |map|
     :member => {
       :event_search => :post,
       :event => :post,
-      :discard => :post
+      :discard => :post,
+      :move_lab => :post
   },
     :collection => {
       :search => :get

@@ -195,11 +195,21 @@ class EventsController < ApplicationController
   def soft_delete
     if @event.soft_delete
       flash[:notice] = t("successfully_marked_as_deleted")
-      redirect_to request.env["HTTP_REFERER"]
     else
       flash[:error] = t("error_marking_event_as_deleted")
-      redirect_to request.env["HTTP_REFERER"]
     end
+    redirect_to request.env["HTTP_REFERER"]
+  end
+  
+  def set_parent
+    @event = Event.find_by_id(params[:id])
+    result = @event.set_parent(params)
+    if(result == "successfully_set_parent")
+      flash[:notice] = t(result)
+    else
+      flash[:error] = t(result)
+    end
+    redirect_to request.env["HTTP_REFERER"]
   end
 
   def lab_form
