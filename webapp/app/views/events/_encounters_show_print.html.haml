@@ -49,7 +49,8 @@
 
       %span.subsection-header
         =t('encounter_labs')
-      = render :partial => 'events/labs_list_print.html.haml', :locals => { :f => f }
+        - form_for(:encounter, encounter, :builder => ExtendedFormBuilder) do |encounter_form|
+          = render :partial => 'events/labs_list_print.html.haml', :locals => { :f => encounter_form }
 
       %span.subsection-header
         =t('encounter_forms')
