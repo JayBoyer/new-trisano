@@ -292,7 +292,7 @@ class Person < ActiveRecord::Base
           if multi
             conditions += "AND "
           end
-          conditions += condition[1] + " = '" + options[condition[0]].downcase + "' "
+          conditions += condition[1] + " = '" + options[condition[0]].gsub("'", "''").downcase + "' "
           multi = true
         end
       end
