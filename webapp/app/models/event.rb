@@ -420,7 +420,7 @@ class Event < ActiveRecord::Base
       end
     end 
     self.parent_id = parent_id
-    self.save(false)
+    self.send(:update_without_callbacks)
     return "successfully_set_parent"
   end
   

@@ -361,21 +361,21 @@ class EventsController < ApplicationController
       end
     end
 
-    if @event.save
-      flash[:notice] = t("event_successfully_routed")
-      if(!request.env["HTTP_REFERER"].blank?) 
-        redirect_to :back
+    if User.current_user.can_update?(@event)
+      if @event.send(:update_without_callbacks)
+        flash[:notice] = t("event_successfully_routed")
+        if(!request.env["HTTP_REFERER"].blank?) 
+          redirect_to :back
+        else
+          redirect_to events_path
+        end
       else
-        redirect_to events_path
-      end
-    else
-      if User.current_user.can_update?(@event)
         flash.now[:error] = t("unable_to_change_cmr_state")
         render :action => :edit, :status => :bad_request
-      else
-        flash[:error] = t(:unable_to_change_state_no_edit_privs)
-        redirect_to events_path
       end
+    else
+      flash[:error] = t(:unable_to_change_state_no_edit_privs)
+      redirect_to events_path
     end
   end
 

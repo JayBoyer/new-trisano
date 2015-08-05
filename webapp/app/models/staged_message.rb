@@ -440,7 +440,7 @@ class StagedMessage < ActiveRecord::Base
       redis.delete_matched("views/events/#{id}/*")  
     end
     self.state = 'PENDING'
-    self.save(false)
+    self.send(:update_without_callbacks)
     return "success_unassign"
   end
   
@@ -464,7 +464,7 @@ class StagedMessage < ActiveRecord::Base
         if(participation.event_id != event_id)
           event_ids.add(participation.event_id)
           participation.event_id = event_id
-          participation.save(false)
+          participation.send(:update_without_callbacks)
         end
       end
       event_ids.each do |id|
