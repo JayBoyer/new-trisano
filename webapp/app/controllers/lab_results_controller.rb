@@ -11,7 +11,7 @@ class LabResultsController < ApplicationController
       redis.delete_matched("staged_messages/#{lab_result.staged_message.id}*")  
       redirect_to('/staged_messages/'+lab_result.staged_message.id.to_s)
     else
-      result = lab_result.move_to_event(params[:destination_event])
+      result = lab_result.move_to_event(params[:destination_event].strip)
       redirect_to request.env["HTTP_REFERER"]
     end
     redis.delete_matched("lab_results/#{params[:id]}*")  
