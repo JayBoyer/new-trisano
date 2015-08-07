@@ -16,4 +16,19 @@
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
 module LabResultsHelper
+  def loinc_code_name(loinc_code_id)
+    LoincCode.find(loinc_code_id).loinc_code
+  end
+  
+  def lab_name(id)
+    Place.find_by_entity_id(Participation.find(LabResult.find(id).participation_id).secondary_entity_id).name
+  end
+  
+  def lab_result_value_name(external_code_id)
+    ExternalCode.find(external_code_id).code_description
+  end
+  
+  def lab_result_event_path(event)
+    event_path(event)
+  end
 end

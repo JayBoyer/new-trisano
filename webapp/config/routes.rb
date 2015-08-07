@@ -259,12 +259,16 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :csv_fields
 
+  map.resources :lab_results,
+    :member => {
+      :move_lab => :post
+  }
+  
   map.resources :staged_messages,
     :member => {
       :event_search => :post,
       :event => :post,
-      :discard => :post,
-      :move_lab => :post
+      :discard => :post
   },
     :collection => {
       :search => :get

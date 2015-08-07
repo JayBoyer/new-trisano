@@ -443,36 +443,6 @@ class StagedMessage < ActiveRecord::Base
     self.send(:update_without_callbacks)
     return "success_unassign"
   end
-  
-  # move a staged message assigned to an event to a new event
-  def move_to_event(record_number)
-    if(record_number.length == 0)
-      return "invalid_event"
-    else
-      event = Event.find(:first, :conditions => ["record_number = ?", record_number])
-      if(event.nil?)
-        return "invalid_event"
-      end
-      if(event.type != 'MorbidityEvent' && event.type != 'AssessmentEvent' && event.type != 'ContactEvent')
-        return "ae_cmr_contact_event"
-      end
-      event_id = event.id
-      lab_results = LabResult.find(:all, :conditions => ["staged_message_id =?", self.id])
-      event_ids = Set.new([event_id])
-      lab_results.each do |lab_result|
-        participation = Participation.find(:first, :conditions => ["id = ?", lab_result.participation_id])
-        if(participation.event_id != event_id)
-          event_ids.add(participation.event_id)
-          participation.event_id = event_id
-          participation.send(:update_without_callbacks)
-        end
-      end
-      event_ids.each do |id|
-        redis.delete_matched("views/events/#{id}/*")  
-      end
-    end
-    return "success_reassign"
-  end
 
   private
 

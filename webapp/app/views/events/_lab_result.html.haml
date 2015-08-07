@@ -1,4 +1,5 @@
 -# Hack.  This template is rendered from both the ordinary CMR form and via the live-search
+-# Hack.  This template is rendered from both the ordinary CMR form and via the live-search
 -# Ajax callback.  During the latter we do not have the proper namespace set up for form
 -# fields.  This does that.
 
@@ -78,6 +79,11 @@
           %span.horiz
             %label=t 'original_report'
             = link_to t('electronic_lab_report'), staged_message_path(lab_result.staged_message)
+            &nbsp;&nbsp;&nbsp;
+
+        - if lab_result.try(:id)
+          %span.horiz
+            = link_to('Re-assign this lab', lab_result_path(lab_result))
 
         - if defined?(f) && !f.object.new_record?
           %span.vert

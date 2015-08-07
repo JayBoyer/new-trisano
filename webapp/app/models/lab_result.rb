@@ -85,4 +85,50 @@ class LabResult < ActiveRecord::Base
                    :system_generated => true)
     end
   end
+  
+  def assigned_event
+    self.try(:participation).try(:event)
+  end
+  
+  # move a lab result assigned to an event to a new event
+  def move_to_event(record_number)
+    if(record_number.length == 0)
+      return "invalid_event"
+    else
+      event = Event.find(:first, :conditions => ["record_number = ?", record_number])
+      if(event.nil?)
+        return "invalid_event"
+      end
+      if(event.type != 'MorbidityEvent' && event.type != 'AssessmentEvent' && event.type != 'ContactEvent')
+        return "ae_cmr_contact_event"
+      end
+      event_id = event.id
+      if(self.staged_message_id.blank?)
+        lab_results = [self]
+      else
+        lab_results = LabResult.find(:all, :conditions => ["staged_message_id =?", self.staged_message_id])
+      end
+      event_ids = Set.new([event_id])
+      lab_results.each do |lab_result|
+        participation = Participation.find(:first, :conditions => ["id = ?", lab_result.participation_id])
+        if(participation.event_id != event_id)
+          event_ids.add(participation.event_id)
+          participation.event_id = event_id
+          participation.send(:update_without_callbacks)
+        end
+      end
+      event_ids.each do |id|
+        redis.delete_matched("views/events/#{id}/*")  
+      end
+    end
+    return "success_reassign"
+  end
+
+  def un_assign
+    if(!self.staged_message_id.blank?)
+      staged_message = StagedMessage.find(self.staged_message_id)
+      staged_message.un_assign
+    end
+  end
+  
 end

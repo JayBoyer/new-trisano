@@ -64,5 +64,8 @@
           - core_element_show(:comment, lab_result, :horiz) do
             = lab_result.label :comment
             %b= h(lab_result.object.comment)
+        %span.vert
+          - if(lab_result.try(:object).try(:id))
+            = link_to('Re-assign this lab', lab_result_path(lab_result.object.id))
       %br
       %hr

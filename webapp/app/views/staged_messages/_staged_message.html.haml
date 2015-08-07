@@ -77,12 +77,4 @@
               %b
                 =t 'raw'
                 %span= h(staged_message.hl7_message)
-            - if (view_mode != :index)
-              - if staged_message.state == StagedMessage.states[:assigned] and staged_message.assigned_event
-                - form_tag("move_lab", {:id => "move_lab", :style => "display: inline"}) do
-                  = hidden_field_tag("id", staged_message.id)
-                  = submit_tag(t(:move_lab_to_event))
-                  = text_field_tag("destination_event", '')
-                  &nbsp;&nbsp;
-                  = submit_tag(t(:un_assign))
 

@@ -1,0 +1,33 @@
+- content_for :title do
+  =t 'lab_result'
+
+%fieldset.form
+  %legend=t 'lab_result'
+  %table.list
+    %tr
+      %td
+        .results
+          %table
+            %tr
+              %th=t 'lab'
+              %th=t 'loinc_code'
+              %th=t 'result'
+              %th=t 'lab_test_date'
+            %tr
+              %td=@lab_result.id.blank? ? "" : lab_name(@lab_result.id) 
+              %td=@lab_result.loinc_code.blank? ? "" : loinc_code_name(@lab_result.loinc_code)  
+              %td=@lab_result.test_result_id.blank? ? "" : lab_result_value_name(@lab_result.test_result_id)
+              %td=@lab_result.lab_test_date 
+
+  %p              
+  - event = @lab_result.assigned_event
+  = link_to('Assigned to: '+event.record_number, event_path(event))
+
+  %p
+  - form_tag("move_lab", {:id => "move_lab", :style => "display: inline"}) do
+    = hidden_field_tag("id", @lab_result.id)
+    = submit_tag(t(:move_lab_to_event))
+    = text_field_tag("destination_event", '')
+    &nbsp;&nbsp;
+    - if !@lab_result.staged_message_id.blank?
+      = submit_tag(t(:un_assign))
