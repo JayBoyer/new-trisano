@@ -84,22 +84,37 @@ class PrintPdfsController < ApplicationController
       end
             
       def compareDateStrings(date1, date2, comparison)
-        if (date1 && date2) != '' && (date1 && date2) != nil
+        logger.info(">>>>>date1" + date1.to_s)
+        logger.info(">>>>>date2" + date2.to_s)
+        logger.info(">>>>>comparison" + comparison.to_s)
+        if (date1 == '' || date2 == '' || date1 == nil || date2 == nil) 
+          return (comparison == 'early' ? @@earlyDate : @@lateDate)
+        else
           date1 = Date.strptime date1, '%Y-%m-%d'
           date2 = Date.strptime date2, '%Y-%m-%d'
           compareDates(date1, date2, comparison)
         end
       end
       
-      def compareDates()
-        if (date1 < date2) && comparison == 'early'
-          return date1.to_s
-        elsif (date1 > date2) && comparison == 'early'
-          return date2.to_s
-        elsif (date1 < date2) && comparison == 'late'
-          return date2.to_s
-        elsif (date1 > date2) && comparison == 'late'
-          return date1.to_s
+      def compareDates(date1, date2, comparison)
+        if (date1 && date2) != '' && (date1 && date2) != nil
+            if !date1.is_a? Date
+                date1 = Date.strptime date1, '%Y-%m-%d'
+            end
+            if !date2.is_a? Date
+                date2 = Date.strptime date2, '%Y-%m-%d'
+            end
+          if (date1 < date2) && comparison == 'early'
+            return date1.to_s
+          elsif (date1 > date2) && comparison == 'early'
+            return date2.to_s
+          elsif (date1 < date2) && comparison == 'late'
+            return date2.to_s
+          elsif (date1 > date2) && comparison == 'late'
+            return date1.to_s
+          elsif (date1 == date2)
+            return date1.to_s
+          end
         end
       end
       
@@ -189,27 +204,10 @@ class PrintPdfsController < ApplicationController
         end 
       end
 
-      def compareDates(date1, date2, comparison)
-        if (date1 && date2) != '' && (date1 && date2) != nil
-            if !date1.is_a? Date
-                date1 = Date.strptime date1, '%Y-%m-%d'
-            end
-            if !date2.is_a? Date
-                date2 = Date.strptime date2, '%Y-%m-%d'
-            end
-          if (date1 < date2) && comparison == 'early'
-            return date1.to_s
-          elsif (date1 > date2) && comparison == 'early'
-            return date2.to_s
-          elsif (date1 < date2) && comparison == 'late'
-            return date2.to_s
-          elsif (date1 > date2) && comparison == 'late'
-            return date1.to_s
-          end
-        end
-      end
-
       def repeatID(testDate, eventID, question)
+        logger.info(">>>>>testDate" + testDate.to_s)
+        logger.info(">>>>>eventID" + eventID.to_s)
+        logger.info(">>>>>question" + question.to_s)
         rpt_id = 0
         sqlStr = "SELECT repeater_form_object_id FROM tb_qa_views where answer_text = '" + testDate + "' and lower(question_short_name) = '" + question + "' and event_id =" + eventID 
         @@sth = @@dbh.execute(sqlStr)
@@ -553,7 +551,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[0], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-					
+
                                 @@indvChars = breakUp(splitArr[0])
                                 res_inv172_y = PdfMapping('pg5_inv172_y')
                                 populatePdfFields(res_inv172_y)
@@ -577,7 +575,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[1], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-					
+
                                 @@indvChars = breakUp(splitArr[1])
                                 res_inv172_s = PdfMapping('pg4_inv172_s')
                                 populatePdfFields(res_inv172_s)
@@ -601,7 +599,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[2], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-					
+
                                 @@indvChars = breakUp(splitArr[2])
                                 res_inv172_l = PdfMapping('pg4_inv172_l')
                                 populatePdfFields(res_inv172_l)
@@ -702,7 +700,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[0], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-					
+
                                 @@indvChars = breakUp(splitArr[0])
                                 res_inv173_y = PdfMapping('pg5_inv173_y')
                                 populatePdfFields(res_inv173_y)
@@ -726,7 +724,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[1], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-					
+
                                 @@indvChars = breakUp(splitArr[1])
                                 res_inv173_s = PdfMapping('pg4_inv173_s')
                                 populatePdfFields(res_inv173_s)
@@ -750,7 +748,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[2], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-					
+
                                 @@indvChars = breakUp(splitArr[2])
                                 res_inv173_l = PdfMapping('pg4_inv173_l')
                                 populatePdfFields(res_inv173_l)
@@ -2325,7 +2323,7 @@ class PrintPdfsController < ApplicationController
               rows.each do |row|
                 @chest_radiograph_date = row['answer_text']
                   if @chest_radiograph_date != '' && @chest_radiograph_date != nil
-                    @@lateDate = compareDates(@@lateDate, @chest_radiograph_date, 'late')
+                    @@lateDate = compareDateStrings(@@lateDate, @chest_radiograph_date, 'late')
                   end
               end
             end
@@ -2578,7 +2576,7 @@ class PrintPdfsController < ApplicationController
                                                     rowsInner.each do |rowInner|
                                                         @sputum_collect_date = rowInner['answer_text']
                                                         if @sputum_collect_date != '' && @sputum_collect_date != nil
-                                                           @@earlyDate = compareDates(@@earlyDate, @sputum_collect_date, 'early')
+                                                           @@earlyDate = compareDateStrings(@@earlyDate, @sputum_collect_date, 'early')
                                                         end
                                                     end
                                                 end
@@ -2588,6 +2586,7 @@ class PrintPdfsController < ApplicationController
                     end
             
                 @@targetDate = @@earlyDate
+                logger.info(">>>>>targetDate" + @@targetDate.to_s)
                 @@repeatID = repeatID(@@targetDate, @@event_id, 'sputum_collect_date')
                 reset
 
@@ -2628,7 +2627,7 @@ class PrintPdfsController < ApplicationController
                                                 @@boundary = limits(dateString, @@count)
                                                 populateOutputHash(@@boundary)
                                                 reset
-                                            end	
+                                            end
                                             
                                         end
                                 end
@@ -2665,7 +2664,7 @@ class PrintPdfsController < ApplicationController
                                                     rowsInner.each do |rowInner|
                                                         @sputum_collection_date = rowInner['answer_text']
                                                         if @sputum_collection_date != '' && @sputum_collection_date != nil
-                                                            @@earlyDate = compareDates(@@earlyDate, @sputum_collection_date, 'early')
+                                                            @@earlyDate = compareDateStrings(@@earlyDate, @sputum_collection_date, 'early')
                                                         end
                                                     end
                                                 end
@@ -2717,7 +2716,7 @@ class PrintPdfsController < ApplicationController
                                                 @@boundary = limits(dateString, @@count)
                                                 populateOutputHash(@@boundary)
                                                 reset
-                                            end	
+                                            end
                                             
                                             if @phin_var_r == 'tb225'
                                                 dateString = formatDateString(@single_question_answer_r)
@@ -2727,7 +2726,7 @@ class PrintPdfsController < ApplicationController
                                                 @@boundary = limits(dateString, @@count)
                                                 populateOutputHash(@@boundary)
                                                 reset
-                                            end	
+                                            end
                                             
                                             if @phin_var_r == 'tb227' 
                                                 if @single_question_answer_r == 'public health lab'
