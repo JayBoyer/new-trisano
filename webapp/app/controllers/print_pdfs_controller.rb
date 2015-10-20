@@ -29,6 +29,7 @@ class PrintPdfsController < ApplicationController
       @@bigX = 'X'
       out_filename = ''
       pdftk_path = '/usr/bin/pdftk'
+      parentCitizen = ''
       
       if Rails.env.production? || Rails.env.uat? || Rails.env.demo?
         pdf_path = '/opt/TriSano/current/app/pdfs/'
@@ -89,7 +90,7 @@ class PrintPdfsController < ApplicationController
         logger.info(">>>>>comparison" + comparison.to_s)
         if (date1 == '' || date2 == '' || date1 == nil || date2 == nil) 
           return (comparison == 'early' ? @@earlyDate : @@lateDate)
-        else
+		else
           date1 = Date.strptime date1, '%Y-%m-%d'
           date2 = Date.strptime date2, '%Y-%m-%d'
           compareDates(date1, date2, comparison)
@@ -209,7 +210,26 @@ class PrintPdfsController < ApplicationController
         logger.info(">>>>>eventID" + eventID.to_s)
         logger.info(">>>>>question" + question.to_s)
         rpt_id = 0
-        sqlStr = "SELECT repeater_form_object_id FROM tb_qa_views where answer_text = '" + testDate + "' and lower(question_short_name) = '" + question + "' and event_id =" + eventID 
+        
+        sqlStr = "SELECT repeater_form_object_id FROM tb_qa_views where answer_text = '" + testDate + "' and lower(question_short_name) = '" + question.downcase + "' and event_id =" + eventID 
+        @@sth = @@dbh.execute(sqlStr)
+        if @@sth.fetchable?
+           rows = @@sth.fetch_all
+            if(rows != nil && rows.size > 0)
+                rows.each do |row|
+                    rpt_id =  row['repeater_form_object_id']
+                end
+            end
+        end
+        return rpt_id
+      end
+      
+      def repeatIDNoDate(eventID, question)
+        logger.info(">>>>>eventID" + eventID.to_s)
+        logger.info(">>>>>question" + question.to_s)
+        rpt_id = 0
+        
+        sqlStr = "SELECT repeater_form_object_id FROM tb_qa_views where lower(question_short_name) = '" + question.downcase + "' and event_id =" + eventID 
         @@sth = @@dbh.execute(sqlStr)
         if @@sth.fetchable?
            rows = @@sth.fetch_all
@@ -225,7 +245,7 @@ class PrintPdfsController < ApplicationController
         def checkResultHrchy(rsltArray, qshortname)
             rvctRslt = ''
             rsltArray.each do |rslt|
-                sqlStr = "SELECT * FROM tb_qa_views where lower(question_short_name) = '" + qshortname + "' and lower(answer_text) = '" + rslt + "' and event_id = " + @@event_id + " order by repeater_form_object_id, question_short_name, answer_text"
+                sqlStr = "SELECT * FROM tb_qa_views where lower(question_short_name) = '" + qshortname.downcase + "' and lower(answer_text) = '" + rslt + "' and event_id = " + @@event_id + " order by repeater_form_object_id, question_short_name, answer_text"
                 @@sth = @@dbh.execute(sqlStr)
                 if @@sth.fetchable?
                     rows = @@sth.fetch_all
@@ -551,7 +571,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[0], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-
+					
                                 @@indvChars = breakUp(splitArr[0])
                                 res_inv172_y = PdfMapping('pg5_inv172_y')
                                 populatePdfFields(res_inv172_y)
@@ -575,7 +595,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[1], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-
+					
                                 @@indvChars = breakUp(splitArr[1])
                                 res_inv172_s = PdfMapping('pg4_inv172_s')
                                 populatePdfFields(res_inv172_s)
@@ -599,7 +619,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[2], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-
+					
                                 @@indvChars = breakUp(splitArr[2])
                                 res_inv172_l = PdfMapping('pg4_inv172_l')
                                 populatePdfFields(res_inv172_l)
@@ -700,7 +720,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[0], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-
+					
                                 @@indvChars = breakUp(splitArr[0])
                                 res_inv173_y = PdfMapping('pg5_inv173_y')
                                 populatePdfFields(res_inv173_y)
@@ -724,7 +744,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[1], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-
+					
                                 @@indvChars = breakUp(splitArr[1])
                                 res_inv173_s = PdfMapping('pg4_inv173_s')
                                 populatePdfFields(res_inv173_s)
@@ -748,7 +768,7 @@ class PrintPdfsController < ApplicationController
                                 @@boundary = limits(splitArr[2], @@count)
                                 populateOutputHash(@@boundary)
                                 reset
-
+					
                                 @@indvChars = breakUp(splitArr[2])
                                 res_inv173_l = PdfMapping('pg4_inv173_l')
                                 populatePdfFields(res_inv173_l)
@@ -817,7 +837,7 @@ class PrintPdfsController < ApplicationController
         @@hash_output['pg5_inv173_s2'] = 'V'
       end  
 =end
-      
+      @usborn = ""
       #Process non-repeating questions
       @@sqlStr = "SELECT * FROM  tb_phin_qa_single_views where phin_var is not null and event_id =" + @@event_id + " order by phin_var"
 
@@ -864,11 +884,23 @@ class PrintPdfsController < ApplicationController
                     @@hash_output['dem153'] = @single_question_answer_orig
                   end
                   
-                  if @phin_var == 'dem2003' 
+                  if @phin_var == 'a_dem2003' 
                     if @single_question_answer == 'yes'
-                      @@hash_output['dem2003_y'] = @@smallx
+                      parentCitizen = 'yes'
                     elsif @single_question_answer == 'no'
+                      parentCitizen = 'no'
+                    end
+                  end
+                    logger.info(">>>parentCitizen=" + parentCitizen) 
+                    logger.info(">>>phin_var=" + @phin_var)
+  
+                  if @phin_var == 'dem2003' 
+                    if @single_question_answer == 'yes' && parentCitizen == 'yes'
+                      @@hash_output['dem2003_y'] = @@smallx
+                    elsif @single_question_answer == 'yes' && parentCitizen == 'no'
                       @@hash_output['dem2003_n'] = @@smallx
+                    elsif @single_question_answer == 'no'
+                      @@hash_output['dem2003_y'] = @@smallx
                     end
                   end
                   
@@ -2162,7 +2194,8 @@ class PrintPdfsController < ApplicationController
                     @@tb_drug_test_result = @idrs_pdf_var
                   end
                   
-                  if index == @@sthidrs.column_names().length - 1
+                  #if index == @@sthidrs.column_names().length - 1
+                  if index == rows.size - 1
                     evalRecord
                   end
                 end
@@ -2250,7 +2283,11 @@ class PrintPdfsController < ApplicationController
       @@targetDate = @@lateDate
       @@repeatID = repeatID(@@targetDate, @@event_id, 'diag_tst_placed_date')
       reset
-
+      
+      if @@repeatID.to_i == 0
+        @@repeatID = repeatIDNoDate(@@event_id, 'diag_tst_test')
+      end
+      
       if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
         @@repeatID = @@repeatID.to_s
         @@sqlStr = "SELECT *, CASE
@@ -2525,27 +2562,24 @@ class PrintPdfsController < ApplicationController
                               @@hash_output['tb250_u'] = @@smallx
                             end
                           end
-                end
-            end
+                          
+                          if @phin_var_r == 'tb251'
+                            dateString = formatDateString(@single_question_answer_r)
+                            @@indvChars = breakUp(dateString)
+                            res_tb251 = PdfMapping('tb251')
+                            populatePdfFields(res_tb251)
+                            @@boundary = limits(dateString, @@count)
+                            populateOutputHash(@@boundary)
+                            reset
+                          end  
               
-              if @phin_var_r == 'tb251'
-                dateString = formatDateString(@single_question_answer_r)
-                @@indvChars = breakUp(dateString)
-                res_tb251 = PdfMapping('tb251')
-                populatePdfFields(res_tb251)
-                @@boundary = limits(dateString, @@count)
-                populateOutputHash(@@boundary)
-                reset
-              end  
-              
-              if @phin_var_r == 'tb253' 
-              @@hash_output['tb253'] = @single_question_answer_r_orig
-            end
-            
+                          if @phin_var_r == 'tb253' 
+                            @@hash_output['tb253'] = @single_question_answer_r_orig
+                          end
+                      end
+                  end
+              end
           end
-
-        end
-
       end
       
       resetRpt
@@ -2627,7 +2661,7 @@ class PrintPdfsController < ApplicationController
                                                 @@boundary = limits(dateString, @@count)
                                                 populateOutputHash(@@boundary)
                                                 reset
-                                            end
+                                            end	
                                             
                                         end
                                 end
@@ -2716,7 +2750,7 @@ class PrintPdfsController < ApplicationController
                                                 @@boundary = limits(dateString, @@count)
                                                 populateOutputHash(@@boundary)
                                                 reset
-                                            end
+                                            end	
                                             
                                             if @phin_var_r == 'tb225'
                                                 dateString = formatDateString(@single_question_answer_r)
@@ -2726,7 +2760,7 @@ class PrintPdfsController < ApplicationController
                                                 @@boundary = limits(dateString, @@count)
                                                 populateOutputHash(@@boundary)
                                                 reset
-                                            end
+                                            end	
                                             
                                             if @phin_var_r == 'tb227' 
                                                 if @single_question_answer_r == 'public health lab'
