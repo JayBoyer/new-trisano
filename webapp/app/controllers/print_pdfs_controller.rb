@@ -342,7 +342,7 @@ class PrintPdfsController < ApplicationController
         populateOutputHash(@@boundary)
         reset
       end
-      
+=begin      
       if @investigation_started_date != '' && @investigation_started_date != nil
         dateString = formatDate(@investigation_started_date)
         @@indvChars = breakUp(dateString)
@@ -352,7 +352,7 @@ class PrintPdfsController < ApplicationController
         populateOutputHash(@@boundary)
         reset
       end
-      
+=end      
       #TB080, 081, 082
       @street_num = ''
       @street_name = ''
@@ -597,7 +597,7 @@ class PrintPdfsController < ApplicationController
                                 reset
 					
                                 @@indvChars = breakUp(splitArr[1])
-                                res_inv172_s = PdfMapping('pg4_inv172_s')
+                                res_inv172_s = PdfMapping('pg5_inv172_s')
                                 populatePdfFields(res_inv172_s)
                                 @@boundary = limits(splitArr[1], @@count)
                                 populateOutputHash(@@boundary)
@@ -621,7 +621,7 @@ class PrintPdfsController < ApplicationController
                                 reset
 					
                                 @@indvChars = breakUp(splitArr[2])
-                                res_inv172_l = PdfMapping('pg4_inv172_l')
+                                res_inv172_l = PdfMapping('pg5_inv172_l')
                                 populatePdfFields(res_inv172_l)
                                 @@boundary = limits(splitArr[2], @@count)
                                 populateOutputHash(@@boundary)
@@ -702,6 +702,15 @@ class PrintPdfsController < ApplicationController
       end
     
       if @state_case_num != '' && @state_case_num != nil
+      
+                @@indvChars[0] = @state_case_num
+                res_state_case_num = PdfMapping('state_case_num')
+                populatePdfFields(res_state_case_num)
+                populateArrayStatic(@state_case_num, @@count)
+                @@boundary = @@count
+                populateOutputHash(@@boundary)
+                reset
+                
                 if @state_case_num.include? '-'
                    splitArr =  @state_case_num.split(/-/)
                    
@@ -746,7 +755,7 @@ class PrintPdfsController < ApplicationController
                                 reset
 					
                                 @@indvChars = breakUp(splitArr[1])
-                                res_inv173_s = PdfMapping('pg4_inv173_s')
+                                res_inv173_s = PdfMapping('pg5_inv173_s')
                                 populatePdfFields(res_inv173_s)
                                 @@boundary = limits(splitArr[1], @@count)
                                 populateOutputHash(@@boundary)
@@ -770,7 +779,7 @@ class PrintPdfsController < ApplicationController
                                 reset
 					
                                 @@indvChars = breakUp(splitArr[2])
-                                res_inv173_l = PdfMapping('pg4_inv173_l')
+                                res_inv173_l = PdfMapping('pg5_inv173_l')
                                 populatePdfFields(res_inv173_l)
                                 @@boundary = limits(splitArr[2], @@count)
                                 populateOutputHash(@@boundary)
@@ -919,6 +928,16 @@ class PrintPdfsController < ApplicationController
                     populateOutputHash(@@boundary)
                     reset
                   end
+                  
+                  if @phin_var == 'inv177'
+                    dateString = formatDateString(@single_question_answer)
+                    @@indvChars = breakUp(dateString)
+                    res_inv177 = PdfMapping('inv177')
+                    populatePdfFields(res_inv177)
+                    @@boundary = limits(dateString, @@count)
+                    populateOutputHash(@@boundary)
+                    reset
+                  end  
                   
                   if @phin_var == 'tb099' 
                     if @single_question_answer == 'yes'
@@ -2369,7 +2388,11 @@ class PrintPdfsController < ApplicationController
       @@targetDate = @@lateDate
       @@repeatID = repeatID(@@targetDate, @@event_id, 'chest_radiograph_date')
       reset
-
+    
+      if @@repeatID.to_i == 0
+        @@repeatID = repeatIDNoDate(@@event_id, 'chest_radiograph_result')
+      end
+      
       if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
           @@repeatID = @@repeatID.to_s
           @@sqlStr = "SELECT *, CASE
@@ -2451,6 +2474,10 @@ class PrintPdfsController < ApplicationController
       @@repeatID = repeatID(@@targetDate, @@event_id, 'chest_ct_imaging_date')
       reset
 
+      if @@repeatID.to_i == 0
+        @@repeatID = repeatIDNoDate(@@event_id, 'chest_ct_imaging_result')
+      end
+      
       if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
         @@repeatID = @@repeatID.to_s
         @@sqlStr = "SELECT *, CASE
@@ -2531,6 +2558,10 @@ class PrintPdfsController < ApplicationController
       @@repeatID = repeatID(@@targetDate, @@event_id, 'diag_igra_collect_date')
       reset
 
+      if @@repeatID.to_i == 0
+        @@repeatID = repeatIDNoDate(@@event_id, 'diag_igra_result')
+      end
+      
       if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
         @@repeatID = @@repeatID.to_s
         @@sqlStr = "SELECT *, CASE
@@ -2624,6 +2655,10 @@ class PrintPdfsController < ApplicationController
                 @@repeatID = repeatID(@@targetDate, @@event_id, 'sputum_collect_date')
                 reset
 
+                if @@repeatID.to_i == 0
+                    @@repeatID = repeatIDNoDate(@@event_id, 'sputum_smear_test')
+                end
+                
                 if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
                     @@repeatID = @@repeatID.to_s
                     @@sqlStr = "SELECT *, CASE
@@ -2711,6 +2746,10 @@ class PrintPdfsController < ApplicationController
                 @@repeatID = repeatID(@@targetDate, @@event_id, 'sputum_collection_date')
                 reset
 
+                if @@repeatID.to_i == 0
+                    @@repeatID = repeatIDNoDate(@@event_id, 'sputum_test')
+                end
+                
                 if @@repeatID != '' && @@repeatID != nil && @@repeatID.to_i > 0
                     @@repeatID = @@repeatID.to_s
                     @@sqlStr = "SELECT *, CASE
