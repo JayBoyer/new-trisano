@@ -331,15 +331,16 @@ class StagedMessage < ActiveRecord::Base
 
   MASK_OOE = 0x01
   MASK_STD = 0x02
+  MASK_PHB = 0x04
 
   # get the jurisdiction bit mask
   def self.get_mask_jurisdiction
     mask_jurisdiction = 0;
-    mask_from_jurisdiction = { 'SNHDOOE' => MASK_OOE, 'SNHD-HIV-STD-TB' => MASK_STD }
+    mask_from_jurisdiction = { 'SNHDOOE' => MASK_OOE, 'SNHD-HIV-STD-TB' => MASK_STD, 'SNHDPHB' => MASK_PHB }
 
     # if a super-user, they can see everything
     if User.current_user.is_admin?
-      return MASK_OOE | MASK_STD
+      return MASK_OOE | MASK_STD | MASK_PHB
     end
 
     # get the list of jurisdictions for the current user
@@ -354,8 +355,10 @@ class StagedMessage < ActiveRecord::Base
   # build an SQL string to filter by disease group
   def self.build_filter_condition
     conditions = [
-      "(hl7_message LIKE '%SNHDOOE%' OR (hl7_message NOT LIKE '%SNHD-HIV-STD-TB%'))",
-      "(hl7_message LIKE '%SNHD-HIV-STD-TB%')" ]
+      "(hl7_message LIKE '%SNHDOOE%' OR (hl7_message NOT LIKE '%SNHD-HIV-STD-TB%' AND hl7_message NOT LIKE '%SNHDPHB%'))",
+      "(hl7_message LIKE '%SNHD-HIV-STD-TB%')", 
+      "(hl7_message LIKE '%SNHDPHB%')", 
+	  ]
     add_or = false
     condition = ""
 
