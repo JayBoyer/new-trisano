@@ -23,7 +23,7 @@
 
 %span{:class => "vert"}
   %span.print-label=ct('date_record_created')
-  %span.print-value= ld(@event.event_onset_date)
+  %span.print-value= ld(@event.created_at.try(:to_date))
 
 %span{:class => "horiz"}
   %span.print-label=ct('mmwr_year')

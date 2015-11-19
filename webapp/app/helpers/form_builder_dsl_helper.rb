@@ -99,7 +99,6 @@ module FormBuilderDslHelper
   # Print mode counterpart to #render_investigator_element and #show_investigator_element
   def print_investigator_element(form_elements_cache, element, f, local_form_builder=nil)
     result = ""
-
     case element.class.name
 
     when "SectionElement"
@@ -275,7 +274,6 @@ module FormBuilderDslHelper
   def investigator_view(mode, view, form, f, local_form_builder=nil)
     return "" if view.nil?
     result = ""
-    
     # To simplify the calls create a method reference which we can invoke below
     # example modes include :render_investigator_element, :show_investigator_element, :print_investigator_element 
     method_ref = method(mode + "_investigator_element")
@@ -693,20 +691,20 @@ module FormBuilderDslHelper
       content_tag(:div, :class => "print-element") do
         result = render(:partial => "events/investigate_section_element_header_print.html.haml", :locals => {:section => section_element})
 
-        if f.object.investigator_form_sections.map(&:section_element_id).include?(section_element.id)
-          if section_element.repeater?
-            f.fields_for(:investigator_form_sections, :builder => ExtendedFormBuilder) do |investigator_form|
-              if (investigator_form.object.section_element_id == section_element.id) || investigator_form.object.new_record?
-                result << investigator_section(partial, form_elements_cache, section_element, f, investigator_form)
-              end
+        if section_element.repeater?
+
+          # TODO: This fields_for loop is inefficient. We shouldn't loop through each form section, hunting
+          # for the right one. Not sure how to better design this though.
+          f.fields_for(:investigator_form_sections, :builder => ExtendedFormBuilder) do |investigator_form|
+            if investigator_form.object.section_element_id == section_element.id
+              result << investigator_section(partial, form_elements_cache, section_element, f, investigator_form)
             end
-            result
-          else
-            result << investigator_section(partial, form_elements_cache, section_element, f)
           end
 
+          result << content_tag(:div, nil, :id => "repeater_section_investigate_#{h(section_element.id)}")
+
         else
-          result << "No #{section_element.name} have been recorded for this #{f.object.class.name.underscore.humanize.downcase}"
+          result << investigator_section(partial, form_elements_cache, section_element, f)
         end
 
         result
