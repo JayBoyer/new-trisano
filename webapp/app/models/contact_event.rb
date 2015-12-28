@@ -24,6 +24,7 @@ class ContactEvent < HumanEvent
   supports :promote_to_assessment_event
 
   before_create :direct_child_creation_initialization, :add_contact_event_creation_note
+  before_create :auto_assign_investigator_on_create
 
   after_create :add_parent_event_creation_note
 
@@ -208,6 +209,11 @@ class ContactEvent < HumanEvent
       self.participations_contact.errors.add(:disposition_date, :cannot_precede_birth_date)
       base_errors['contacts'] = [:precede_birth_date, { :thing => I18n.t(:disposition) }]
     end
+  end
+
+  def auto_assign_investigator_on_create
+    self.investigator_id = User.current_user.id
+    self.workflow_state = 'assigned_to_investigator'
   end
 
 end
