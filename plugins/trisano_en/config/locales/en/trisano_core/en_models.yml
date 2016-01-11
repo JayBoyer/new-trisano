@@ -87,7 +87,7 @@ en:
         disease_id: Disease
         disease_onset_date: Onset date
         date_diagnosed: Date diagnosed
-        hospitalized_id: Hospitalized
+        hospitalized_id: Was patient hospitalized?
         died_id: Died
 
       disease:
