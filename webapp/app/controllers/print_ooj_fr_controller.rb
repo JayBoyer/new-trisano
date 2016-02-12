@@ -179,11 +179,16 @@ class PrintOojFrController < ApplicationController
       @recordnum = ''
       
       @time = Time.new
+      @time1wk = @time + 604800
       @time = @time.strftime("%m/%d/%Y")
+      @time1wk = @time1wk.strftime("%m/%d/%Y")
       rtndata = false
       
       if @time != '' && @time != nil
         @@hash_output['letter_date'] = @time
+      end 
+      if @time1wk != '' && @time1wk != nil
+        @@hash_output['letter_date_1wk'] = @time1wk
       end 
       
       @@sqlStr = "SELECT DISTINCT p.first_name, p.last_name, p.middle_name, p.birth_date, ex.the_code as birth_sex, ext.the_code as ethnicity, p.date_of_death, extc.the_code as dead, extr.code_description as race, 

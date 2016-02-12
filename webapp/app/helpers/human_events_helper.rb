@@ -44,7 +44,7 @@ module HumanEventsHelper
             if event.disease_name.downcase.include? "tuberculosis" or event.disease_name.downcase.include? "tb co-infection"
                 controls << " | " << link_to(t('generate_rvct'), pdf_print_pdfs_path(:evnt_id => event.id), :method => :get)
             end
-            disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std", "syphilis", "tb co-infection"]
+			disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std/hiv", "syphilis", "std testing", "tuber", "tb testing"]
             if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
                 controls << " | " << link_to(t('generate_oojfr'), pdfoojfr_print_ooj_fr_path(:evnt_id => event.id), :method => :get)
             end

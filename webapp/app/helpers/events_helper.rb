@@ -157,7 +157,7 @@ module EventsHelper
       controls << " | " << link_to(t(:promote_to_ae), event_type_contact_event_path(event, :type => "assessment_event"), 
         :confirm => t(:are_you_sure), :id => 'event-type')
       if !event.nil? && event.disease_name != "" && event.disease_name != nil
-        disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std/hiv", "syphilis"]
+        disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std/hiv", "syphilis", "std testing", "tuber", "tb testing"]
         if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
           controls << " | " << link_to(t('generate_oojfr'), pdfoojfr_print_ooj_fr_path(:evnt_id => event.id), :method => :get)
         end
