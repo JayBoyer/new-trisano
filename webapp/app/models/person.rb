@@ -279,12 +279,23 @@ class Person < ActiveRecord::Base
           ["Reporter", "Reporter"]
       ]
     end
-    
+
+    # check for an exact match on a person with the given inputs
+	# if no middle name is given, 
+	#   check first, last, dob
+	# if a middle initial is given
+	#   check first, MI, last, dob
+	#   then check first, blank_middle, last, dob
+	# if a middle name is given
+	#   check first, middle, last, dob
+	#   check first, MI, last, dob
+	#   then check first, last, blank middle, dob
     def find_exact_match(options)
       check_conditions = [[:last_name, 'lower(last_name)'],
                           [:first_name, 'lower(first_name)'], 
-                          [:middle_name, 'lower(middle_name)'],
                           [:birth_date, 'birth_date']]
+	  middle_name = options[:middle_name].blank? ? '' : options[:middle_name].downcase
+	  middle_initial = middle_name.blank? ? '' : middle_name.slice(0,1)
       conditions = ""
       multi = false
       check_conditions.each do |condition|
@@ -297,12 +308,29 @@ class Person < ActiveRecord::Base
         end
       end
 
+	  middle_conditions = Array.new
+	  
       unless conditions.blank?
-        sql = "SELECT * FROM people WHERE " + conditions + " ORDER BY id LIMIT 1"
-        persons = Person.find_by_sql(sql)
-        unless(persons.blank?)
-          return persons[0]
-        end
+		# if a middle name was supplied
+		if(middle_name.size > 1) 
+          middle_conditions.push("AND lower(middle_name) = '" + middle_name.gsub("'", "''") + "' ")
+          middle_conditions.push("AND lower(middle_name) = '" + middle_initial + "' ")
+          middle_conditions.push("AND (middle_name is NULL OR trim(middle_name) = '') ")
+		# else if middle initial
+		elsif(middle_name.size == 1)
+          middle_conditions.push("AND lower(middle_name) LIKE '" + middle_initial + "%' ")
+          middle_conditions.push("AND (middle_name is NULL OR trim(middle_name) = '') ")
+		else
+          middle_conditions.push("")
+		end
+
+		for i in 0..middle_conditions.size-1
+          sql = "SELECT * FROM people WHERE " + conditions + middle_conditions[i] + " ORDER BY id LIMIT 1"
+          persons = Person.find_by_sql(sql)
+          unless(persons.blank?)
+            return persons[0]
+          end
+		end
       end
       return nil
     end
