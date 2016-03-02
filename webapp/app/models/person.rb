@@ -281,21 +281,21 @@ class Person < ActiveRecord::Base
     end
 
     # check for an exact match on a person with the given inputs
-	# if no middle name is given, 
-	#   check first, last, dob
-	# if a middle initial is given
-	#   check first, MI, last, dob
-	#   then check first, blank_middle, last, dob
-	# if a middle name is given
-	#   check first, middle, last, dob
-	#   check first, MI, last, dob
-	#   then check first, last, blank middle, dob
+    # if no middle name is given, 
+    #   check first, last, dob, gender
+    # if a middle initial is given
+    #   check first, MI, last, dob, gender
+    #   then check first, blank_middle, last, dob
+    # if a middle name is given
+    #   check first, middle, last, dob, gender
+    #   check first, MI, last, dob
+    #   then check first, last, blank middle, dob, gender
     def find_exact_match(options)
       check_conditions = [[:last_name, 'lower(last_name)'],
                           [:first_name, 'lower(first_name)'], 
                           [:birth_date, 'birth_date']]
-	  middle_name = options[:middle_name].blank? ? '' : options[:middle_name].downcase
-	  middle_initial = middle_name.blank? ? '' : middle_name.slice(0,1)
+      middle_name = options[:middle_name].blank? ? '' : options[:middle_name].downcase
+      middle_initial = middle_name.blank? ? '' : middle_name.slice(0,1)
       conditions = ""
       multi = false
       check_conditions.each do |condition|
@@ -308,29 +308,34 @@ class Person < ActiveRecord::Base
         end
       end
 
-	  middle_conditions = Array.new
-	  
+      middle_conditions = Array.new
+      
       unless conditions.blank?
-		# if a middle name was supplied
-		if(middle_name.size > 1) 
+        # if a middle name was supplied
+        if(middle_name.size > 1) 
           middle_conditions.push("AND lower(middle_name) = '" + middle_name.gsub("'", "''") + "' ")
           middle_conditions.push("AND lower(middle_name) = '" + middle_initial + "' ")
           middle_conditions.push("AND (middle_name is NULL OR trim(middle_name) = '') ")
-		# else if middle initial
-		elsif(middle_name.size == 1)
+        # else if middle initial
+        elsif(middle_name.size == 1)
           middle_conditions.push("AND lower(middle_name) LIKE '" + middle_initial + "%' ")
           middle_conditions.push("AND (middle_name is NULL OR trim(middle_name) = '') ")
-		else
+        else
           middle_conditions.push("")
-		end
+        end
+        
+        gender_conditions = ""
+        unless options[:birth_gender_id].blank?
+          gender_conditions = "AND (birth_gender_id is NULL OR birth_gender_id NOT IN (1,2) OR birth_gender_id=" + options[:birth_gender_id].strip + ")"
+        end
 
-		for i in 0..middle_conditions.size-1
-          sql = "SELECT * FROM people WHERE " + conditions + middle_conditions[i] + " ORDER BY id LIMIT 1"
+        for i in 0..middle_conditions.size-1
+          sql = "SELECT * FROM people WHERE " + conditions + middle_conditions[i] + gender_conditions + " ORDER BY id LIMIT 1"
           persons = Person.find_by_sql(sql)
           unless(persons.blank?)
             return persons[0]
           end
-		end
+        end
       end
       return nil
     end

@@ -42,6 +42,7 @@ class PersonEntity < Entity
       options[:middle_name] = person_attributes[:middle_name]
       options[:first_name] = person_attributes[:first_name]
       options[:birth_date] = person_attributes[:birth_date]
+      options[:birth_gender_id] = person_attributes[:birth_gender_id]
       person = Person.find_exact_match(options)
       unless(person.blank?)
         return person.entity_id
