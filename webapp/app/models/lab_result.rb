@@ -103,6 +103,8 @@ class LabResult < ActiveRecord::Base
         return "ae_cmr_contact_event"
       end
       event_id = event.id
+	  interested_party = Participation.find(:first, :conditions => ["type = 'InterestedParty' AND event_id = ?", event_id])
+	  primary_entity_id = interested_party.nil? ? nil : interested_party.primary_entity_id
       if(self.staged_message_id.blank?)
         lab_results = [self]
       else
@@ -114,6 +116,9 @@ class LabResult < ActiveRecord::Base
         if(participation.event_id != event_id)
           event_ids.add(participation.event_id)
           participation.event_id = event_id
+		  if(!primary_entity_id.nil?)
+			participation.primary_entity_id = primary_entity_id
+		  end
           participation.send(:update_without_callbacks)
         end
       end
