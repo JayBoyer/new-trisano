@@ -212,8 +212,10 @@ class ContactEvent < HumanEvent
   end
 
   def auto_assign_investigator_on_create
-    self.investigator_id = User.current_user.id
-    self.workflow_state = 'assigned_to_investigator'
+	unless User.nil? || User.current_user.nil?
+	  self.investigator_id = User.current_user.id
+      self.workflow_state = 'assigned_to_investigator'
+	end
   end
 
 end

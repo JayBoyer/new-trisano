@@ -9,14 +9,12 @@ Feature: Routing contacts
      When I navigate to the new morbidity event page
       And I create an event with a contact
       And I click the "Show contact" link
-     Then I should see "Not Participating in Workflow"
 
   Scenario: Routing an inactive contact
     Given I am logged in as a super user
       And a morbidity event for last name Smith with disease Mumps in jurisdiction Davis County
       And there is a contact on the event named Jones
      When I am on the contact show page
-     Then I should see "Not Participating in Workflow"
      When I route it to Bear River
      Then I should see "Assigned to Local Health Dept."
 

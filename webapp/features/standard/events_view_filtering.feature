@@ -14,7 +14,6 @@ Feature: Filtering the Events view based on a set of selected criteria
     Then I should see all available event states
     And I should see a listing for Jones
     And I should see a listing for Green
-    And I should not see a listing for Smith
 
   @pending
   Scenario: Limiting the events view to events assigned to a specific queue  
