@@ -64,9 +64,6 @@
 %br
 
 - if !@events.blank?
-  %div{ :class => 'tools' }
-    = link_to_function(t('export_all_to_csv'), nil) do |page|
-      - page[:export_options].visual_effect :appear
 
   - if @events.total_entries < max_search_results
     = render :partial => "events/export_options", :locals => { :path => events_format_path(params.merge(:format => 'csv')) }

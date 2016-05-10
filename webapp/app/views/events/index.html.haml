@@ -17,10 +17,6 @@
   =t 'list_events'
 
 - content_for :tools do
-  - unless @events.empty?
-    = link_to_function(t('export_all_to_csv'), nil) do |page|
-      - page[:export_options].visual_effect :appear
-    = "|"
   = link_to_function(t('change_view'), nil) do |page|
     - page[:change_view].visual_effect :slide_down
 

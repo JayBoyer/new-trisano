@@ -73,12 +73,13 @@ module HumanEventsHelper
           controls << " | " << link_to(t(:demote_to_ae), event_type_cmr_path(event, :type => "assessment_event"), :confirm => t(:are_you_sure), :id => 'event-type')
         end
       end
-      if can_view
-        controls << " | " unless controls.blank?
-        controls << link_to_function(t('export_to_csv'), nil) do |page|
-          page[:export_options].visual_effect :appear
-        end
-      end
+# Remove export to csv link
+#      if can_view
+#        controls << " | " unless controls.blank?
+#        controls << link_to_function(t('export_to_csv'), nil) do |page|
+#          page[:export_options].visual_effect :appear
+#        end
+#      end
       if can_create
         controls << " | " unless controls.blank?
         controls << link_to_function(t('create_new_event_from_this_one')) do |page|
