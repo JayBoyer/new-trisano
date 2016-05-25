@@ -540,18 +540,39 @@ class PrintPdfsController < ApplicationController
 
 
       #INV172, INV173
-      @@sqlStr = "SELECT answer_text FROM tb_phin_qa_single_views WHERE phin_var = 'inv172_l' and event_id =" + @@event_id
-
-      @@sth = @@dbh.execute(@@sqlStr)
-      if @@sth.fetchable?
-           rows = @@sth.fetch_all
-            if(rows != nil && rows.size > 0)
-                  rows.each do |row|
-                    @city_case_num = row['answer_text']
-                   end 
-            end
+      
+          @@sqlStr = "SELECT answer_text FROM tb_phin_qa_single_views WHERE phin_var = 'inv172_l' and event_id =" + @@event_id
+          @@sth = @@dbh.execute(@@sqlStr)
+          if @@sth.fetchable?
+               rows = @@sth.fetch_all
+                if(rows != nil && rows.size > 0)
+                      rows.each do |row|
+                        @city_case_num = row['answer_text']
+                       end 
+                end
+          end
+      
+      if @city_case_num == '' || @city_case_num == nil
+          if @@event_id != '' && @@event_id != nil
+                @city_case_num = ''
+                @@sqlStr = "SELECT record_number FROM events WHERE id = " + @@event_id
+                
+                @@sth = @@dbh.execute(@@sqlStr)
+                if @@sth.fetchable?
+                    rows = @@sth.fetch_all
+                    if(rows != nil && rows.size > 0)
+                        rows.each do |row|
+                            @year = row['record_number']
+                       end 
+                    end
+                end 
+                
+                @city_case_num = @year[0,4] + "-NV-" + @@event_id.rjust(9, padstr='0') 
+                logger.info(">>>@city_case_num=" + @city_case_num)
+          end
       end
-
+      
+      
       if @city_case_num != '' && @city_case_num != nil
                 if @city_case_num.include? '-'
                    splitArr =  @city_case_num.split(/-/)
