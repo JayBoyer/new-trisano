@@ -89,12 +89,14 @@ module ApplicationHelper
     end
   end
 
-  def calculate_age(date_birth)
-    date_today = Date.today
-    age = date_today.year - date_birth.year  
-    # can't use date_today.yday here because leap years mess it up
-    if((date_today.month < date_birth.month) || 
-       (date_today.month == date_birth.month && date_today.mday < date_birth.mday))
+  def calculate_age(date_birth, date_calc=nil)
+    if(date_calc.blank?)
+      date_calc = Date.today
+    end
+    age = date_calc.year - date_birth.year
+    # can't use date_calcay.yday here because leap years mess it up
+    if((date_calc.month < date_birth.month) || 
+       (date_calc.month == date_birth.month && date_calc.mday < date_birth.mday))
       age -= 1
     end
     return age

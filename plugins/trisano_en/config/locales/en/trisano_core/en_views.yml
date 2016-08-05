@@ -742,6 +742,7 @@ en:
   #morbidity_events
   generate_rvct:  "Generate RVCT"
   generate_oojfr:  "Generate OOJ/FR"
+  generate_hars:  "Generate HARS"
   create_new_event_from_this_one: "Create a new event from this one"
   export_to_csv: "Export to CSV"
   add_attachment: "Add Attachment"

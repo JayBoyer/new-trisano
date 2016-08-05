@@ -156,6 +156,8 @@ ActionController::Routing::Routes.draw do |map|
       :export_single => :post,
       :event_type => :get,
       :set_parent => :post
+#      :set_parent => :post,
+#      :copy_encounter => :post
     },
     :new => {
       :lab_form => :get,
@@ -178,6 +180,8 @@ ActionController::Routing::Routes.draw do |map|
       :export_single => :post,
       :event_type => :get,
       :set_parent => :post
+#      :set_parent => :post,
+#      :copy_encounter => :post
     },
     :new => {
       :lab_form => :get,
@@ -288,6 +292,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :print_ooj_fr, :collection => { :pdfoojfr => :get }
   
+  map.resources :generate_pdf, :collection => { :generatepdf => :get }
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

@@ -161,7 +161,11 @@ module EventsHelper
         if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
           controls << " | " << link_to(t('generate_oojfr'), pdfoojfr_print_ooj_fr_path(:evnt_id => event.id), :method => :get)
         end
-      end
+		disease_array= ["aids", "hiv", "std/hiv", "std testing"]
+        if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
+          controls << " | " << link_to(t('generate_hars'), generatepdf_generate_pdf_path(:evnt_id => event.id), :method => :get)
+        end
+   end
     end
 
     controls
@@ -256,6 +260,19 @@ module EventsHelper
       end
     end
   end
+
+#  def encounter_controls(event, id)
+#    if(User.current_user.can_update?(event))
+#      returning "" do |controls|
+#        controls << routing_form_tag(:copy_encounter, event, :id => "copy_encounter") do
+#          returning "" do |form|
+#            form << hidden_field_tag("encounter_id", id.to_s)
+#            form << "<br/> " + submit_tag('Copy encounter to notes') + " <br/></div>"
+#          end
+#        end
+#      end
+#    end
+#  end
 
   def jurisdiction_routing_control(event)
     returning "" do |controls|

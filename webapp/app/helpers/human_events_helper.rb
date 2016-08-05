@@ -48,6 +48,10 @@ module HumanEventsHelper
             if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
                 controls << " | " << link_to(t('generate_oojfr'), pdfoojfr_print_ooj_fr_path(:evnt_id => event.id), :method => :get)
             end
+			disease_array= ["aids", "hiv", "std/hiv", "std testing"]
+            if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
+                controls << " | " << link_to(t('generate_hars'), generatepdf_generate_pdf_path(:evnt_id => event.id), :method => :get)
+            end
         end
     end
     if event.deleted_at.nil? && can_update
