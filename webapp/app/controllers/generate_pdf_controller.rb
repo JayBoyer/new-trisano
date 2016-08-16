@@ -42,7 +42,7 @@ class GeneratePdfController < ApplicationController
             elements = core_field_path.split("|")
             obj = event
             elements.each do |element|
-              if(obj == nil)
+              if(obj.blank?)
                 break
               end
               obj = obj.try(element)
@@ -52,7 +52,7 @@ class GeneratePdfController < ApplicationController
             end
             if(obj != nil)
               values[0] = obj.to_s.strip
-              if(!mapping['code_name'].blank?)
+              if(!mapping['code_name'].blank? && !values[0].blank?)
                 external_code = ExternalCode.find(:first, :conditions => ["code_name = ? AND external_codes.id = ? ", mapping['code_name'], values[0]])
                 begin
                 values[0] = external_code.the_code.to_s
@@ -68,7 +68,7 @@ class GeneratePdfController < ApplicationController
           end
           answers = Answer.find(which, :conditions => ["answers.event_id = ?", event_id], :joins=> 
             "INNER JOIN form_references fr ON fr.event_id = " + event_id + 
-            " INNER JOIN forms f ON f.id = fr.form_id AND f.status = 'Live' AND f.short_name = '" + mapping['form_short_name'] + "'" +
+            " INNER JOIN forms f ON f.id = fr.form_id AND f.short_name = '" + mapping['form_short_name'] + "'" +
             " INNER JOIN form_elements fe ON fe.form_id = f.id " +
             " INNER JOIN questions q ON q.form_element_id = fe.id AND q.short_name = '" + mapping['form_field_name'] + "'" +
             " AND q.id = answers.question_id", :order => "id ASC")
@@ -127,6 +127,8 @@ class GeneratePdfController < ApplicationController
           if(test.length > 0 && test.upcase()[0,1] == "N")
             output_fields[mapping['template_field_name']] = values[0]
           end
+        when "date_now"
+          output_fields[mapping['template_field_name']] = Date.today().to_s
         else # treat as replace
           output_fields[mapping['template_field_name']] = values[0]
         end

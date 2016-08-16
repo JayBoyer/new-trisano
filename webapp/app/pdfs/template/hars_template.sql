@@ -29,6 +29,8 @@ INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_s
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'state', 'core', 'address|state_id', 'state', NULL, NULL, NULL);
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'date_form_completed', 'core', '', NULL, NULL, 'date_today', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'disease_aids_infection', 'core', 'disease_event|disease_id', NULL, NULL, 'check_box', '49');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'disease_aids_infection', 'core', 'disease_event|disease_id', NULL, NULL, 'check_box', '164');
@@ -67,33 +69,35 @@ INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_s
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'social_security_number', 'STD_core_elements', 'ssn', NULL, NULL, NULL, NULL);
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'social_security_number', 'STD_contact_field_record', 'ssn', NULL, NULL, NULL, NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'birth_country', 'STD_core_elements', 'country_birth', NULL, NULL, NULL, NULL);
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'seperated', 'STD_interview_record', 'marital_status', NULL, NULL, 'check_box', 'SEP - Separated');
+  VALUES ('hars', 'seperated', 'STD_core_elements', 'marital_status', NULL, NULL, 'check_box', 'SEP - Separated');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'divorced', 'STD_interview_record', 'marital_status', NULL, NULL, 'check_box', 'D - Divorced');
+  VALUES ('hars', 'divorced', 'STD_core_elements', 'marital_status', NULL, NULL, 'check_box', 'D - Divorced');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'married', 'STD_interview_record', 'marital_status', NULL, NULL, 'check_box', 'M - Married');
+  VALUES ('hars', 'married', 'STD_core_elements', 'marital_status', NULL, NULL, 'check_box', 'M - Married');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'single', 'STD_interview_record', 'marital_status', NULL, NULL, 'check_box', 'S - Single, Never Married');
+  VALUES ('hars', 'single', 'STD_core_elements', 'marital_status', NULL, NULL, 'check_box', 'S - Single, Never Married');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'widowed', 'STD_interview_record', 'marital_status', NULL, NULL, 'check_box', 'W - Widowed');
+  VALUES ('hars', 'widowed', 'STD_core_elements', 'marital_status', NULL, NULL, 'check_box', 'W - Widowed');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'current_male', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Male');
+  VALUES ('hars', 'current_male', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Male');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'current_male', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Female to Male Transgender');
+  VALUES ('hars', 'current_male', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Female to Male Transgender');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'current_female', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Female');
+  VALUES ('hars', 'current_female', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Female');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'current_female', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Male to Female Transgender');
+  VALUES ('hars', 'current_female', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Male to Female Transgender');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'gender_male', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Male');
+  VALUES ('hars', 'gender_male', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Male');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'gender_female', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Male');
+  VALUES ('hars', 'gender_female', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Female');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'male_to_female', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Male to Female Transgender');
+  VALUES ('hars', 'male_to_female', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Male to Female Transgender');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars', 'female_to_male', 'STD_interview_record', 'current_gender', NULL, NULL, 'check_box', 'Female to Male Transgender');
+  VALUES ('hars', 'female_to_male', 'STD_core_elements', 'current_gender', NULL, NULL, 'check_box', 'Female to Male Transgender');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'alive', 'core', 'disease_event|died_id', 'yesno', NULL, 'check_box', 'N');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
@@ -218,6 +222,28 @@ INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_s
   VALUES ('hars', 'no_identified_risk_no', 'std_risk_factors_assessment', 'nir', NULL, NULL, 'check_box', 'No');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', 'no_identified_risk_unk', 'std_risk_factors_assessment', 'nir', NULL, NULL, 'check_box', 'Unknown');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'clotting_yes', 'std_risk_factors_assessment', 'clottting_factor', NULL, NULL, 'check_box', 'Yes');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'clotting_no', 'std_risk_factors_assessment', 'clottting_factor', NULL, NULL, 'check_box', 'No');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'clotting_unk', 'std_risk_factors_assessment', 'clottting_factor', NULL, NULL, 'check_box', 'Unknown');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'clotting_date', 'std_risk_factors_assessment', 'cf_dt_lt', NULL, '/', 'date_m_d_y', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'clotting_factor', 'std_risk_factors_assessment', 'cf_name_lt', NULL, NULL, NULL, NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'transplant_yes', 'std_risk_factors_assessment', 'received_transplant', NULL, NULL, 'check_box', 'Yes');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'transplant_no', 'std_risk_factors_assessment', 'received_transplant', NULL, NULL, 'check_box', 'No');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'transplant_unk', 'std_risk_factors_assessment', 'received_transplant', NULL, NULL, 'check_box', 'Unknown');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'transfusion_yes', 'std_risk_factors_assessment', 'received_transfusion', NULL, NULL, 'check_box', 'Yes');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'transfusion_no', 'std_risk_factors_assessment', 'received_transfusion', NULL, NULL, 'check_box', 'No');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars', 'transfusion_unk', 'std_risk_factors_assessment', 'received_transfusion', NULL, NULL, 'check_box', 'Unknown');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars', '8th_grade', 'std_physical_desc', 'education', NULL, NULL, 'check_box', '8th grade or less');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
