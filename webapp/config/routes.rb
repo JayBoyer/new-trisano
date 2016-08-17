@@ -156,8 +156,6 @@ ActionController::Routing::Routes.draw do |map|
       :export_single => :post,
       :event_type => :get,
       :set_parent => :post
-#      :set_parent => :post,
-#      :copy_encounter => :post
     },
     :new => {
       :lab_form => :get,
@@ -180,8 +178,6 @@ ActionController::Routing::Routes.draw do |map|
       :export_single => :post,
       :event_type => :get,
       :set_parent => :post
-#      :set_parent => :post,
-#      :copy_encounter => :post
     },
     :new => {
       :lab_form => :get,

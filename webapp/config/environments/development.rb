@@ -61,7 +61,8 @@ DEFAULT_LOGGER.add_appenders default_appender
 if ENV['TRISANO_LOG_LEVEL'] != nil
   DEFAULT_LOGGER.level = ENV['TRISANO_LOG_LEVEL'].intern
 else
-  DEFAULT_LOGGER.level = :debug
+#  DEFAULT_LOGGER.level = :debug
+  DEFAULT_LOGGER.level = :info
 end
 
 config.logger = DEFAULT_LOGGER

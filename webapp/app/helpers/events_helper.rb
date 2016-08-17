@@ -261,19 +261,6 @@ module EventsHelper
     end
   end
 
-#  def encounter_controls(event, id)
-#    if(User.current_user.can_update?(event))
-#      returning "" do |controls|
-#        controls << routing_form_tag(:copy_encounter, event, :id => "copy_encounter") do
-#          returning "" do |form|
-#            form << hidden_field_tag("encounter_id", id.to_s)
-#            form << "<br/> " + submit_tag('Copy encounter to notes') + " <br/></div>"
-#          end
-#        end
-#      end
-#    end
-#  end
-
   def jurisdiction_routing_control(event)
     returning "" do |controls|
       if User.current_user.can_route_to_any_lhd?(event)
