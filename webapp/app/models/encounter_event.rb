@@ -28,7 +28,8 @@ class EncounterEvent < HumanEvent
   after_create do |encounter|
     parent_event = encounter.parent_event
     encounter.build_interested_party(parent_event.interested_party.attributes) unless parent_event.interested_party.nil?
-    encounter.add_note(I18n.translate("system_notes.encounter_event_created", :locale => I18n.default_locale))
+    encounter.add_note(I18n.translate("system_notes.encounter_event_created", :locale => I18n.default_locale) +
+        " Description set to: " + encounter.participations_encounter.description)
   end
 
   before_update do |encounter|
