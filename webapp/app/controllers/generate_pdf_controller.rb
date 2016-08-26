@@ -46,7 +46,7 @@ class GeneratePdfController < ApplicationController
                 break
               end
               obj = obj.try(element)
-              if (!obj.blank? && obj.is_a?(Array))
+              if (obj != nil && obj.is_a?(Array))
                 obj = obj[0]
               end
             end
@@ -103,7 +103,9 @@ class GeneratePdfController < ApplicationController
             output_fields[mapping['template_field_name']] = values[0][5..6] + mapping['concat_string'] + values[0][8..9] + mapping['concat_string'] + values[0][0..3]
           end
         when "concat"
-          output_fields[mapping['template_field_name']] += mapping['concat_string'] + values[0]
+          if(!values[0].blank?)
+            output_fields[mapping['template_field_name']] += mapping['concat_string'] + values[0]
+          end
         when "multi_line"
           output_fields[mapping['template_field_name']] = ''
           values.each do |value|
@@ -118,7 +120,7 @@ class GeneratePdfController < ApplicationController
             output_fields[mapping['template_field_name']] = 'On'
           end
         when "fill_if_yes"
-        test = stack.pop()
+          test = stack.pop()
           if(test.length > 0 && test.upcase()[0,1] == "Y")
             output_fields[mapping['template_field_name']] = values[0]
           end
@@ -129,6 +131,14 @@ class GeneratePdfController < ApplicationController
           end
         when "date_now"
           output_fields[mapping['template_field_name']] = Date.today().to_s
+        when "replace_if_dst_blank"
+          if(output_fields[mapping['template_field_name']].blank?)
+            output_fields[mapping['template_field_name']] = values[0]
+          end
+        when "replace_if_src_not_blank"
+          if(!values[0].blank?)
+            output_fields[mapping['template_field_name']] = values[0]
+          end
         else # treat as replace
           output_fields[mapping['template_field_name']] = values[0]
         end
