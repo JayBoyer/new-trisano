@@ -77,16 +77,6 @@ class GeneratePdfController < ApplicationController
             " INNER JOIN form_elements fe ON fe.form_id = f.id " +
             " INNER JOIN questions q ON q.form_element_id = fe.id AND q.short_name = '" + mapping['form_field_name'] + "'" +
             " AND q.id = answers.question_id", :order => "id ASC")
-=begin            
-if(mapping['template_field_name'] == 'current_gender')
-puts "JOINS: " + "INNER JOIN form_references fr ON fr.event_id = " + event_id + 
-            " INNER JOIN forms f ON f.id = fr.form_id AND f.short_name = '" + mapping['form_short_name'] + "'" +
-            " INNER JOIN form_elements fe ON fe.form_id = f.id " +
-            " INNER JOIN questions q ON q.form_element_id = fe.id AND q.short_name = '" + mapping['form_field_name'] + "'" +
-            " AND q.id = answers.question_id"
-puts "ANSWER: " +answers.inspect
-end
-=end
           if (answers.is_a?(Array))
             if(answers.length > 0)
               values = []
