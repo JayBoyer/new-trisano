@@ -159,11 +159,11 @@ module EventsHelper
       if !event.nil? && event.disease_name != "" && event.disease_name != nil
         disease_array= ["aids", "gonococcal", "hiv", "chlamydia", "std/hiv", "syphilis", "std testing", "tuber", "tb testing"]
         if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
-          controls << " | " << link_to(t('generate_oojfr'), pdfoojfr_print_ooj_fr_path(:evnt_id => event.id), :method => :get)
+          controls << " | " << link_to(t('generate_oojfr'), generatepdf_generate_pdf_path(:evnt_id => event.id, :pdf_name => 'ooj'), :method => :get)
         end
 		disease_array= ["aids", "hiv", "std/hiv", "std testing"]
         if disease_array.any? {|dis| event.disease_name.downcase.include? dis}
-          controls << " | " << link_to(t('generate_hars'), generatepdf_generate_pdf_path(:evnt_id => event.id), :method => :get)
+          controls << " | " << link_to(t('generate_hars'), generatepdf_generate_pdf_path(:evnt_id => event.id, :pdf_name => 'hars'), :method => :get)
         end
    end
     end

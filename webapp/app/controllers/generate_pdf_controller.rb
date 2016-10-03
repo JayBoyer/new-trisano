@@ -15,13 +15,15 @@ class GeneratePdfController < ApplicationController
       out_filename = ''
       pdftk_path = '/usr/bin/pdftk'
       event = Event.find(event_id)
-      template_pdf_name = "hars"
+      template_pdf_name = params[:pdf_name]
       person = event.interested_party.person_entity.person
       birth_date = person.birth_date
-      if(!birth_date.blank?)
-        age = calculate_age(birth_date)
-        if(age <= 12)
-          template_pdf_name = "hars_pediatric"
+      if(template_pdf_name == "hars")
+        if(!birth_date.blank?)
+          age = calculate_age(birth_date)
+          if(age <= 12)
+            template_pdf_name = "hars_pediatric"
+          end
         end
       end
       
@@ -35,6 +37,9 @@ class GeneratePdfController < ApplicationController
       mappings.each do |mapping|
         values = []
         values[0] = ''
+        # figure out if we are getting text answer or corresponding code from a form question
+        use_code = (mapping.operation == 'answer_code')
+        
         # if data from a core field
         if(mapping.form_short_name == "core")
           core_field_path = mapping['form_field_name']
@@ -61,7 +66,7 @@ class GeneratePdfController < ApplicationController
               end
             end
           end
-        else # form field
+        elsif(mapping.form_short_name.length > 0) # form field
           which = :last
           if(mapping.operation == "multi_line")
             which = :all
@@ -72,15 +77,25 @@ class GeneratePdfController < ApplicationController
             " INNER JOIN form_elements fe ON fe.form_id = f.id " +
             " INNER JOIN questions q ON q.form_element_id = fe.id AND q.short_name = '" + mapping['form_field_name'] + "'" +
             " AND q.id = answers.question_id", :order => "id ASC")
+=begin            
+if(mapping['template_field_name'] == 'current_gender')
+puts "JOINS: " + "INNER JOIN form_references fr ON fr.event_id = " + event_id + 
+            " INNER JOIN forms f ON f.id = fr.form_id AND f.short_name = '" + mapping['form_short_name'] + "'" +
+            " INNER JOIN form_elements fe ON fe.form_id = f.id " +
+            " INNER JOIN questions q ON q.form_element_id = fe.id AND q.short_name = '" + mapping['form_field_name'] + "'" +
+            " AND q.id = answers.question_id"
+puts "ANSWER: " +answers.inspect
+end
+=end
           if (answers.is_a?(Array))
             if(answers.length > 0)
               values = []
               answers.each do |answer|
-                values.push(answer['text_answer'])
+                values.push(use_code ? answer['code'] : answer['text_answer'])
               end
             end
           elsif(!answers.blank?)
-            values[0] = answers['text_answer']
+            values[0] = use_code ? answers['code'] : answers['text_answer']
           end
         end
 
@@ -138,6 +153,48 @@ class GeneratePdfController < ApplicationController
         when "replace_if_src_not_blank"
           if(!values[0].blank?)
             output_fields[mapping['template_field_name']] = values[0]
+          end
+        when "record_number"
+          output_fields[mapping['template_field_name']] = event.record_number.to_s
+        when "age"
+          if(!birth_date.blank?)
+            output_fields[mapping['template_field_name']] = calculate_age(birth_date).to_s
+          end
+        when "lab_results"
+          output_fields[mapping['template_field_name']] = ''
+          participations = Participation.find(:all, :conditions => ["type = 'Lab' AND event_id = ?", event_id], :order => "id ASC")
+          participations.each do |participation|
+            lab_results = LabResult.find(:all, :conditions => ["participation_id = ?", participation.id], :order => "id ASC")
+            lab_results.each do |lab_result|
+              test_type = lab_result.test_type
+              if(test_type.blank?)
+                test_type=''
+              else
+                common_test_type = CommonTestType.find(lab_result.test_type)
+                test_type = common_test_type.common_name
+              end
+              result_value = lab_result.result_value.blank? ? '' : lab_result.result_value
+              collection_date = lab_result.collection_date.blank? ? '' : lab_result.collection_date.to_s
+              output_fields[mapping['template_field_name']] += "Test type: " + test_type + 
+                ", Result: " + result_value + ", Collection date: " + collection_date + "\n"
+            end
+          end
+        when "treatments"
+          sql = "SELECT pt.treatment_date, t.treatment_name " +
+                  "FROM participations_treatments pt " +
+                    "INNER JOIN participations p ON p.id = pt.participation_id AND p.event_id = " + event_id.to_s + " " +
+                    "INNER JOIN treatments t ON t.id = pt.treatment_id " +
+                    "INNER JOIN external_codes ec on pt.treatment_given_yn_id = ec.id AND ec.code_description = 'Yes'"
+          treatments = ParticipationsTreatment.find_by_sql(sql)
+          if(!treatments.is_a?(Array))
+            treatment = treatments
+            treatments = []
+            treatments[0] = treatment
+          end
+          output_fields[mapping['template_field_name']] = ''
+          treatments.each do |treatment|
+            output_fields[mapping['template_field_name']] += (treatment['treatment_date'].blank? ? '' : (treatment['treatment_date'].to_s + ": ")) + 
+              (treatment['treatment_name'].blank? ? '\n' : (treatment['treatment_name'] + "\n"))
           end
         else # treat as replace
           output_fields[mapping['template_field_name']] = values[0]
