@@ -81,11 +81,11 @@ class GeneratePdfController < ApplicationController
             if(answers.length > 0)
               values = []
               answers.each do |answer|
-                values.push(use_code ? answer['code'] : answer['text_answer'])
+                values.push(use_code ? answer['code'].strip() : answer['text_answer'].strip())
               end
             end
           elsif(!answers.blank?)
-            values[0] = use_code ? answers['code'] : answers['text_answer']
+            values[0] = use_code ? answers['code'].strip() : answers['text_answer'].strip()
           end
         end
 
@@ -152,39 +152,39 @@ class GeneratePdfController < ApplicationController
           end
         when "lab_results"
           output_fields[mapping['template_field_name']] = ''
-          participations = Participation.find(:all, :conditions => ["type = 'Lab' AND event_id = ?", event_id], :order => "id ASC")
-          participations.each do |participation|
-            lab_results = LabResult.find(:all, :conditions => ["participation_id = ?", participation.id], :order => "id ASC")
-            lab_results.each do |lab_result|
-              test_type = lab_result.test_type
-              if(test_type.blank?)
-                test_type=''
-              else
-                common_test_type = CommonTestType.find(lab_result.test_type)
-                test_type = common_test_type.common_name
-              end
-              result_value = lab_result.result_value.blank? ? '' : lab_result.result_value
-              collection_date = lab_result.collection_date.blank? ? '' : lab_result.collection_date.to_s
-              output_fields[mapping['template_field_name']] += "Test type: " + test_type + 
-                ", Result: " + result_value + ", Collection date: " + collection_date + "\n"
-            end
+          sql = "SELECT COALESCE(ctt.common_name, '') as test_type, " +
+            "COALESCE(ec.code_description, '') as result, " +
+            "COALESCE(lr.result_value, '') as result_value, " +
+            "COALESCE(to_char(lr.collection_date, 'DD-MM-YY'), '') as collection_date " + 
+              "FROM lab_results lr " + 
+              "INNER JOIN participations p ON p.id = lr.participation_id AND p.event_id =" + event_id.to_s + " " +
+              "LEFT JOIN external_codes ec ON ec.id = lr.test_result_id " +
+              "LEFT JOIN common_test_types ctt ON ctt.id = test_type_id"
+          
+          lab_results = LabResult.find_by_sql(sql)
+          lab_results.each do |lab_result|
+            output_fields[mapping['template_field_name']] += "Test type: " + lab_result['test_type'] + 
+                ", Result: " + lab_result['result'] + "," + lab_result['result_value'] + ", Collection date: " + lab_result['collection_date'].to_s + "\n"
           end
         when "treatments"
-          sql = "SELECT pt.treatment_date, t.treatment_name " +
+          sql = "SELECT COALESCE(to_char(pt.treatment_date, 'DD-MM-YY'), '') as treatment_date, COALESCE(t.treatment_name, '') as treatment_name " +
                   "FROM participations_treatments pt " +
                     "INNER JOIN participations p ON p.id = pt.participation_id AND p.event_id = " + event_id.to_s + " " +
                     "INNER JOIN treatments t ON t.id = pt.treatment_id " +
                     "INNER JOIN external_codes ec on pt.treatment_given_yn_id = ec.id AND ec.code_description = 'Yes'"
           treatments = ParticipationsTreatment.find_by_sql(sql)
-          if(!treatments.is_a?(Array))
-            treatment = treatments
-            treatments = []
-            treatments[0] = treatment
-          end
           output_fields[mapping['template_field_name']] = ''
           treatments.each do |treatment|
-            output_fields[mapping['template_field_name']] += (treatment['treatment_date'].blank? ? '' : (treatment['treatment_date'].to_s + ": ")) + 
-              (treatment['treatment_name'].blank? ? '\n' : (treatment['treatment_name'] + "\n"))
+            output_fields[mapping['template_field_name']] += treatment['treatment_date'].to_s + ": " + treatment['treatment_name'] + "\n"
+          end
+        when "std_condition_code"
+          # don't replace if field is already set
+          if (output_fields[mapping['template_field_name']].blank? && !values[0].blank? && values[0].length > 2)
+            result = values[0].slice(0,3)
+            if (result == 'Yes')
+              result = (mapping['template_field_name'] == 'ct_condition')  ? '200' : '300'
+            end
+            output_fields[mapping['template_field_name']] = result
           end
         else # treat as replace
           output_fields[mapping['template_field_name']] = values[0]
