@@ -853,6 +853,13 @@ class Event < ActiveRecord::Base
     forms.select {|f| !template_ids.include?(f.template_id) }
   end
 
+  def best_name
+    first = self.try(:interested_party).try(:person_entity).try(:person).try(:first_name)
+    middle = self.try(:interested_party).try(:person_entity).try(:person).try(:middle_name)
+    last = self.try(:interested_party).try(:person_entity).try(:person).try(:last_name)
+    return "" +  ((first.blank? ? "" : first + " ") + (middle.blank? ? "" : middle.slice(0,1) + " ") + (last.blank? ? "" : last)).strip() 
+  end
+
   private
   def create_form_references
  
@@ -919,7 +926,7 @@ class Event < ActiveRecord::Base
   def expire_parent_record_contacts_cache
     redis.delete_matched("views/events/#{self.id}*")
   end
-
+  
   # Sub-classes can either override these method to return true or use a declarative option:
   # supports :something
   class << self

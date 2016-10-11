@@ -15,7 +15,7 @@
 
 %span{ :class => "vert" }
   = f.label(:name)
-  = f.text_field(:name, :size => 20)
+  = f.text_field(:name, :size => 20, :value => @event.best_name)
 
 %span{ :class => "vert" }
   = f.label(:notes)
