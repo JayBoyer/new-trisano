@@ -857,7 +857,7 @@ class Event < ActiveRecord::Base
     first = self.try(:interested_party).try(:person_entity).try(:person).try(:first_name)
     middle = self.try(:interested_party).try(:person_entity).try(:person).try(:middle_name)
     last = self.try(:interested_party).try(:person_entity).try(:person).try(:last_name)
-    return "" +  ((first.blank? ? "" : first + " ") + (middle.blank? ? "" : middle.slice(0,1) + " ") + (last.blank? ? "" : last)).strip() 
+    return "" +  ((first.blank? ? "" : first + " ") + (middle.blank? ? "" : middle + " ") + (last.blank? ? "" : last)).strip() 
   end
 
   private
