@@ -140,7 +140,9 @@ module EventSearch
         if options[:accession_no].blank?
           joins << <<-JOIN
             LEFT OUTER JOIN lab_results on lab_results.id = (SELECT lab_results.id FROM lab_results 
-              INNER JOIN participations ON participations.event_id = events.id AND participations.type = 'Lab' AND lab_results.participation_id = participations.id
+              INNER JOIN participations ON participations.event_id = events.id AND participations.type = 'Lab' AND 
+                lab_results.participation_id = participations.id AND
+                lab_results.collection_date IS NOT NULL
               ORDER BY lab_results.collection_date DESC LIMIT 1)
           JOIN
         else
