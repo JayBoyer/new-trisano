@@ -22,6 +22,7 @@ class Person < ActiveRecord::Base
   has_many   :participations, :foreign_key => 'secondary_entity_id', :primary_key => 'entity_id' 
 
   belongs_to :birth_gender, :class_name => 'ExternalCode'
+  belongs_to :age_type, :class_name => 'ExternalCode'
   belongs_to :ethnicity, :class_name => 'ExternalCode'
   belongs_to :primary_language, :class_name => 'ExternalCode'
 
@@ -91,6 +92,10 @@ class Person < ActiveRecord::Base
     (Date.today - self.birth_date.to_date).to_i / 365 unless self.birth_date.blank?
   end
 
+  def age_type_description
+    age_type.code_description unless age_type.blank?
+  end
+  
   def birth_gender_description
     birth_gender.code_description unless birth_gender.blank?
   end

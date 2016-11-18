@@ -30,6 +30,10 @@
           =person_form.label(:approximate_age_no_birthday)
           %span.data_approximate_age_no_birthday
             =h(person.approximate_age_no_birthday)
+      -core_element_show :age_type_id, person_form, :horiz do
+        -if !person.approximate_age_no_birthday.blank?
+          =person_form.label(:age_type_id)
+          %span.data_age_type=h(person.age_type_description)
       -if event_form
         -core_element_show :age_at_onset, person_form, :horiz do
           =event_form.label :age_at_onset
