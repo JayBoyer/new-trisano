@@ -134,8 +134,7 @@ class MorbidityEventsController < EventsController
     respond_to do |format|
       if @event.save
 
-        # Assume that "save & exits" represent a 'significant' update
-        @event.add_note(I18n.translate("system_notes.event_edited", :locale => I18n.default_locale)) unless go_back
+        @event.add_note(I18n.translate("system_notes.event_edited", :locale => I18n.default_locale))
 
         # Debt:  There's gotta be a better place for this.  Doesn't work on after_save of events.
         Event.transaction do

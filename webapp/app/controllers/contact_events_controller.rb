@@ -92,8 +92,7 @@ class ContactEventsController < EventsController
         redis.delete_matched("views/events/#{@event.parent_id}/show/contacts_tab*")
         redis.delete_matched("views/events/#{@event.parent_id}/showedit/contacts_tab*")
 
-        # Assume that "save & exits" represent a 'significant' update
-        @event.add_note(I18n.translate("system_notes.event_edited", :locale => I18n.default_locale)) unless go_back
+        @event.add_note(I18n.translate("system_notes.event_edited", :locale => I18n.default_locale))
 
         flash[:notice] = t("contact_event_successfully_updated")
         format.html do

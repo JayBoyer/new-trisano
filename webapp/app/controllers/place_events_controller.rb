@@ -78,7 +78,7 @@ class PlaceEventsController < EventsController
     respond_to do |format|
       @event.validate_against_bday = true
       if @event.update_attributes(params[:place_event])
-        @event.add_note(t("system_notes.event_edited", :locale => I18n.default_locale)) unless go_back
+        @event.add_note(t("system_notes.event_edited", :locale => I18n.default_locale))
         flash[:notice] = t("place_event_updated")
         format.html do
           if go_back
