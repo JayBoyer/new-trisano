@@ -121,6 +121,7 @@ class ContactEvent < HumanEvent
       assign_to_queue
       assign_to_investigator
       close_contact :approve
+      approve_by_lhd :approve
       reopen_by_manager :reopen
     end
     state :reopened_by_manager do
@@ -132,6 +133,10 @@ class ContactEvent < HumanEvent
       assign_to_investigator
       complete_investigation :close
       complete_and_close_investigation :complete_and_close
+    end
+    state :approved_by_lhd, :meta => {:description => I18n.translate('workflow.approved_by_lhd')} do
+      assign_to_lhd
+      close :approve
     end
     state :closed do
       reopen_by_manager :reopen
