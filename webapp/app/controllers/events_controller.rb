@@ -470,12 +470,14 @@ class EventsController < ApplicationController
 
   # Debt: too fat. needs to be in the place class
   def places_by_name_and_types(name, type_array)
-    @places = Place.find(:all, :select => "DISTINCT ON (LOWER(TRIM(places.name)), codes.id) places.entity_id, places.name, codes.id",
-      :include => [:place_types, {:entity => [:addresses, :canonical_address]}],
-      :conditions => [ "LOWER(places.name) LIKE ? AND codes.code_name = 'placetype' AND codes.the_code IN (#{type_array.to_list}) AND entities.deleted_at IS NULL", name.downcase + '%'],
-      :order => "LOWER(TRIM(name)) ASC",
-      :limit => 20
-    )
+	sql = "SELECT DISTINCT p.id as id, p.entity_id as entity_id, p.created_at as created_at, p.updated_at as updated_at, " + 
+	  "TRIM(p.name) as name, p.name as short_name, NULL as primary, c.id FROM places p " + 
+      "INNER JOIN places_types pt ON pt.place_id = p.id " + 
+      "INNER JOIN codes c ON c.id = pt.type_id " + 
+      "INNER JOIN entities e on e.id = p.entity_id " + 
+    "WHERE (LOWER(p.name) LIKE '" + name.downcase + "%" + "' AND c.the_code IN (#{type_array.to_list}) AND e.deleted_at IS NULL) " + 
+    "ORDER BY TRIM(p.name) ASC LIMIT 20"
+    @places = Place.find_by_sql(sql)
   end
 
   def find_or_build_event
