@@ -145,7 +145,7 @@ class GeneratePdfController < ApplicationController
           end
         elsif(mapping.form_short_name.length > 0) # form field
           which = :last
-          if(mapping.operation == "multi_line")
+          if(mapping.operation == "multi_line" || mapping.operation == "std_check_box")
             which = :all
           end
           answers = fetch_answers(which, event_id, mapping['form_short_name'], mapping['form_field_name'])
@@ -208,9 +208,15 @@ class GeneratePdfController < ApplicationController
           end
         when "date_now"
           output_fields[mapping['template_field_name']] = Date.today().to_s
+        when "date_plus_week"
+          output_fields[mapping['template_field_name']] = (Date.today()+7).to_s
         when "replace_if_dst_blank"
           if(output_fields[mapping['template_field_name']].blank?)
             output_fields[mapping['template_field_name']] = values[0]
+          end
+        when "replace_if_dst_blank_strip_alpha"
+          if(output_fields[mapping['template_field_name']].blank?)
+            output_fields[mapping['template_field_name']] = values[0].gsub(/[^0-9\-]/, "")
           end
         when /replace_if_src_not_blank|answer_code/
           if(!values[0].blank?)
@@ -252,7 +258,7 @@ class GeneratePdfController < ApplicationController
                 ", Result: " + lab_result['result'] + "," + lab_result['result_value'] + ", Collection date: " + collection_date + "\n"
           end
         when "treatments"
-          sql = "SELECT COALESCE(to_char(pt.treatment_date, 'DD-MM-YY'), '') as treatment_date, COALESCE(t.treatment_name, '') as treatment_name " +
+          sql = "SELECT COALESCE(to_char(pt.treatment_date, 'YYYY-MM-DD'), '') as treatment_date, COALESCE(t.treatment_name, '') as treatment_name " +
                   "FROM participations_treatments pt " +
                     "INNER JOIN participations p ON p.id = pt.participation_id AND p.event_id = " + event_id.to_s + " " +
                     "INNER JOIN treatments t ON t.id = pt.treatment_id " +
@@ -268,6 +274,15 @@ class GeneratePdfController < ApplicationController
           j = indices[1].to_i
           if(std_condition_values.length >= i)
             output_fields[mapping['template_field_name']] = std_condition_values[i-1][j-1]
+          end
+        when "strip_alpha"
+          output_fields[mapping['template_field_name']] = values[0].gsub(/[^0-9\-]/, "")
+        when "std_check_box"
+          values.each do |value|
+            if(value.upcase.include?(mapping['match_value'].upcase))
+              output_fields[mapping['template_field_name']] = 'On'
+              break
+            end
           end
         else # treat as replace
           output_fields[mapping['template_field_name']] = values[0]

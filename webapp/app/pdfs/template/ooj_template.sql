@@ -91,6 +91,8 @@ INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_s
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('ooj', 'letter_date', '', '', NULL, NULL, 'date_now', NULL);
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('ooj', 'letter_date_plus_week', '', '', NULL, NULL, 'date_plus_week', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('ooj', 'full_name', 'core', 'interested_party|person_entity|person|first_name', NULL, NULL, NULL, NULL);
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('ooj', 'full_name', 'core', 'interested_party|person_entity|person|last_name', NULL, ' ', 'concat', NULL);
