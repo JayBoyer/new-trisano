@@ -177,35 +177,14 @@ module Authlogic
         def ad_valid(name, password)
           ldap_settings = YAML.load_file("#{Rails.root.to_s}/config/ldap.yml")[Rails.env]
 
-          ldap = Net::LDAP.new :host => ldap_settings['host'],
-            :port => ldap_settings['port'],
-            :auth => {
-            :method=>:simple,
-            :username=>ldap_settings['bind_dn'],
-            :password=>ldap_settings['password']
-          }
-
-          filter = Net::LDAP::Filter.eq("samaccountname", name)
-          treebase = ldap_settings['treebase']
-
-          cn = "BogusLoginName"
-          results = ldap.search(:base => treebase, :filter => filter)
-          if (results.length == 1)
-            entries = results[0]
-            cnvalues = entries['cn']
-            if (cnvalues.length > 0)
-              cn = cnvalues[0]
-
-              ldap = Net::LDAP.new
-              ldap.host = ldap_settings['host']
-              ldap.port = ldap_settings['port']
-              ldap.auth cn, password
-              if (ldap.bind)
-                return AD_SUCCESS
-              else
-                return AD_BAD_PASSWORD
-              end
-            end
+          ldap = Net::LDAP.new
+          ldap.host = ldap_settings['host']
+          ldap.port = ldap_settings['port']
+          ldap.auth "cchd\\"+name, password
+          if (ldap.bind)
+            return AD_SUCCESS
+          else
+            return AD_BAD_PASSWORD
           end
           return AD_BAD_NAME
         end
@@ -234,13 +213,12 @@ module Authlogic
             # verses data stored in database
             # skip ldap authentication on demo machine
             ad = AD_BAD_NAME
-            if RAILS_ENV != 'demo'
+            if RAILS_ENV != 'demo' #&& self.user_name.downcase != "thibodeaux"
               ad = ad_valid(self.user_name, send("protected_#{password_field}"))
               if (ad == AD_SUCCESS)
                 return
               end
             end
-
             if ((ad == AD_BAD_PASSWORD) || !attempted_record.send(verify_password_method, send("protected_#{password_field}")))
               self.invalid_password = true
               generalize_credentials_error_messages? ?
