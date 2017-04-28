@@ -271,10 +271,6 @@ INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_s
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars_pediatric', 'education_uknown', 'std_physical_desc', 'education', NULL, NULL, 'check_box', 'Unknown');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars_pediatric', 'std_history', 'STD_core_elements', 'std_condition', NULL, '\n\n', 'multi_line', NULL);
-INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hars_pediatric', 'std_history_dates', 'STD_core_elements', 'std_dx_date', NULL, '\n\n', 'multi_line', NULL);
-INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars_pediatric', 'perinatal_hiv_exposure', 'core', 'disease_event|disease_id', NULL, NULL, 'check_box', '166');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars_pediatric', 'pediatric_hiv', 'core', 'disease_event|disease_id', NULL, NULL, 'check_box', '54');
@@ -343,9 +339,32 @@ INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_s
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
   VALUES ('hars_pediatric', 'hiv_bubble_date', 'std_risk_factors_assessment', 'session_date', NULL, NULL, NULL, NULL);
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hiv_pediatric', 'ct_history', 'STD_core_elements', 'std_condition', NULL, NULL, 'std_check_box', 'chlam');
+  VALUES ('hars_pediatric', 'ct_history', 'STD_core_elements', 'std_condition', NULL, NULL, 'std_check_box', 'chlam');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hiv_pediatric', 'ng_history', 'STD_core_elements', 'std_condition', NULL, NULL, 'std_check_box', 'gono');
+  VALUES ('hars_pediatric', 'ct_history', 'std_coinfection', 'ct_condition', NULL, NULL, 'std_check_box', 'yes');
 INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
-  VALUES ('hiv_pediatric', 'syph_history', 'STD_core_elements', 'std_condition', NULL, NULL, 'std_check_box', 'syph');
+  VALUES ('hars_pediatric', 'gc_history', 'STD_core_elements', 'std_condition', NULL, NULL, 'std_check_box', 'gono');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'gc_history', 'std_coinfection', 'gc_condition', NULL, NULL, 'std_check_box', 'yes');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'syph_history', 'STD_core_elements', 'std_condition', NULL, NULL, 'std_check_box', 'syph');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'syph_history', 'std_coinfection', 'syph_condition', NULL, NULL, 'std_check_box', '7');
   
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history', 'STD_core_elements', 'std_condition', NULL, '\n', 'multi_line', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history', 'std_coinfection', 'ct_condition', 'Chlamydia', '\n', 'multi_line_concat', 'Yes');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history', 'std_coinfection', 'gc_condition', 'Gonorrhea', '\n', 'multi_line_concat', 'Yes');
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history', 'std_coinfection', 'syph_condition', 'Syphilis', '\n', 'multi_line_concat', NULL);
+
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history_dates', 'STD_core_elements', 'std_dx_date', NULL, '\n', 'multi_line', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history_dates', 'std_coinfection', 'ct_dx_dt', NULL, '\n', 'multi_line_concat', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history_dates', 'std_coinfection', 'gc_dx_dt', NULL, '\n', 'multi_line_concat', NULL);
+INSERT INTO generate_pdf_mappings(template_pdf_name, template_field_name, form_short_name, form_field_name, code_name, concat_string, operation, match_value) 
+  VALUES ('hars_pediatric', 'std_history_dates', 'std_coinfection', 'syph_dx_dt', NULL, '\n', 'multi_line_concat', NULL);

@@ -58,7 +58,7 @@ class GeneratePdfController < ApplicationController
       # check for multiple conditions
       std_condition_values = []
       form_short_name = "STD_field_record"
-      form_coinfect = "std_coinfection"
+      form_coinfect = "std_coinection"
       if (event.type == "ContactEvent")
         form_short_name = "STD_contact_field_record"
         form_coinfect = "std_contact_coinfection"
@@ -112,8 +112,11 @@ class GeneratePdfController < ApplicationController
 
       stack = []
       mappings.each do |mapping|
-        values = []
-        values[0] = ''
+        is_multi_concat = (mapping.operation == "multi_line_concat")
+        if(!is_multi_concat) 
+          values = []
+          values[0] = 'x'
+        end
         # figure out if we are getting text answer or corresponding code from a form question
         use_code = (mapping.operation == 'answer_code')
         
@@ -145,22 +148,32 @@ class GeneratePdfController < ApplicationController
           end
         elsif(mapping.form_short_name.length > 0) # form field
           which = :last
-          if(mapping.operation == "multi_line" || mapping.operation == "std_check_box")
+          if(mapping.operation == "multi_line" || mapping.operation == "multi_line_concat" || mapping.operation == "std_check_box")
             which = :all
           end
           answers = fetch_answers(which, event_id, mapping['form_short_name'], mapping['form_field_name'])
           if (answers.is_a?(Array))
             if(answers.length > 0)
-              values = []
+              if(!is_multi_concat)
+                values = []
+              end
               answers.each do |answer|
-                values.push(use_code ? answer['code'].strip() : answer['text_answer'].strip())
+                if(is_multi_concat)
+                  push_multi_concat_answer(values, answer, mapping)
+                else
+                  values.push(use_code ? answer['code'].strip() : answer['text_answer'].strip())
+                end
               end
             end
           elsif(!answers.blank?)
-            values[0] = use_code ? answers['code'].strip() : answers['text_answer'].strip()
+            if(is_multi_concat)
+              push_multi_concat_answer(values, answers, mapping)
+            else
+              values[0] = (use_code ? answers['code'].strip() : answers['text_answer'].strip())
+            end
           end
         end
-
+ 
         case mapping.operation
         when "push"
           stack.push(values[0])
@@ -183,7 +196,7 @@ class GeneratePdfController < ApplicationController
           if(!values[0].blank?)
             output_fields[mapping['template_field_name']] += mapping['concat_string'] + values[0]
           end
-        when "multi_line"
+        when /multi_line|multi_line_concat/
           output_fields[mapping['template_field_name']] = ''
           values.each do |value|
             output_fields[mapping['template_field_name']] += value + mapping['concat_string']
@@ -325,6 +338,18 @@ class GeneratePdfController < ApplicationController
       " INNER JOIN form_elements fe ON fe.form_id = f.id " +
       " INNER JOIN questions q ON q.form_element_id = fe.id AND q.short_name = '" + form_field_name + "'" +
       " AND q.id = answers.question_id", :order => "id ASC")
+  end
+  
+  def push_multi_concat_answer(values, answer, mapping)
+    if(!mapping['match_value'].blank?)
+      if(answer['text_answer'].strip().upcase() == mapping['match_value'].upcase())
+        values.push(mapping['code_name'].strip())
+      else
+        values.push("")
+      end
+    else
+      values.push(answer['text_answer'])
+    end
   end
 end
   
