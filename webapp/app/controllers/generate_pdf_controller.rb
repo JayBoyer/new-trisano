@@ -115,7 +115,7 @@ class GeneratePdfController < ApplicationController
         is_multi_concat = (mapping.operation == "multi_line_concat")
         if(!is_multi_concat) 
           values = []
-          values[0] = 'x'
+          values[0] = ''
         end
         # figure out if we are getting text answer or corresponding code from a form question
         use_code = (mapping.operation == 'answer_code')
