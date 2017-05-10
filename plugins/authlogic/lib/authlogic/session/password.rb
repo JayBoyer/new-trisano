@@ -219,7 +219,7 @@ module Authlogic
                 return
               end
             end
-            if ((ad == AD_BAD_PASSWORD) || !attempted_record.send(verify_password_method, send("protected_#{password_field}")))
+            if (!attempted_record.send(verify_password_method, send("protected_#{password_field}")))
               self.invalid_password = true
               generalize_credentials_error_messages? ?
                 add_general_credentials_error :
