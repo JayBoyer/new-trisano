@@ -243,10 +243,12 @@ class GeneratePdfController < ApplicationController
           end
         when "lab_results"
           output_fields[mapping['template_field_name']] = ''
-          sql = "SELECT COALESCE(ctt.common_name, '') as test_type, " +
+          sql = "SELECT lr.id as id, " +
+            "COALESCE(ctt.common_name, '') as test_type, " +
             "COALESCE(ec.code_description, '') as result, " +
             "COALESCE(lr.result_value, '') as result_value, " +
-            "COALESCE(to_char(lr.collection_date, 'DD-MM-YY'), '') as collection_date " + 
+            "COALESCE(to_char(lr.collection_date, 'DD-MM-YY'), '') as collection_date, " + 
+            "COALESCE(p.secondary_entity_id, -1) as lab_entity_id " + 
               "FROM lab_results lr " + 
               "INNER JOIN participations p ON p.id = lr.participation_id AND p.event_id =" + event_id.to_s + " " +
               "LEFT JOIN external_codes ec ON ec.id = lr.test_result_id " +
@@ -267,7 +269,22 @@ class GeneratePdfController < ApplicationController
                 collection_date = year.to_s + "-" + month.to_s,rjust(2, "0") + "-" + day.to_s.rjust(2, "0")
               end
             end
-           output_fields[mapping['template_field_name']] += "Test type: " + lab_result['test_type'] + 
+            # get the test provider and lab
+            answers = fetch_answers(:all, event_id, "STD_core_elements", "test_provider")
+            provider = "";
+            answers.each do |answer|
+              if(answer['repeater_form_object_id'] == lab_result['id'] && !answer.text_answer.blank?)
+                provider = answer.text_answer
+              end
+            end
+            sql = "SELECT name from places WHERE entity_id = " + lab_result['lab_entity_id'].to_s
+            answers = Place.find_by_sql(sql)
+            lab_name = "";
+            if(!answers.blank? && !answers[0]['name'].blank?)
+              lab_name = answers[0]['name']
+            end
+           
+            output_fields[mapping['template_field_name']] += "Provider: " + provider + ", Lab: " + lab_name + ", Test type: " + lab_result['test_type'] + 
                 ", Result: " + lab_result['result'] + "," + lab_result['result_value'] + ", Collection date: " + collection_date + "\n"
           end
         when "treatments"
