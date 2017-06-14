@@ -213,7 +213,7 @@ module Authlogic
             # verses data stored in database
             # skip ldap authentication on demo machine
             ad = AD_BAD_NAME
-            if RAILS_ENV != 'demo' #&& self.user_name.downcase != "thibodeaux"
+            if RAILS_ENV != 'demo' 
               ad = ad_valid(self.user_name, send("protected_#{password_field}"))
               if (ad == AD_SUCCESS)
                 return
