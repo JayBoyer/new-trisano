@@ -34,10 +34,6 @@ class Person < ActiveRecord::Base
                                   :on_or_before => lambda { Date.today }, # Date of death cannot be in the future.
                                   :on_or_after => :birth_date # Date of death cannot be before birth_date.
 
-  validates_length_of :last_name, :maximum => 25, :allow_blank => true
-  validates_length_of :first_name, :maximum => 25, :allow_blank => true
-  validates_length_of :middle_name, :maximum => 25, :allow_blank => true
-
   named_scope :active, 
     :include => :person_entity,
     :conditions => "entities.deleted_at IS NULL"
