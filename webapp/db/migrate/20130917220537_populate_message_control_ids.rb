@@ -1,3 +1,6 @@
+#TODO jay
+require "#{Rails.root}/app/models/staged_message"
+
 class PopulateMessageControlIds < ActiveRecord::Migration
   def self.up
    StagedMessage.all.each do |m|

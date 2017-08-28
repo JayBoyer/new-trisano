@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
+#TODO jay
+require "#{Rails.root}/lib/trisano/repeater"
+require "#{Rails.root}/app/models/email_address"
+
 class MakeEmailAddressOwnerPolymorphic < ActiveRecord::Migration
   def self.up
     transaction do

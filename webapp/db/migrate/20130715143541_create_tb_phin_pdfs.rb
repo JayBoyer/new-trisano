@@ -1,3 +1,6 @@
+#TODO jay
+require "#{Rails.root}/app/models/tb_phin_pdf"
+
 class CreateTbPhinPdfs < ActiveRecord::Migration
   def self.up
     create_table :tb_phin_pdfs do |t|

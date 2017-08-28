@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
+#TODO jay
+require "#{Rails.root}/app/models/privilege"
+
 class AddEntityPrivileges < ActiveRecord::Migration
   def self.up
     Privilege.find_or_create_by_priv_name('manage_entities').save!

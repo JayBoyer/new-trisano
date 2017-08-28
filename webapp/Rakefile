@@ -26,6 +26,25 @@ require 'tasks/helpers'
 begin; require 'parallel_tests/tasks'; rescue LoadError; end
 include Tasks::Helpers::Commands
 
+# TODO Jay
+require "#{Rails.root}/app/helpers/migration_helpers"
+require "#{Rails.root}/app/models/code_name"
+require "#{Rails.root}/app/models/privilege"
+require "#{Rails.root}/app/models/privileges_role"
+require "#{Rails.root}/app/models/entity"
+require "#{Rails.root}/app/models/place_entity"
+require "#{Rails.root}/app/models/role"
+require "#{Rails.root}/app/models/role_membership"
+require "#{Rails.root}/app/models/export_disease_group"
+require "#{Rails.root}/app/models/export_name"
+require "#{Rails.root}/app/models/export_column"
+require "#{Rails.root}/lib/postgres_fu"
+require "#{Rails.root}/lib/export/cdc"
+require "#{Rails.root}/app/models/disease"
+require "#{Rails.root}/app/models/export_conversion_value"
+require "#{Rails.root}/app/models/treatment"
+require "#{Rails.root}/app/models/disease_specific_treatment"
+
 def rakefile_dir file_name=''
   File.expand_path file_name, File.dirname(__FILE__)
 end

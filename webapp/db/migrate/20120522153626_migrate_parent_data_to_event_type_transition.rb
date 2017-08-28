@@ -14,6 +14,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
+#TODO jay
+require "#{Rails.root}/app/models/event_type_transition"
+
 class MigrateParentDataToEventTypeTransition < ActiveRecord::Migration
   def self.up
     EventTypeTransition.transaction do
