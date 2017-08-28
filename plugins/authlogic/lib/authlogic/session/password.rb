@@ -168,27 +168,6 @@ module Authlogic
           invalid_password == true
         end
 
-        AD_SUCCESS      = 0
-        AD_BAD_NAME     = 1
-        AD_BAD_PASSWORD = 2
-
-        ## TODO Jay          
-        ##  Determine if the given name and password are valid LDAP credentials
-        def ad_valid(name, password)
-          ldap_settings = YAML.load_file("#{Rails.root.to_s}/config/ldap.yml")[Rails.env]
-
-          ldap = Net::LDAP.new
-          ldap.host = ldap_settings['host']
-          ldap.port = ldap_settings['port']
-          ldap.auth "cchd\\"+name, password
-          if (ldap.bind)
-            return AD_SUCCESS
-          else
-            return AD_BAD_PASSWORD
-          end
-          return AD_BAD_NAME
-        end
-        
         private
           def authenticating_with_password?
             login_field && (!send(login_field).nil? || !send("protected_#{password_field}").nil?)
@@ -209,16 +188,6 @@ module Authlogic
               return
             end
 
-            # check LDAP for AD credential validation, if the username is not an AD name continue with authentication
-            # verses data stored in database
-            # skip ldap authentication on demo machine
-            ad = AD_BAD_NAME
-            if RAILS_ENV != 'demo' 
-              ad = ad_valid(self.user_name, send("protected_#{password_field}"))
-              if (ad == AD_SUCCESS)
-                return
-              end
-            end
             if (!attempted_record.send(verify_password_method, send("protected_#{password_field}")))
               self.invalid_password = true
               generalize_credentials_error_messages? ?
